@@ -1,0 +1,138 @@
+{
+  "final": {
+    "points": {
+      "scenario": "final",
+      "source": "Z:\\Banco de dados Preditor Br\\03_preditor_grade31_teste0407\\03_outputs\\04_produtos\\consolidado_3_modelos\\0407_predicoes_3_modelos.geoparquet",
+      "source_mtime": 1783380710.5042827,
+      "tile_zoom": 12,
+      "tile_count": 796,
+      "point_count": 3548974,
+      "format": "json.gz",
+      "bounds": [
+        -52.54282109566724,
+        -25.917974587294573,
+        -38.22554408714933,
+        0.8802992338215802
+      ],
+      "topn": 7,
+      "fcu_counts": {
+        "area_arranjo_pop_rj": 3675,
+        "area_conc_urb_curitiba": 15579,
+        "area_conc_urb_fortaleza": 17625,
+        "area_conc_urb_goiania": 3441,
+        "area_conc_urb_rio_de_janeiro": 44227,
+        "area_conc_urb_sao_paulo": 51022,
+        "area_medias_conc_urb_rj": 19395,
+        "area_rgint_belem": 57673,
+        "area_rgint_macapa": 8468,
+        "area_rgint_redencao": 1889
+      },
+      "created_at": "2026-07-07T22:32:57"
+    },
+    "id_lookup": {
+      "scenario": "final",
+      "prefix_len": 12,
+      "format": "json.gz",
+      "record": [
+        "id",
+        "area",
+        "tile_x",
+        "tile_y",
+        "probability",
+        "rank",
+        "target",
+        "municipio",
+        "lat",
+        "lng"
+      ],
+      "shard_count": 4985,
+      "point_count": 3548974,
+      "tile_count": 796,
+      "created_at": "2026-07-07T22:33:56"
+    },
+    "overview": {
+      "scenario": "final",
+      "zooms": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "tile_count": 613,
+      "drawn_points": 3325980,
+      "class_counts": {
+        "other": 2879992,
+        "attention": 334487,
+        "priority": 111501
+      },
+      "format": "png",
+      "created_at": "2026-07-07T22:57:51"
+    },
+    "fcu_adherence": "Z:\\Banco de dados Preditor Br\\03_preditor_grade31_teste0407\\03_outputs\\05_dashboard_b\\data_tiles\\fcu_aderencia.geojson",
+    "bounds": [
+      -52.54282109566724,
+      -25.917974587294573,
+      -38.22554408714933,
+      0.8802992338215802
+    ],
+    "fcu_counts": {
+      "area_arranjo_pop_rj": 3675,
+      "area_conc_urb_curitiba": 15579,
+      "area_conc_urb_fortaleza": 17625,
+      "area_conc_urb_goiania": 3441,
+      "area_conc_urb_rio_de_janeiro": 44227,
+      "area_conc_urb_sao_paulo": 51022,
+      "area_medias_conc_urb_rj": 19395,
+      "area_rgint_belem": 57673,
+      "area_rgint_macapa": 8468,
+      "area_rgint_redencao": 1889
+    },
+    "point_count": 3548974,
+    "tile_count": 796
+  },
+  "fcu_adherence": "fcu_aderencia.geojson",
+  "downloads": [
+    {
+      "label": "GeoParquet final consolidado",
+      "file": "0407_predicoes_3_modelos.geoparquet",
+      "root_file": "0407_predicoes_3_modelos.geoparquet",
+      "size_mb": 811.0,
+      "mode": "existing",
+      "root_mode": "existing"
+    },
+    {
+      "label": "GPKG base inicial",
+      "file": "0407_base_inicial_completa_10_areas.gpkg",
+      "root_file": "0407_base_inicial_completa_10_areas.gpkg",
+      "size_mb": 5296.1,
+      "mode": "existing",
+      "root_mode": "existing"
+    },
+    {
+      "label": "GPKG modelo completo",
+      "file": "0407_modelo_completo.gpkg",
+      "root_file": "0407_modelo_completo.gpkg",
+      "size_mb": 3333.4,
+      "mode": "existing",
+      "root_mode": "existing"
+    },
+    {
+      "label": "GPKG modelo morfolÃ³gico",
+      "file": "0407_modelo_morfologico.gpkg",
+      "root_file": "0407_modelo_morfologico.gpkg",
+      "size_mb": 3263.0,
+      "mode": "existing",
+      "root_mode": "existing"
+    },
+    {
+      "label": "GPKG modelo nÃ£o morfolÃ³gico",
+      "file": "0407_modelo_nao_morfologico.gpkg",
+      "root_file": "0407_modelo_nao_morfologico.gpkg",
+      "size_mb": 2651.6,
+      "mode": "existing",
+      "root_mode": "existing"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+downloads/
+*.gpkg
+*.geoparquet
+*.zip
+__pycache__/
+http_server_*.log
+analise_modelos.html

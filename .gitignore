@@ -1,0 +1,8 @@
+.vercel/
+__pycache__/
+downloads/
+*.gpkg
+*.geoparquet
+*.zip
+http_server_*.log
+analise_modelos.html
