@@ -1089,19 +1089,26 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
     )
     html = html.replace("global_importance.slice(0, 6)", "global_importance.slice(0, 7)")
     html = html.replace(".slice(0, 5);\n            const top5Local", ".slice(0, 7);\n            const top5Local")
+    html = html.replace(
+        "            const top5Local = localContribs.map(c => c[0]);",
+        "            const top5Local = localContribs.map(c => c[0]);\n"
+        "            window.__RF_LAST_RADAR_FEATURES__ = top5Local.slice();",
+    )
     radar_resolver_js = r"""
 
             const radarAliases = {
                 'Moradores em casas por célula': ['Moradores em casas', 'ibge_mediapopc'],
                 'Moradores em casas': ['Moradores em casas por célula', 'ibge_mediapopc'],
-                'Domicílios em casas por célula': ['Domicílios em casas', 'ibge_mediadomc'],
-                'Domicílios em casas': ['Domicílios em casas por célula', 'ibge_mediadomc'],
+                'Domicílios tipo casa': ['Domicílios em casas', 'Domicílios em casas por célula', 'ibge_mediadomc'],
+                'Domicílios em casas por célula': ['Domicílios tipo casa', 'Domicílios em casas', 'ibge_mediadomc'],
+                'Domicílios em casas': ['Domicílios tipo casa', 'Domicílios em casas por célula', 'ibge_mediadomc'],
                 'Moradores por domicílio tipo casa': ['Moradores por casa', 'ibge_mediapopdomc'],
                 'Moradores por casa': ['Moradores por domicílio tipo casa', 'ibge_mediapopdomc'],
                 'Moradores em apartamentos por célula': ['Moradores por apartamento', 'ibge_mediapopa'],
                 'Moradores por apartamento': ['Moradores em apartamentos por célula', 'ibge_mediapopdoma'],
-                'Domicílios tipo apartamento por célula': ['Domicílios em apartamentos', 'ibge_mediadoma'],
-                'Domicílios em apartamentos': ['Domicílios tipo apartamento por célula', 'ibge_mediadoma']
+                'Domicílios tipo apartamento': ['Domicílios tipo apartamento por célula', 'Domicílios em apartamentos', 'ibge_mediadoma'],
+                'Domicílios tipo apartamento por célula': ['Domicílios tipo apartamento', 'Domicílios em apartamentos', 'ibge_mediadoma'],
+                'Domicílios em apartamentos': ['Domicílios tipo apartamento', 'Domicílios tipo apartamento por célula', 'ibge_mediadoma']
             };
             const normRadarKey = value => String(value || '')
                 .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -1174,14 +1181,16 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
         """            const radarAliases = {
                 'Moradores em casas por célula': ['Moradores em casas', 'ibge_mediapopc'],
                 'Moradores em casas': ['Moradores em casas por célula', 'ibge_mediapopc'],
-                'Domicílios em casas por célula': ['Domicílios em casas', 'ibge_mediadomc'],
-                'Domicílios em casas': ['Domicílios em casas por célula', 'ibge_mediadomc'],
+                'Domicílios tipo casa': ['Domicílios em casas', 'Domicílios em casas por célula', 'ibge_mediadomc'],
+                'Domicílios em casas por célula': ['Domicílios tipo casa', 'Domicílios em casas', 'ibge_mediadomc'],
+                'Domicílios em casas': ['Domicílios tipo casa', 'Domicílios em casas por célula', 'ibge_mediadomc'],
                 'Moradores por domicílio tipo casa': ['Moradores por casa', 'ibge_mediapopdomc'],
                 'Moradores por casa': ['Moradores por domicílio tipo casa', 'ibge_mediapopdomc'],
                 'Moradores em apartamentos por célula': ['Moradores por apartamento', 'ibge_mediapopa'],
                 'Moradores por apartamento': ['Moradores em apartamentos por célula', 'ibge_mediapopdoma'],
-                'Domicílios tipo apartamento por célula': ['Domicílios em apartamentos', 'ibge_mediadoma'],
-                'Domicílios em apartamentos': ['Domicílios tipo apartamento por célula', 'ibge_mediadoma']
+                'Domicílios tipo apartamento': ['Domicílios tipo apartamento por célula', 'Domicílios em apartamentos', 'ibge_mediadoma'],
+                'Domicílios tipo apartamento por célula': ['Domicílios tipo apartamento', 'Domicílios em apartamentos', 'ibge_mediadoma'],
+                'Domicílios em apartamentos': ['Domicílios tipo apartamento', 'Domicílios tipo apartamento por célula', 'ibge_mediadoma']
             };
             const normRadarKey = value => String(value || '')
                 .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')
@@ -1241,6 +1250,42 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
         "                const anch = mMaxes[feat] || mMaxes[String(feat || '').replace(/^p_ibge_|^m_ibge_|^s_cad_|^shape_|^decliv_|^m_cad_/g, '')];",
         "                const anch = radarLookup(mMaxes, feat, null) || mMaxes[String(feat || '').replace(/^p_ibge_|^m_ibge_|^s_cad_|^shape_|^decliv_|^m_cad_/g, '')];",
     )
+    html = html.replace(
+        """            const radarDisplayLabel = (label) => {
+                return label;
+            };""",
+        """            const radarDisplayLabel = (label) => {
+                const text = String(label || '');
+                if (text.length <= 18) return text;
+                const words = text.split(/\\s+/);
+                const lines = [];
+                let line = '';
+                words.forEach(word => {
+                    const next = line ? `${line} ${word}` : word;
+                    if (next.length > 18 && line) {
+                        lines.push(line);
+                        line = word;
+                    } else {
+                        line = next;
+                    }
+                });
+                if (line) lines.push(line);
+                return lines.slice(0, 3).join('<br>');
+            };""",
+    )
+    html = html.replace(
+        """                polar: {
+                    radialaxis:""",
+        """                polar: {
+                    angularaxis: {
+                        tickfont: { size: 11 }
+                    },
+                    radialaxis:""",
+    )
+    html = html.replace(
+        "                margin: { l: 40, r: 40, t: 50, b: 40 },",
+        "                margin: { l: 84, r: 84, t: 50, b: 54 },",
+    )
     html = re.sub(
         r"        function renderTermGraphs\(graphs, sample\) \{.*?\n        function selectSample\(sample\) \{",
         r"""        function renderTermGraphs(graphs, sample) {
@@ -1254,42 +1299,58 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
             }
             grid.innerHTML = '';
 
-            const featureValue = (feat) => {
-                if (!sample || !sample.values) return null;
-                const candidates = [feat, getLabel(feat)];
+            const normFeatureKey = value => String(value || '')
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+            const localFeatureAliases = {
+                'Moradores em casas por célula': ['Moradores em casas', 'ibge_mediapopc'],
+                'Moradores em casas': ['Moradores em casas por célula', 'ibge_mediapopc'],
+                'Domicílios tipo casa': ['Domicílios em casas', 'Domicílios em casas por célula', 'ibge_mediadomc'],
+                'Domicílios em casas': ['Domicílios tipo casa', 'Domicílios em casas por célula', 'ibge_mediadomc'],
+                'Domicílios em casas por célula': ['Domicílios tipo casa', 'Domicílios em casas', 'ibge_mediadomc'],
+                'Moradores por domicílio tipo casa': ['Moradores por casa', 'ibge_mediapopdomc'],
+                'Moradores por casa': ['Moradores por domicílio tipo casa', 'ibge_mediapopdomc'],
+                'Moradores em apartamentos por célula': ['Moradores por apartamento', 'ibge_mediapopa'],
+                'Moradores por apartamento': ['Moradores em apartamentos por célula', 'ibge_mediapopdoma'],
+                'Domicílios tipo apartamento': ['Domicílios tipo apartamento por célula', 'Domicílios em apartamentos', 'ibge_mediadoma'],
+                'Domicílios tipo apartamento por célula': ['Domicílios tipo apartamento', 'Domicílios em apartamentos', 'ibge_mediadoma'],
+                'Domicílios em apartamentos': ['Domicílios tipo apartamento', 'Domicílios tipo apartamento por célula', 'ibge_mediadoma']
+            };
+            const featureCandidates = (feat) => {
+                const label = getLabel(feat);
+                const out = [feat, label];
+                [feat, label].forEach(k => (localFeatureAliases[k] || []).forEach(alias => out.push(alias)));
                 if (App.currentPolo && App.currentPolo.feature_labels) {
-                    Object.entries(App.currentPolo.feature_labels).forEach(([raw, label]) => {
-                        if (raw === feat || label === feat || label === getLabel(feat)) {
-                            candidates.push(raw, label);
+                    Object.entries(App.currentPolo.feature_labels).forEach(([raw, lbl]) => {
+                        const keys = [feat, label, ...(localFeatureAliases[feat] || []), ...(localFeatureAliases[label] || [])];
+                        if (keys.includes(raw) || keys.includes(lbl) || keys.some(k => normFeatureKey(k) === normFeatureKey(raw) || normFeatureKey(k) === normFeatureKey(lbl))) {
+                            out.push(raw, lbl);
                         }
                     });
                 }
-                for (const key of [...new Set(candidates.filter(Boolean))]) {
-                    if (Object.prototype.hasOwnProperty.call(sample.values, key)) {
-                        const value = Number(sample.values[key]);
-                        if (Number.isFinite(value)) return value;
-                    }
+                return [...new Set(out.filter(Boolean))];
+            };
+            const resolveFeatureKey = (obj, feat) => {
+                if (!obj) return null;
+                const candidates = featureCandidates(feat);
+                for (const key of candidates) {
+                    if (Object.prototype.hasOwnProperty.call(obj, key)) return key;
                 }
-                return null;
+                const normalized = candidates.map(normFeatureKey);
+                return Object.keys(obj).find(k => normalized.includes(normFeatureKey(k))) || null;
+            };
+            const featureValue = (feat) => {
+                const key = resolveFeatureKey(sample && sample.values, feat);
+                if (!key) return null;
+                const value = Number(sample.values[key]);
+                return Number.isFinite(value) ? value : null;
             };
 
             const featureContribution = (feat) => {
-                if (!sample || !sample.contributions) return null;
-                const candidates = [feat, getLabel(feat)];
-                if (App.currentPolo && App.currentPolo.feature_labels) {
-                    Object.entries(App.currentPolo.feature_labels).forEach(([raw, label]) => {
-                        if (raw === feat || label === feat || label === getLabel(feat)) {
-                            candidates.push(raw, label);
-                        }
-                    });
-                }
-                for (const key of [...new Set(candidates.filter(Boolean))]) {
-                    if (Object.prototype.hasOwnProperty.call(sample.contributions, key)) {
-                        const value = Number(sample.contributions[key]);
-                        if (Number.isFinite(value)) return value;
-                    }
-                }
-                return null;
+                const key = resolveFeatureKey(sample && sample.contributions, feat);
+                if (!key) return null;
+                const value = Number(sample.contributions[key]);
+                return Number.isFinite(value) ? value : null;
             };
 
             const nearestCurveY = (xVals, yVals, xValue) => {
@@ -1306,7 +1367,11 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
                 return Number.isFinite(y) ? y : 0;
             };
 
-            const graphKeys = Object.keys(graphs || {}).filter(feat => !sample || featureValue(feat) !== null);
+            const radarGraphKeys = (window.__RF_LAST_RADAR_FEATURES__ || [])
+                .map(feat => resolveFeatureKey(graphs || {}, feat))
+                .filter(Boolean);
+            const graphKeys = [...new Set([...radarGraphKeys, ...Object.keys(graphs || {})])]
+                .filter(feat => !sample || featureValue(feat) !== null);
             if (!graphKeys.length) {
                 grid.style.display = 'none';
                 return;
@@ -1775,6 +1840,53 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
         "          if (!finalClassVisible(cls.key)) continue;\n"
         "          if (!cls.alpha || cls.alpha <= 0) continue;",
     )
+    html = html.replace(
+        """          ctx.beginPath();
+          ctx.arc(x, y, cls.radius, 0, Math.PI * 2);
+          ctx.fillStyle = cls.color;
+          ctx.globalAlpha = cls.alpha;
+          ctx.fill();""",
+        """          const zoomBoost = Math.max(0, coords.z - TILE_Z);
+          const drawRadius = cls.key === 'priority' || cls.key === 'attention'
+            ? Math.min(9.5, cls.radius + zoomBoost * 0.78)
+            : Math.min(2.3, cls.radius + zoomBoost * 0.16);
+          ctx.beginPath();
+          ctx.arc(x, y, drawRadius, 0, Math.PI * 2);
+          ctx.fillStyle = cls.color;
+          ctx.globalAlpha = cls.key === 'priority' || cls.key === 'attention'
+            ? Math.max(0.62, cls.alpha - Math.min(0.16, zoomBoost * 0.02))
+            : cls.alpha;
+          ctx.fill();
+          if (cls.key === 'priority' || cls.key === 'attention') {
+            ctx.globalAlpha = Math.min(0.72, ctx.globalAlpha + 0.08);
+            ctx.strokeStyle = cls.key === 'priority' ? 'rgba(90, 24, 16, 0.70)' : 'rgba(110, 70, 12, 0.62)';
+            ctx.lineWidth = Math.max(1.1, Math.min(1.8, drawRadius * 0.18));
+            ctx.stroke();
+          }""",
+    )
+    html = html.replace(
+        "App.allPointsLayer = new AllPointsLayer({tileSize: 256, opacity: 0.9, zIndex: 350});",
+        "App.allPointsLayer = new AllPointsLayer({tileSize: 256, opacity: 0.92, zIndex: 460});",
+    )
+    html = html.replace(
+        "        appendSampleLinks(sample);\n        setTimeout(() => {",
+        "        appendSampleLinks(sample);\n"
+        "        if (sample && typeof renderTermGraphs === 'function' && App.currentPolo && App.currentPolo.term_graphs) {\n"
+        "          const rankedLocal = Object.entries(sample.contributions || {})\n"
+        "            .sort((a, b) => Math.abs(Number(b[1]) || 0) - Math.abs(Number(a[1]) || 0))\n"
+        "            .slice(0, 7)\n"
+        "            .map(row => row[0]);\n"
+        "          window.__RF_LAST_RADAR_FEATURES__ = rankedLocal;\n"
+        "          renderTermGraphs(App.currentPolo.term_graphs, sample);\n"
+        "        }\n"
+        "        setTimeout(() => {",
+    )
+    html = html.replace(
+        "        previousLoadPolo(name);\n        if (App.allPointsLayer) App.allPointsLayer.redraw();",
+        "        previousLoadPolo(name);\n"
+        "        renderBandSampleControls(App.currentPolo.local_explanations || []);\n"
+        "        if (App.allPointsLayer) App.allPointsLayer.redraw();",
+    )
     html = re.sub(
         r"App\.fcuPolygonsLayer = L\.geoJSON\(null, \{\s+interactive: false,\s+style: \{.*?\},\s+onEachFeature",
         """App.fcuBasePolygonsLayer = L.geoJSON(null, {
@@ -1878,7 +1990,6 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
       if (App.overviewLayer && App.overviewLayer.setOpacity) {
         App.overviewLayer.setOpacity(0.95);
       }
-      if (App.fcuCanvasLayer) App.fcuCanvasLayer.redraw();
       if (App.allPointsLayer) App.allPointsLayer.redraw();
       refreshFcuPolygonsStyle();
     };
@@ -1937,6 +2048,11 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
       if (App.fcuBasePolygonsLayer && !App.map.hasLayer(App.fcuBasePolygonsLayer)) App.fcuBasePolygonsLayer.addTo(App.map);
       if (App.fcuPolygonsLayer && !App.map.hasLayer(App.fcuPolygonsLayer)) App.fcuPolygonsLayer.addTo(App.map);
     }
+    const layerCount = App.fcuPolygonsLayer && App.fcuPolygonsLayer.getLayers ? App.fcuPolygonsLayer.getLayers().length : 0;
+    if (App.__fcuLoadedArea === areaCol && layerCount > 0) {
+      refreshFcuPolygonsStyle();
+      return;
+    }
     fcuDataPromise.then(data => {
       const features = (data.features || []).filter(f => f.properties && f.properties.area_col === areaCol);
       window.__RF_FCU_DEBUG__ = {
@@ -1945,6 +2061,7 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
         visibleFeatures: features.length,
         currentPoloName: App.currentPoloName || null
       };
+      App.__fcuLoadedArea = areaCol;
       if (App.fcuBasePolygonsLayer) {
         App.fcuBasePolygonsLayer.clearLayers();
         App.fcuBasePolygonsLayer.addData({type:'FeatureCollection', features});
@@ -1995,10 +2112,6 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
     html = html.replace(
         "      ensureOverviewLayer();\n      refreshTouchInteractionGates();",
         "      ensureOverviewLayer();\n"
-        "      if (!App.fcuCanvasLayer && typeof FinalFcuCanvasLayer !== 'undefined') {\n"
-        "        App.fcuCanvasLayer = new FinalFcuCanvasLayer({tileSize: 256, opacity: 1, zIndex: 340});\n"
-        "        App.fcuCanvasLayer.addTo(App.map);\n"
-        "      }\n"
         "      refreshTouchInteractionGates();",
     )
     html = html.replace(
@@ -2014,7 +2127,6 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
         "    if (areaCol && (areaCol !== finalFcuLastArea || layerCount === 0)) {\n"
         "      finalFcuLastArea = areaCol;\n"
         "      loadFcusForCurrentArea();\n"
-        "      if (App.fcuCanvasLayer) App.fcuCanvasLayer.redraw();\n"
         "    }\n"
         "  }\n"
         "  setTimeout(finalEnsureFcus, 800);\n"
