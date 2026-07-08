@@ -1286,6 +1286,10 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
         "                margin: { l: 40, r: 40, t: 50, b: 40 },",
         "                margin: { l: 84, r: 84, t: 50, b: 54 },",
     )
+    html = html.replace(
+        '                title: { text: (typeof CURR_LANG !== \'undefined\' && CURR_LANG === \'pt\' ? "Drivers da informalidade local" : "Local Informality Drivers"), font: { size: 14 } },',
+        '                title: { text: (typeof CURR_LANG !== \'undefined\' && CURR_LANG === \'pt\' ? "Drivers Locais" : "Local Drivers"), font: { size: 14 } },',
+    )
     impact_radar_js = r"""
             const impactValues = top5Local.map(f => Math.abs(radarValue(sample.contributions, f, 0)));
             const maxImpact = Math.max(...impactValues, 1e-9);
@@ -1335,7 +1339,7 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
 """
     html = html.replace(
         "            renderTermGraphs(App.currentPolo.term_graphs, sample);",
-        impact_radar_js + "            renderTermGraphs(App.currentPolo.term_graphs, sample);",
+        "            renderTermGraphs(App.currentPolo.term_graphs, sample);",
     )
     html = re.sub(
         r"        function renderTermGraphs\(graphs, sample\) \{.*?\n        function selectSample\(sample\) \{",
@@ -1770,6 +1774,34 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
       `</div>`;
   }
 
+  function finalRenderSelectionDetails(sample) {
+    const details = document.getElementById('local-details');
+    if (!details || !sample) return;
+    details.innerHTML = `${mapText('currentSelection')} <code>${escapeHtml(sample.id)}</code> ${mapText('withProbability')} <span style="color:var(--primary)">${percentLabel(sample.proba)}</span>${modelProbabilitiesHtml(sample)}`;
+    appendSampleLinks(sample);
+  }
+
+  function finalNeedsModelProbabilities(sample) {
+    return !!sample && modelProbabilityRows(sample).length < 3 &&
+      Number.isFinite(Number(sample.lat)) && Number.isFinite(Number(sample.lng));
+  }
+
+  function finalEnrichModelProbabilities(sample) {
+    if (!finalNeedsModelProbabilities(sample)) return;
+    const c = tileCoord(Number(sample.lat), Number(sample.lng), TILE_Z);
+    fetchTile(c.x, c.y).then(data => {
+      const point = (data.p || []).find(p => String(p.id || '') === String(sample.id || ''));
+      if (!point) return;
+      sample.prob_completo = point.pc === null || point.pc === undefined ? sample.prob_completo : Number(point.pc);
+      sample.prob_morfologico = point.pm === null || point.pm === undefined ? sample.prob_morfologico : Number(point.pm);
+      sample.prob_nao_morfologico = point.pn === null || point.pn === undefined ? sample.prob_nao_morfologico : Number(point.pn);
+      sample.winner_scenario = point.w || sample.winner_scenario || '';
+      sample.local_scenario = point.lw || point.w || sample.local_scenario || '';
+      const current = (typeof App !== 'undefined' && App.selectedSample) ? String(App.selectedSample.id || '') : '';
+      if (current === String(sample.id || '')) finalRenderSelectionDetails(sample);
+    }).catch(() => {});
+  }
+
 """
     html = html.replace("  function showPointPopup(sample) {", helper + "  function showPointPopup(sample) {")
     html = html.replace(
@@ -1781,7 +1813,8 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
     )
     html = html.replace(
         "          details.innerHTML = `${mapText('currentSelection')} <code>${escapeHtml(sample.id)}</code> ${mapText('withProbability')} <span style=\"color:var(--primary)\">${percentLabel(sample.proba)}</span>`;",
-        "          details.innerHTML = `${mapText('currentSelection')} <code>${escapeHtml(sample.id)}</code> ${mapText('withProbability')} <span style=\"color:var(--primary)\">${percentLabel(sample.proba)}</span>${modelProbabilitiesHtml(sample)}`;",
+        "          finalRenderSelectionDetails(sample);\n"
+        "          finalEnrichModelProbabilities(sample);",
     )
     html = html.replace(
         "    chip.innerText = `${prefix} - ${sample.id} (${percentLabel(sample.proba)})`;",
@@ -1921,7 +1954,6 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
     )
     html = html.replace(
         "        appendSampleLinks(sample);\n        setTimeout(() => {",
-        "        appendSampleLinks(sample);\n"
         "        if (sample && typeof renderTermGraphs === 'function' && App.currentPolo && App.currentPolo.term_graphs) {\n"
         "          const rankedLocal = Object.entries(sample.contributions || {})\n"
         "            .sort((a, b) => Math.abs(Number(b[1]) || 0) - Math.abs(Number(a[1]) || 0))\n"
@@ -2175,7 +2207,7 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
     )
     html = html.replace(
         "        Plotly.relayout(radar, {'title.text': mapText('localDrivers')});",
-        "        Plotly.relayout(radar, {'title.text': lang === 'en' ? 'Local driver strength' : 'Força dos drivers locais'});",
+        "        Plotly.relayout(radar, {'title.text': lang === 'en' ? 'Local Drivers' : 'Drivers Locais'});",
     )
     html = html.replace(
         "        if (App.allPointsLayer) App.allPointsLayer.redraw();\n        loadFcusForCurrentArea();",
