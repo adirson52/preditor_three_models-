@@ -1286,6 +1286,57 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
         "                margin: { l: 40, r: 40, t: 50, b: 40 },",
         "                margin: { l: 84, r: 84, t: 50, b: 54 },",
     )
+    impact_radar_js = r"""
+            const impactValues = top5Local.map(f => Math.abs(radarValue(sample.contributions, f, 0)));
+            const maxImpact = Math.max(...impactValues, 1e-9);
+            const nImpact = impactValues.map(v => Math.max(0, Math.min(1, v / maxImpact)));
+            if (nImpact.length > 0) nImpact.push(nImpact[0]);
+            const impactCustom = top5Local.map((f, i) => {
+                const contrib = radarValue(sample.contributions, f, 0);
+                return [
+                    formatRadarValue(rSampleVals[i], f, i),
+                    formatRadarNumber(contrib, 2)
+                ];
+            });
+            if (impactCustom.length > 0) impactCustom.push(impactCustom[0]);
+            Plotly.react('local-radar', [{
+                type: 'scatterpolar',
+                r: nImpact,
+                theta: theta,
+                fill: 'toself',
+                name: (typeof CURR_LANG !== 'undefined' && CURR_LANG === 'en' ? 'Local impact' : 'Impacto local'),
+                line: { color: '#0e91c3', width: 3 },
+                fillcolor: 'rgba(14,145,195,0.32)',
+                customdata: impactCustom,
+                hovertemplate: '%{theta}<br>' +
+                    ((typeof mapLang === 'function' ? mapLang() : 'pt') === 'en' ? 'Real value' : 'Valor real') +
+                    ': %{customdata[0]}<br>' +
+                    ((typeof mapLang === 'function' ? mapLang() : 'pt') === 'en' ? 'EBM impact' : 'Impacto EBM') +
+                    ': %{customdata[1]}<extra></extra>'
+            }], {
+                title: { text: (typeof CURR_LANG !== 'undefined' && CURR_LANG === 'pt' ? 'Força dos drivers locais' : 'Local driver strength'), font: { size: 14 } },
+                polar: {
+                    angularaxis: { tickfont: { size: 11 } },
+                    radialaxis: {
+                        visible: true,
+                        range: [0, 1],
+                        tickvals: [0, 0.25, 0.5, 0.75, 1],
+                        showticklabels: false,
+                        showline: false,
+                        ticks: '',
+                        gridcolor: 'rgba(0,0,0,0.1)'
+                    }
+                },
+                showlegend: false,
+                margin: { l: 84, r: 84, t: 50, b: 54 },
+                font: { family: 'Inter, sans-serif' }
+            }, { responsive: false, displayModeBar: false });
+
+"""
+    html = html.replace(
+        "            renderTermGraphs(App.currentPolo.term_graphs, sample);",
+        impact_radar_js + "            renderTermGraphs(App.currentPolo.term_graphs, sample);",
+    )
     html = re.sub(
         r"        function renderTermGraphs\(graphs, sample\) \{.*?\n        function selectSample\(sample\) \{",
         r"""        function renderTermGraphs(graphs, sample) {
@@ -1885,6 +1936,7 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
         "        previousLoadPolo(name);\n        if (App.allPointsLayer) App.allPointsLayer.redraw();",
         "        previousLoadPolo(name);\n"
         "        renderBandSampleControls(App.currentPolo.local_explanations || []);\n"
+        "        if (App.fcuCanvasLayer) App.fcuCanvasLayer.redraw();\n"
         "        if (App.allPointsLayer) App.allPointsLayer.redraw();",
     )
     html = re.sub(
@@ -1990,6 +2042,7 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
       if (App.overviewLayer && App.overviewLayer.setOpacity) {
         App.overviewLayer.setOpacity(0.95);
       }
+      if (App.fcuCanvasLayer) App.fcuCanvasLayer.redraw();
       if (App.allPointsLayer) App.allPointsLayer.redraw();
       refreshFcuPolygonsStyle();
     };
@@ -2112,7 +2165,29 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
     html = html.replace(
         "      ensureOverviewLayer();\n      refreshTouchInteractionGates();",
         "      ensureOverviewLayer();\n"
+        "      if (!App.fcuCanvasLayer) {\n"
+        "        App.fcuCanvasLayer = new FinalFcuCanvasLayer({tileSize: 256, opacity: 0.98, zIndex: 360});\n"
+        "        App.fcuCanvasLayer.addTo(App.map);\n"
+        "      } else if (!App.map.hasLayer(App.fcuCanvasLayer)) {\n"
+        "        App.fcuCanvasLayer.addTo(App.map);\n"
+        "      }\n"
         "      refreshTouchInteractionGates();",
+    )
+    html = html.replace(
+        "        Plotly.relayout(radar, {'title.text': mapText('localDrivers')});",
+        "        Plotly.relayout(radar, {'title.text': lang === 'en' ? 'Local driver strength' : 'Força dos drivers locais'});",
+    )
+    html = html.replace(
+        "        if (App.allPointsLayer) App.allPointsLayer.redraw();\n        loadFcusForCurrentArea();",
+        "        if (App.fcuCanvasLayer) App.fcuCanvasLayer.redraw();\n"
+        "        if (App.allPointsLayer) App.allPointsLayer.redraw();\n"
+        "        loadFcusForCurrentArea();",
+    )
+    html = html.replace(
+        "      if (App.allPointsLayer) App.allPointsLayer.redraw();\n      setTimeout(bindFeatureClickHandlers, 260);",
+        "      if (App.fcuCanvasLayer) App.fcuCanvasLayer.redraw();\n"
+        "      if (App.allPointsLayer) App.allPointsLayer.redraw();\n"
+        "      setTimeout(bindFeatureClickHandlers, 260);",
     )
     html = html.replace(
         "  patchMapWhenReady();",

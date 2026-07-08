@@ -2188,6 +2188,51 @@ window.addEventListener('unhandledrejection', function(event) {
                 font: { family: 'Inter, sans-serif' }
             }, { responsive: false, displayModeBar: false });
 
+            const impactValues = top5Local.map(f => Math.abs(radarValue(sample.contributions, f, 0)));
+            const maxImpact = Math.max(...impactValues, 1e-9);
+            const nImpact = impactValues.map(v => Math.max(0, Math.min(1, v / maxImpact)));
+            if (nImpact.length > 0) nImpact.push(nImpact[0]);
+            const impactCustom = top5Local.map((f, i) => {
+                const contrib = radarValue(sample.contributions, f, 0);
+                return [
+                    formatRadarValue(rSampleVals[i], f, i),
+                    formatRadarNumber(contrib, 2)
+                ];
+            });
+            if (impactCustom.length > 0) impactCustom.push(impactCustom[0]);
+            Plotly.react('local-radar', [{
+                type: 'scatterpolar',
+                r: nImpact,
+                theta: theta,
+                fill: 'toself',
+                name: (typeof CURR_LANG !== 'undefined' && CURR_LANG === 'en' ? 'Local impact' : 'Impacto local'),
+                line: { color: '#0e91c3', width: 3 },
+                fillcolor: 'rgba(14,145,195,0.32)',
+                customdata: impactCustom,
+                hovertemplate: '%{theta}<br>' +
+                    ((typeof mapLang === 'function' ? mapLang() : 'pt') === 'en' ? 'Real value' : 'Valor real') +
+                    ': %{customdata[0]}<br>' +
+                    ((typeof mapLang === 'function' ? mapLang() : 'pt') === 'en' ? 'EBM impact' : 'Impacto EBM') +
+                    ': %{customdata[1]}<extra></extra>'
+            }], {
+                title: { text: (typeof CURR_LANG !== 'undefined' && CURR_LANG === 'pt' ? 'Força dos drivers locais' : 'Local driver strength'), font: { size: 14 } },
+                polar: {
+                    angularaxis: { tickfont: { size: 11 } },
+                    radialaxis: {
+                        visible: true,
+                        range: [0, 1],
+                        tickvals: [0, 0.25, 0.5, 0.75, 1],
+                        showticklabels: false,
+                        showline: false,
+                        ticks: '',
+                        gridcolor: 'rgba(0,0,0,0.1)'
+                    }
+                },
+                showlegend: false,
+                margin: { l: 84, r: 84, t: 50, b: 54 },
+                font: { family: 'Inter, sans-serif' }
+            }, { responsive: false, displayModeBar: false });
+
 
             renderTermGraphs(App.currentPolo.term_graphs, sample);
             initSimulator(sample);
@@ -2973,7 +3018,7 @@ window.addEventListener('unhandledrejection', function(event) {
       }
       const radar = document.getElementById('local-radar');
       if (radar && radar.data) {
-        Plotly.relayout(radar, {'title.text': mapText('localDrivers')});
+        Plotly.relayout(radar, {'title.text': lang === 'en' ? 'Local driver strength' : 'Força dos drivers locais'});
         if (radar.data.length >= 4) {
           Plotly.restyle(radar, {
             name: [mapText('localSample'), mapText('studyAreaAverage'), mapText('nonFcuAverage'), mapText('fcuAverage')]
@@ -3776,6 +3821,7 @@ window.addEventListener('unhandledrejection', function(event) {
       if (App.overviewLayer && App.overviewLayer.setOpacity) {
         App.overviewLayer.setOpacity(0.95);
       }
+      if (App.fcuCanvasLayer) App.fcuCanvasLayer.redraw();
       if (App.allPointsLayer) App.allPointsLayer.redraw();
       refreshFcuPolygonsStyle();
     };
@@ -3944,6 +3990,12 @@ window.addEventListener('unhandledrejection', function(event) {
       ensureBasemapControl();
       ensureMapSizeControl();
       ensureOverviewLayer();
+      if (!App.fcuCanvasLayer) {
+        App.fcuCanvasLayer = new FinalFcuCanvasLayer({tileSize: 256, opacity: 0.98, zIndex: 360});
+        App.fcuCanvasLayer.addTo(App.map);
+      } else if (!App.map.hasLayer(App.fcuCanvasLayer)) {
+        App.fcuCanvasLayer.addTo(App.map);
+      }
       refreshTouchInteractionGates();
       if (!App.allPointsLayer) {
         App.allPointsLayer = new AllPointsLayer({tileSize: 256, opacity: 0.92, zIndex: 460});
@@ -4027,6 +4079,7 @@ window.addEventListener('unhandledrejection', function(event) {
         if (latlngs.length > 0 && App.map) {
           App.map.fitBounds(L.latLngBounds(latlngs), {padding: [20, 20]});
         }
+        if (App.fcuCanvasLayer) App.fcuCanvasLayer.redraw();
         if (App.allPointsLayer) App.allPointsLayer.redraw();
         loadFcusForCurrentArea();
       };
@@ -4040,6 +4093,7 @@ window.addEventListener('unhandledrejection', function(event) {
         }
         previousLoadPolo(name);
         renderBandSampleControls(App.currentPolo.local_explanations || []);
+        if (App.fcuCanvasLayer) App.fcuCanvasLayer.redraw();
         if (App.allPointsLayer) App.allPointsLayer.redraw();
         loadFcusForCurrentArea();
         setTimeout(refreshTouchInteractionGates, 260);
@@ -4051,6 +4105,7 @@ window.addEventListener('unhandledrejection', function(event) {
       initMap();
       updateMapMarkers(App.currentPolo.local_explanations || []);
       renderBandSampleControls(App.currentPolo.local_explanations || []);
+      if (App.fcuCanvasLayer) App.fcuCanvasLayer.redraw();
       if (App.allPointsLayer) App.allPointsLayer.redraw();
       loadFcusForCurrentArea();
       setTimeout(refreshTouchInteractionGates, 260);
@@ -4068,6 +4123,7 @@ window.addEventListener('unhandledrejection', function(event) {
       updateMapMarkers(App.currentPolo.local_explanations || []);
       renderBandSampleControls(App.currentPolo.local_explanations || []);
       refreshBandChipLabels();
+      if (App.fcuCanvasLayer) App.fcuCanvasLayer.redraw();
       if (App.allPointsLayer) App.allPointsLayer.redraw();
       setTimeout(bindFeatureClickHandlers, 260);
     }
