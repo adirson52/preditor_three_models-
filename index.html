@@ -2406,7 +2406,7 @@ window.addEventListener('unhandledrejection', function(event) {
   const TILE_BASE = `data_tiles/${SCENARIO_KEY}/points/${TILE_Z}`;
   const OVERVIEW_BASE = `data_tiles/${SCENARIO_KEY}/overview/{z}/{x}/{y}.png?v=base0407_overview_v10`;
   const EMPTY_TILE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
-  const LOOKUP_PREFIX_LEN = 12;
+  const LOOKUP_PREFIX_LEN = 8;
   const LOOKUP_BASE = `data_tiles/${SCENARIO_KEY}/id_lookup/${LOOKUP_PREFIX_LEN}`;
   const FCU_URL = 'data_tiles/fcu_aderencia.geojson?v=base0407_final_fcu_v2';
   const FCU_COUNTS = {"area_arranjo_pop_rj": 3675, "area_conc_urb_curitiba": 15579, "area_conc_urb_fortaleza": 17625, "area_conc_urb_goiania": 3441, "area_conc_urb_rio_de_janeiro": 44227, "area_conc_urb_sao_paulo": 51022, "area_medias_conc_urb_rj": 19395, "area_rgint_belem": 57673, "area_rgint_macapa": 8468, "area_rgint_redencao": 1889};
@@ -2526,7 +2526,7 @@ window.addEventListener('unhandledrejection', function(event) {
     const key = String(prefix || '').toUpperCase();
     if (!key || key.length < LOOKUP_PREFIX_LEN) return Promise.resolve({p: []});
     if (!lookupCache.has(key)) {
-      lookupCache.set(key, fetch(`${LOOKUP_BASE}/${encodeURIComponent(key)}.json.gz?v=base0407_lookup_v2`)
+      lookupCache.set(key, fetch(`${LOOKUP_BASE}/${encodeURIComponent(key)}.json.gz?v=base0407_lookup_v3`)
         .then(r => {
           if (!r.ok) return {p: []};
           const encoding = (r.headers.get('content-encoding') || '').toLowerCase();

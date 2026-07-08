@@ -31,7 +31,7 @@
     },
     "id_lookup": {
       "scenario": "final",
-      "prefix_len": 12,
+      "prefix_len": 8,
       "format": "json.gz",
       "record": [
         "id",
@@ -45,7 +45,7 @@
         "lat",
         "lng"
       ],
-      "shard_count": 4985,
+      "shard_count": 108,
       "point_count": 3548974,
       "tile_count": 796,
       "created_at": "2026-07-07T22:33:56"
