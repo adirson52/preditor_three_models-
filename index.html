@@ -3048,8 +3048,8 @@ window.addEventListener('unhandledrejection', function(event) {
     const target = Number(p.t) || 0;
     const rank = Number(p.r);
     const nFcu = fcuCountForArea(areaCol);
-    if (target && maxModelProbFromPoint(p) < 0.70) return {color: 'transparent', radius: 0, alpha: 0, key: 'mappedLow'};
-    if (target) return {color: 'transparent', radius: 0, alpha: 0, key: 'mappedFcu'};
+    if (target && maxModelProbFromPoint(p) < 0.70) return {color: 'transparent', radius: 2.2, alpha: 0.001, key: 'mappedLow'};
+    if (target) return {color: 'transparent', radius: 2.2, alpha: 0.001, key: 'mappedFcu'};
     if (!Number.isFinite(rank) || rank <= 0 || nFcu <= 0) return {color: '#ffeda0', radius: 0.8, alpha: 0.045, key: 'other'};
     if (rank <= Math.ceil(nFcu / 2)) return {color: '#f03b20', radius: 1.90, alpha: 0.88, key: 'priority'};
     if (rank <= nFcu * 2) return {color: '#feb24c', radius: 1.70, alpha: 0.84, key: 'attention'};

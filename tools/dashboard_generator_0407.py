@@ -1833,8 +1833,8 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
     )
     html = html.replace(
         "    if (target) return {color: '#3f3f46', radius: 1.1, alpha: 0.44, key: 'mappedFcu'};",
-        "    if (target && maxModelProbFromPoint(p) < 0.70) return {color: 'transparent', radius: 0, alpha: 0, key: 'mappedLow'};\n"
-        "    if (target) return {color: 'transparent', radius: 0, alpha: 0, key: 'mappedFcu'};",
+        "    if (target && maxModelProbFromPoint(p) < 0.70) return {color: 'transparent', radius: 2.2, alpha: 0.001, key: 'mappedLow'};\n"
+        "    if (target) return {color: 'transparent', radius: 2.2, alpha: 0.001, key: 'mappedFcu'};",
     )
     html = html.replace(
         "return {color: '#e74c3c', radius: 1.45, alpha: 0.78, key: 'priority'};",
