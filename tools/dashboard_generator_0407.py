@@ -1277,6 +1277,23 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
         "                    let anch = radarLookup(mMaxes, feat, null) || mMaxes[cleanFeat];",
     )
     html = html.replace(
+        """                    if (!anch || !Array.isArray(anch) || anch.length < 2) {
+                        // No anchors: if value is already 0-1, use it; otherwise clamp
+                        return Math.max(0, Math.min(1, v));
+                    }""",
+        """                    if (!anch || !Array.isArray(anch) || anch.length < 2) {
+                        const compareVals = [rSampleVals[i], rMeanPolo[i], rMeanFcu[i], rMeanNonFcu[i]]
+                            .map(Number).filter(Number.isFinite);
+                        if (compareVals.some(x => x < 0)) {
+                            const maxAbs = Math.max(...compareVals.map(x => Math.abs(x)), Math.abs(Number(v) || 0), 1e-9);
+                            const divisor = maxAbs <= 1.5 ? 1 : maxAbs;
+                            return Math.max(0, Math.min(1, 0.5 + 0.5 * ((Number(v) || 0) / divisor)));
+                        }
+                        // No anchors: if value is already 0-1, use it; otherwise clamp.
+                        return Math.max(0, Math.min(1, v));
+                    }""",
+    )
+    html = html.replace(
         "                const anch = mMaxes[feat] || mMaxes[String(feat || '').replace(/^p_ibge_|^m_ibge_|^s_cad_|^shape_|^decliv_|^m_cad_/g, '')];",
         "                const anch = radarLookup(mMaxes, feat, null) || mMaxes[String(feat || '').replace(/^p_ibge_|^m_ibge_|^s_cad_|^shape_|^decliv_|^m_cad_/g, '')];",
     )
