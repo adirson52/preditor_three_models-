@@ -1044,6 +1044,26 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
     html = html.replace("base0407_overview_v2", "base0407_overview_v10")
     html = html.replace("base0407_overview_v9", "base0407_overview_v10")
     html = html.replace(
+        """  function translateFeature(label) {
+    const value = repairText(label);
+    return mapLang() === 'en' ? (FEATURE_LABELS_EN[value] || value) : value;
+  }""",
+        """  function canonicalFeatureLabel(value) {
+    const text = repairText(value);
+    const norm = String(text || '')
+      .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')
+      .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    if (norm === 'edificios por hectare gba') return 'Edifícios GBA por célula';
+    return text;
+  }
+
+  function translateFeature(label) {
+    const value = canonicalFeatureLabel(label);
+    if (mapLang() === 'en' && value === 'Edifícios GBA por célula') return 'GBA buildings per cell';
+    return mapLang() === 'en' ? (FEATURE_LABELS_EN[value] || value) : value;
+  }""",
+    )
+    html = html.replace(
         "fetch(`${LOOKUP_BASE}/${encodeURIComponent(key)}.json.gz`)",
         "fetch(`${LOOKUP_BASE}/${encodeURIComponent(key)}.json.gz?v=base0407_lookup_v3`)",
     )
@@ -1110,6 +1130,11 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
                 'Domicílios tipo apartamento por célula': ['Domicílios tipo apartamento', 'Domicílios em apartamentos', 'ibge_mediadoma'],
                 'Domicílios em apartamentos': ['Domicílios tipo apartamento', 'Domicílios tipo apartamento por célula', 'ibge_mediadoma']
             };
+            Object.assign(radarAliases, {
+                'Edifícios por hectare (GBA)': ['Edifícios GBA por célula', 'Número de edificações (GBA)'],
+                'Edifícios GBA por célula': ['Edifícios por hectare (GBA)', 'Número de edificações (GBA)'],
+                'Número de edificações (GBA)': ['Edifícios GBA por célula', 'Edifícios por hectare (GBA)']
+            });
             const normRadarKey = value => String(value || '')
                 .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
                 .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
@@ -1192,6 +1217,11 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
                 'Domicílios tipo apartamento por célula': ['Domicílios tipo apartamento', 'Domicílios em apartamentos', 'ibge_mediadoma'],
                 'Domicílios em apartamentos': ['Domicílios tipo apartamento', 'Domicílios tipo apartamento por célula', 'ibge_mediadoma']
             };
+            Object.assign(radarAliases, {
+                'Edifícios por hectare (GBA)': ['Edifícios GBA por célula', 'Número de edificações (GBA)'],
+                'Edifícios GBA por célula': ['Edifícios por hectare (GBA)', 'Número de edificações (GBA)'],
+                'Número de edificações (GBA)': ['Edifícios GBA por célula', 'Edifícios por hectare (GBA)']
+            });
             const normRadarKey = value => String(value || '')
                 .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')
                 .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
@@ -1371,6 +1401,11 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
                 'Domicílios tipo apartamento por célula': ['Domicílios tipo apartamento', 'Domicílios em apartamentos', 'ibge_mediadoma'],
                 'Domicílios em apartamentos': ['Domicílios tipo apartamento', 'Domicílios tipo apartamento por célula', 'ibge_mediadoma']
             };
+            Object.assign(localFeatureAliases, {
+                'Edifícios por hectare (GBA)': ['Edifícios GBA por célula', 'Número de edificações (GBA)'],
+                'Edifícios GBA por célula': ['Edifícios por hectare (GBA)', 'Número de edificações (GBA)'],
+                'Número de edificações (GBA)': ['Edifícios GBA por célula', 'Edifícios por hectare (GBA)']
+            });
             const featureCandidates = (feat) => {
                 const label = getLabel(feat);
                 const out = [feat, label];
