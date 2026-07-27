@@ -807,22 +807,153 @@ window.addEventListener('unhandledrejection', function(event) {
 <style id="revelando-map-responsive">
   .local-map-layout {
     display: grid;
-    grid-template-columns: minmax(240px, 1fr) minmax(360px, 1.5fr);
+    grid-template-columns: minmax(190px, 0.64fr) minmax(420px, 2.36fr);
     gap: 1rem;
     align-items: stretch;
   }
   .local-search-panel {
     min-width: 0;
+    font-size: 0.84rem;
+  }
+  .local-search-panel .input-group {
+    margin-bottom: 0.65rem;
+  }
+  .local-search-panel label {
+    font-size: 0.78rem;
+  }
+  .local-search-panel .chip {
+    font-size: 0.72rem;
+    padding: 0.36rem 0.5rem;
+  }
+  .local-map-layout.panel-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .local-map-layout.panel-collapsed .local-search-panel {
+    display: none;
+  }
+  .local-map-layout.panel-collapsed .local-map-panel {
+    height: clamp(520px, 68vh, 780px);
   }
   .local-map-panel {
     min-width: 0;
-    height: clamp(340px, 42vh, 520px);
-    min-height: 320px;
+    height: clamp(440px, 58vh, 700px);
+    min-height: 420px;
     border-radius: 8px;
     border: 1px solid var(--border, #e5e7eb);
     overflow: hidden;
     position: relative;
     background: #eef2f7;
+  }
+  .map-search-overlay {
+    position: absolute;
+    top: 12px;
+    left: calc(50% + 22px);
+    transform: translateX(-50%);
+    z-index: 1650;
+    width: min(500px, calc(100% - 128px));
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .map-search-toggle {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(15, 23, 42, 0.16);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.96);
+    color: #0b3d5c;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.16);
+    cursor: pointer;
+    font: 900 18px/1 Inter, system-ui, sans-serif;
+  }
+  .map-search-box {
+    flex: 1 1 auto;
+    min-width: 0;
+    position: relative;
+  }
+  .map-search-box label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .map-search-box input {
+    width: 100%;
+    min-height: 38px;
+    border: 1px solid rgba(15, 23, 42, 0.16);
+    border-radius: 8px;
+    padding: 0.55rem 0.75rem;
+    background: rgba(255, 255, 255, 0.96);
+    color: #21313d;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.16);
+    font: 700 0.86rem Inter, system-ui, sans-serif;
+    outline: none;
+  }
+  .map-search-box input:focus {
+    border-color: #0b7fa3;
+    box-shadow: 0 0 0 3px rgba(11, 127, 163, 0.18), 0 8px 22px rgba(15, 23, 42, 0.16);
+  }
+  .map-search-results {
+    display: none;
+    margin-top: 6px;
+    max-height: 260px;
+    overflow: auto;
+    border: 1px solid #d8dee6;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.20);
+  }
+  .map-search-results.active {
+    display: block;
+  }
+  .map-search-result {
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid #eef2f7;
+    background: transparent;
+    text-align: left;
+    padding: 0.55rem 0.65rem;
+    display: grid;
+    gap: 2px;
+    cursor: pointer;
+    color: #263442;
+  }
+  .map-search-result:hover,
+  .map-search-result:focus-visible {
+    background: #eff6ff;
+    outline: 0;
+  }
+  .map-search-result strong {
+    font: 800 0.82rem Inter, system-ui, sans-serif;
+  }
+  .map-search-result span {
+    color: #64748b;
+    font: 650 0.72rem Inter, system-ui, sans-serif;
+  }
+  .map-search-type {
+    display: inline-flex;
+    align-items: center;
+    width: max-content;
+    max-width: 100%;
+    margin-right: 0.35rem;
+    border-radius: 999px;
+    padding: 0.1rem 0.38rem;
+    background: rgba(11, 127, 163, 0.10);
+    color: #0b3d5c;
+    font: 850 0.62rem Inter, system-ui, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0;
+  }
+  .map-search-overlay.collapsed {
+    width: auto;
+    left: 48px;
+    transform: none;
+  }
+  .map-search-overlay.collapsed .map-search-box {
+    display: none;
   }
   #map {
     width: 100% !important;
@@ -916,6 +1047,45 @@ window.addEventListener('unhandledrejection', function(event) {
     outline: 2px solid rgba(37, 99, 235, 0.35);
     outline-offset: 1px;
   }
+  .map-panel-control.leaflet-control,
+  .map-location-control.leaflet-control {
+    border: 0;
+    box-shadow: none;
+    position: relative;
+    z-index: 1800;
+  }
+  .map-panel-button,
+  .map-location-button {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(15, 23, 42, 0.18);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #0b3d5c;
+    font-size: 17px;
+    font-weight: 900;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.22);
+  }
+  .map-panel-button:hover,
+  .map-panel-button:focus-visible,
+  .map-location-button:hover,
+  .map-location-button:focus-visible {
+    background: #ffffff;
+    outline: 2px solid rgba(11, 127, 163, 0.30);
+    outline-offset: 1px;
+  }
+  .map-location-button.is-loading {
+    color: #1a73e8;
+    animation: mapLocatePulse 1s ease-in-out infinite;
+  }
+  @keyframes mapLocatePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(0.88); }
+  }
   body.map-expanded {
     overflow: hidden !important;
   }
@@ -989,6 +1159,11 @@ window.addEventListener('unhandledrejection', function(event) {
       height: 58vh;
       min-height: 320px;
     }
+    .map-search-overlay {
+      top: 10px;
+      left: calc(50% + 20px);
+      width: min(460px, calc(100% - 116px));
+    }
     .local-chart-panel,
     #local-waterfall,
     #local-radar {
@@ -1009,6 +1184,11 @@ window.addEventListener('unhandledrejection', function(event) {
     body.map-expanded .local-map-panel {
       inset: 6px !important;
       border-radius: 6px;
+    }
+    .map-search-overlay {
+      top: 8px;
+      left: calc(50% + 18px);
+      width: calc(100% - 104px);
     }
     .local-chart-panel,
     #local-waterfall,
@@ -1128,7 +1308,7 @@ window.addEventListener('unhandledrejection', function(event) {
                             <div class="local-map-layout">
                                 <div class="local-search-panel">
                                     <div class="input-group">
-                                        <label>Search by ID</label>
+                                        <label>Busca interna por célula</label>
                                         <input type="text" id="search-box" placeholder="Enter Cell ID (e.g. C1828...)"
                                             autocomplete="off">
                                     </div>
@@ -1142,6 +1322,16 @@ window.addEventListener('unhandledrejection', function(event) {
                                     </div>
                                 </div>
                                 <div class="local-map-panel">
+                                    <div id="map-search-overlay" class="map-search-overlay">
+                                        <button id="map-search-toggle" class="map-search-toggle" type="button"
+                                            aria-expanded="true" title="Minimizar busca">-</button>
+                                        <div class="map-search-box">
+                                            <label for="map-search-box">Buscar localização ou célula</label>
+                                            <input id="map-search-box" type="search" placeholder="Buscar localização ou célula"
+                                                autocomplete="off">
+                                            <div id="map-search-results" class="map-search-results"></div>
+                                        </div>
+                                    </div>
                                     <div id="map"></div>
                                 </div>
                             </div>
@@ -1443,8 +1633,6 @@ window.addEventListener('unhandledrejection', function(event) {
                         if (!App.map.hasLayer(App.selectionMarker)) {
                             App.selectionMarker.addTo(App.map);
                         }
-                        App.map.flyTo(latlng, 11, { duration: 1.2 }); // Zoom nível municipal (mais distante)
-
                         // Atualizar tabela lateral se necessário
                         const searchBox = document.getElementById('search-box');
                         if (searchBox && searchBox.value !== sample.id) {
@@ -2322,7 +2510,10 @@ window.addEventListener('unhandledrejection', function(event) {
 
             el.innerText = `${sample.id} (${(sample.proba >= 1.0 ? '100.0' : (sample.proba * 100 >= 99.95 ? '>99.9' : (sample.proba * 100).toFixed(1)))}%)`;
             el.dataset.id = sample.id;
-            el.onclick = () => selectSample(sample);
+            el.onclick = () => {
+                if (window.__rfSelectCellSample) window.__rfSelectCellSample(sample, true);
+                else selectSample(sample);
+            };
             return el;
         }
     </script>
@@ -2518,12 +2709,18 @@ window.addEventListener('unhandledrejection', function(event) {
   const EMPTY_TILE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
   const LOOKUP_PREFIX_LEN = 8;
   const LOOKUP_BASE = `data_tiles/${SCENARIO_KEY}/id_lookup/${LOOKUP_PREFIX_LEN}`;
+  const SEARCH_INDEX_URL = `data_tiles/${SCENARIO_KEY}/search_index.json.gz?v=base0407_search_v2`;
+  const SEARCH_GEOMETRIES_URL = `data_tiles/${SCENARIO_KEY}/search_geometries.geojson.gz?v=base0407_search_geom_v1`;
   const FCU_URL = 'data_tiles/fcu_aderencia.geojson?v=base0407_final_fcu_v2';
   const FCU_COUNTS = {"area_arranjo_pop_rj": 3675, "area_conc_urb_curitiba": 15579, "area_conc_urb_fortaleza": 17625, "area_conc_urb_goiania": 3441, "area_conc_urb_rio_de_janeiro": 44227, "area_conc_urb_sao_paulo": 51022, "area_medias_conc_urb_rj": 19395, "area_rgint_belem": 57673, "area_rgint_macapa": 8468, "area_rgint_redencao": 1889};
   const FEATURE_LABELS_EN = {"Contagem Domicílios": "Household count", "Densidade de endereços": "Address density", "Densidade de domicílios": "Household density", "Sem rede d'água": "No water network", "Sem banheiro (agregado)": "Inadequate bathroom", "1 banheiro exclusivo": "One exclusive bathroom", "Banheiros por morador": "Bathrooms per resident", "Via compartilhada": "Shared street", "Via não pavimentada": "Unpaved street", "Sem bueiro": "No storm drain", "Sem iluminação pública": "No public lighting", "Sem calçada": "No sidewalk", "Calçada com obstáculo": "Sidewalk obstacle", "Calçada inadequada": "Inadequate sidewalk", "Sem arborização": "No street trees", "Esgoto inadequado": "Inadequate sewage", "Coleta de lixo inadequada": "Inadequate waste collection", "Lixo em caçamba": "Waste in dumpster", "Lixo queimado": "Waste burned on property", "% IBGE lixoente": "Waste buried on property", "% IBGE lixoterr": "Waste in vacant/public area", "Renda média domiciliar": "Mean household income", "Total domicílios": "Occupied private households", "Total pessoas": "Total residents", "Domicílios": "Mean households per cell", "População": "Mean population per cell", "População por domicílio": "Residents per household", "Domicílios em casas": "Households in houses", "Moradores em casas": "Residents in houses", "Moradores por casa": "Residents per house", "Domicílios tipo apartamento por célula": "Households in apartments", "Moradores em apartamentos por célula": "Residents in apartments", "Moradores por apartamento": "Residents per apartment", "Forma das quadras": "Block shape index", "Distância até via carroçável": "Distance to drivable road", "Proximidade de vias carroçáveis": "Drivable-road proximity", "Idade média da ocupação urbana": "Mean urban occupation age", "Ocupação urbana mais recente": "Minimum urban occupation age", "Ocupação urbana mais antiga": "Maximum urban occupation age", "Restrição urbana": "Urban restriction", "Declividade crítica acima de 30%": "Slope above 30%", "Declividade média": "Mean slope", "Presença de APP": "Permanent preservation area", "APP area m2": "PPA area", "% APP area": "Cell share in PPA", "BF num edif": "Number of buildings", "BF area constr m2": "Built area", "% BF area constr": "Built-area share", "Densidade de edificações": "Building density", "Média BF area edif": "Mean building size", "Média BF perim edif": "Mean building perimeter", "Média BF reg edif": "Urban fabric regularity", "Média BF quadr edif": "Building squareness factor", "Média BF shapein edif": "Building shape index", "Média BF hull edif": "Mean building hull area", "Média BF distviz edif": "Mean neighbor distance", "Distância média aos 20 vizinhos": "Mean distance to 20 neighbors", "Distância média aos 10 vizinhos": "Mean distance to 10 neighbors", "Parede compartilhada": "Shared wall", "Densidade construída": "Built density", "Vegetação média (NDVI)": "Mean NDVI", "Vegetação visível (VARI)": "Mean VARI", "Razão vermelho-verde (RGRI)": "Mean RGRI", "Índice verde-NIR (VgNIRBI)": "Mean VgNIRBI", "Índice espectral PISI": "Mean PISI", "Banda Sentinel-2 B5": "Mean band 5", "Banda Sentinel-2 B6": "Mean band 6", "Banda Sentinel-2 B7": "Mean band 7", "Banda Sentinel-2 B11": "Mean band 11", "Banda Sentinel-2 B12": "Mean band 12", "Índice espectral CSSI-1": "CSSI-1 (spectral index)", "Índice espectral CSSI-2": "CSSI-2 (spectral index)", "Brancos": "White people (%)", "Pretos": "Black people (%)", "Amarelos": "Asian people (%)", "Pardos": "Mixed-race people (%)", "Índigenas": "Indigenous people (%)", "Homens alfabetizados": "Literate men (%)", "Homens não alfabetizados": "Illiterate men (%)", "Mulheres alfabetizadas": "Literate women (%)", "Mulheres não alfabetizadas": "Illiterate women (%)", "ID": "ID", "Divisão Geográfica": "Divisão Geográfica", "Resolução da célula": "Resolução da célula", "ID coluna": "ID coluna", "ID linha": "ID linha", "ID célula 200m": "ID célula 200m", "ID célula 100m": "ID célula 100m", "ID grid 1km": "ID grid 1km", "ID grid 5km": "ID grid 5km", "ID grid 10km": "ID grid 10km", "ID grid 50km": "ID grid 50km", "ID grid 100km": "ID grid 100km", "ID grid 500km": "ID grid 500km", "ID quadrante": "ID quadrante", "Código Município": "Código Município", "Nome Município": "Nome Município", "Código UF": "Código UF", "Código RGI": "Código RGI", "Nome RGI": "Nome RGI", "Código RGInt": "Código RGInt", "Nome RGInt": "Nome RGInt", "Código setor censitário": "Código setor censitário", "Área ocupada MapBiomas": "Área ocupada MapBiomas", "Área ocupada IBGE 2019": "Área ocupada IBGE 2019", "Área ocupada CNEFE": "Área ocupada CNEFE", "Célula FCU": "Célula FCU", "Célula FCU não setorizada": "Célula FCU não setorizada", "Célula FCU setorizada": "Célula FCU setorizada", "Tipo FCU": "Tipo FCU", "ID FCU": "ID FCU", "Código FCU": "Código FCU", "Nome FCU": "Nome FCU", "Nome UF": "Nome UF", "Sigla UF": "Sigla UF", "FCU tipo": "FCU tipo", "FCU fonte": "FCU fonte", "FCU origem": "FCU origem", "FCU contagem": "FCU contagem", "FCU área (km2)": "FCU área (km2)", "RGInt Redenção": "RGInt Redenção", "Concentração Urbana Curitiba": "Concentração Urbana Curitiba", "Concentração Urbana Fortaleza": "Concentração Urbana Fortaleza", "Concentração Urbana Goiânia": "Concentração Urbana Goiânia", "Concentração Urbana São Paulo": "Concentração Urbana São Paulo", "RGInt Macapá": "RGInt Macapá", "RGInt Belém": "RGInt Belém", "area conc urb rio de janeiro": "area conc urb rio de janeiro", "Geometria": "Geometria", "Responsável 60 anos ou mais": "Responsável 60 anos ou mais", "Responsável 40 a 59 anos": "Responsável 40 a 59 anos", "Responsável 25 a 39 anos": "Responsável 25 a 39 anos", "Responsável 18 a 24 anos": "Responsável 18 a 24 anos", "Responsável 12 a 17 anos": "Responsável 12 a 17 anos", "Responsável mulher": "Responsável mulher", "Responsável homem": "Responsável homem", "Mulher indigena não alfabetizada": "Mulher indigena não alfabetizada", "Mulher indigena alfabetizada": "Mulher indigena alfabetizada", "Mulher parda não alfabetizada": "Mulher parda não alfabetizada", "Mulher parda alfabetizada": "Mulher parda alfabetizada", "Mulher amarela não alfabetizada": "Mulher amarela não alfabetizada", "Mulher amarela alfabetizada": "Mulher amarela alfabetizada", "Mulher preta não alfabetizada": "Mulher preta não alfabetizada", "Mulher preta alfabetizada": "Mulher preta alfabetizada", "Mulher branca não alfabetizada": "Mulher branca não alfabetizada", "Mulher branca alfabetizada": "Mulher branca alfabetizada", "Homem indigena não alfabetizado": "Homem indigena não alfabetizado", "Homem indigena alfabetizado": "Homem indigena alfabetizado", "Homem pardo não alfabetizado": "Homem pardo não alfabetizado", "Homem pardo alfabetizado": "Homem pardo alfabetizado", "Homem amarelo não alfabetizado": "Homem amarelo não alfabetizado", "Homem amarelo alfabetizado": "Homem amarelo alfabetizado", "Homem preto não alfabetizado": "Homem preto não alfabetizado", "Homem preto alfabetizado": "Homem preto alfabetizado", "Homem branco não alfabetizado": "Homem branco não alfabetizado", "Homem branco alfabetizado": "Homem branco alfabetizado", "Número de edificações (GBA)": "Número de edificações (GBA)", "Edifícios por hectare (GBA)": "Edifícios por hectare (GBA)", "Área construída GBA": "Área construída GBA", "Proporção área construída GBA": "Proporção área construída GBA", "Área média dos edifícios (GBA)": "Área média dos edifícios (GBA)", "Mediana área edifícios GBA": "Mediana área edifícios GBA", "P10 área edifícios GBA": "P10 área edifícios GBA", "P90 área edifícios GBA": "P90 área edifícios GBA", "Variação da área dos edifícios (GBA)": "Variação da área dos edifícios (GBA)", "Edifícios pequenos (GBA)": "Edifícios pequenos (GBA)", "Proporção de edifícios pequenos (GBA)": "Proporção de edifícios pequenos (GBA)", "Altura média GBA": "Altura média GBA", "Mediana altura GBA": "Mediana altura GBA", "Altura baixa - percentil 10 (GBA)": "Altura baixa - percentil 10 (GBA)", "P90 altura GBA": "P90 altura GBA", "Altura máxima dos edifícios (GBA)": "Altura máxima dos edifícios (GBA)", "Desvio altura GBA": "Desvio altura GBA", "Variação da altura dos edifícios (GBA)": "Variação da altura dos edifícios (GBA)", "IQR altura GBA": "IQR altura GBA", "Edifícios baixos até 6 m (GBA)": "Edifícios baixos até 6 m (GBA)", "% altura alta GBA": "% altura alta GBA", "Volume construído GBA": "Volume construído GBA", "Volume por hectare GBA": "Volume por hectare GBA", "Volume médio dos edifícios (GBA)": "Volume médio dos edifícios (GBA)", "Área de piso proxy GBA": "Área de piso proxy GBA", "Pavimentos estimados (GBA)": "Pavimentos estimados (GBA)", "Variância média altura GBA": "Variância média altura GBA", "P90 variância altura GBA": "P90 variância altura GBA", "% incerteza alta GBA": "% incerteza alta GBA", "% altura válida GBA": "% altura válida GBA", "Distância ao vizinho mais próximo (GBA)": "Distância ao vizinho mais próximo (GBA)", "P10 distância vizinho GBA": "P10 distância vizinho GBA", "Mediana da distância ao vizinho (GBA)": "Mediana da distância ao vizinho (GBA)", "Compacidade dos edifícios (GBA)": "Compacidade dos edifícios (GBA)", "Alongamento GBA": "Alongamento GBA", "Retangularidade dos edifícios (GBA)": "Retangularidade dos edifícios (GBA)", "Desvio orientação GBA": "Desvio orientação GBA", "Diversidade de orientação dos edifícios (GBA)": "Diversidade de orientação dos edifícios (GBA)", "% fonte Google GBA": "% fonte Google GBA", "% fonte OSM GBA": "% fonte OSM GBA", "% fonte Microsoft GBA": "% fonte Microsoft GBA", "% fonte TUM GBA": "% fonte TUM GBA", "Entropia fonte GBA": "Entropia fonte GBA", "Distância 10 vizinhos GBA": "Distância 10 vizinhos GBA", "Distância aos 20 vizinhos (GBA)": "Distância aos 20 vizinhos (GBA)", "Pretos ou pardos": "Pretos ou pardos", "Pretos, pardos ou indígenas": "Pretos, pardos ou indígenas", "Intensidade ocupação GBA": "Intensidade ocupação GBA", "Ocupação x forma GBA": "Ocupação x forma GBA", "Volume x forma GBA": "Volume x forma GBA"};
     const SCENARIO_I18N = {"pt":{"label":"Resultado final","subtitle":"Probabilidade final do modelo vencedor em cada área de estudo. Ao clicar na célula, o painel mostra o cenário vencedor e as três probabilidades."},"en":{"label":"Final result","subtitle":"Final probability from the winning model in each study area. Click a cell to see the winning scenario and the three model probabilities."}};
   const tileCache = new Map();
   const lookupCache = new Map();
+  let searchIndexPromise = null;
+  let searchGeometriesPromise = null;
+  let searchOutlineLayer = null;
+  let studyAreaOutlineLayer = null;
   let fcuDataPromise = null;
 
   function finalCanvasAreaCol() {
@@ -2636,7 +2833,7 @@ window.addEventListener('unhandledrejection', function(event) {
     const key = String(prefix || '').toUpperCase();
     if (!key || key.length < LOOKUP_PREFIX_LEN) return Promise.resolve({p: []});
     if (!lookupCache.has(key)) {
-      lookupCache.set(key, fetch(`${LOOKUP_BASE}/${encodeURIComponent(key)}.json.gz?v=base0407_lookup_v3`)
+      lookupCache.set(key, fetch(`${LOOKUP_BASE}/${encodeURIComponent(key)}.json.gz?v=base0407_lookup_v4`)
         .then(r => {
           if (!r.ok) return {p: []};
           const encoding = (r.headers.get('content-encoding') || '').toLowerCase();
@@ -2652,6 +2849,51 @@ window.addEventListener('unhandledrejection', function(event) {
         .catch(() => ({p: []})));
     }
     return lookupCache.get(key);
+  }
+
+  function fetchMaybeGzipJson(url, fallback) {
+    return fetch(url)
+      .then(r => {
+        if (!r.ok) return fallback;
+        const encoding = (r.headers.get('content-encoding') || '').toLowerCase();
+        if (encoding.includes('gzip')) return r.json();
+        if ('DecompressionStream' in window) {
+          return r.arrayBuffer().then(buf => {
+            const stream = new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'));
+            return new Response(stream).json();
+          });
+        }
+        return r.json();
+      })
+      .catch(() => fallback);
+  }
+
+  function fetchSearchIndex() {
+    if (!searchIndexPromise) {
+      searchIndexPromise = fetchMaybeGzipJson(SEARCH_INDEX_URL, {entries: []});
+    }
+    return searchIndexPromise;
+  }
+
+  function fetchSearchGeometries() {
+    if (!searchGeometriesPromise) {
+      searchGeometriesPromise = fetchMaybeGzipJson(SEARCH_GEOMETRIES_URL, {type: 'FeatureCollection', features: []})
+        .then(data => {
+          const byKey = new Map();
+          (data.features || []).forEach(feature => {
+            const key = feature && feature.properties ? feature.properties.geometry_key : null;
+            if (key) byKey.set(String(key), feature);
+          });
+          data.__byKey = byKey;
+          return data;
+        });
+    }
+    return searchGeometriesPromise;
+  }
+
+  function searchGeometryByKey(key) {
+    if (!key) return Promise.resolve(null);
+    return fetchSearchGeometries().then(data => data.__byKey ? data.__byKey.get(String(key)) : null);
   }
 
   function tileCoord(lat, lng, z) {
@@ -3459,6 +3701,159 @@ window.addEventListener('unhandledrejection', function(event) {
     App.mapSizeControl.addTo(App.map);
   }
 
+  const LOCAL_PANEL_COLLAPSE_KEY = 'revelando-local-panel-collapsed-v1';
+
+  function localPanelLabel(collapsed) {
+    const isEn = typeof mapLang === 'function' && mapLang() === 'en';
+    if (isEn) return collapsed ? 'Show local panel' : 'Hide local panel';
+    return collapsed ? 'Mostrar painel local' : 'Ocultar painel local';
+  }
+
+  function refreshLocalPanelButton() {
+    const btn = document.querySelector('.map-panel-button');
+    if (!btn) return;
+    const layout = document.querySelector('.local-map-layout');
+    const collapsed = !!(layout && layout.classList.contains('panel-collapsed'));
+    const label = localPanelLabel(collapsed);
+    btn.title = label;
+    btn.setAttribute('aria-label', label);
+    btn.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
+    btn.textContent = collapsed ? '☰' : '‹';
+  }
+
+  function setLocalPanelCollapsed(collapsed) {
+    const layout = document.querySelector('.local-map-layout');
+    if (!layout) return;
+    layout.classList.toggle('panel-collapsed', !!collapsed);
+    try { window.rfSafeStorage.setItem(LOCAL_PANEL_COLLAPSE_KEY, collapsed ? '1' : '0'); } catch (_) {}
+    refreshLocalPanelButton();
+    invalidateMapSoon(180, true);
+  }
+
+  function ensureLocalPanelControl() {
+    if (!App.map || App.localPanelControl) return;
+    App.localPanelControl = L.control({position: 'topleft'});
+    App.localPanelControl.onAdd = function() {
+      const div = L.DomUtil.create('div', 'map-panel-control leaflet-control');
+      const btn = L.DomUtil.create('button', 'map-panel-button', div);
+      btn.type = 'button';
+      L.DomEvent.disableClickPropagation(div);
+      L.DomEvent.disableScrollPropagation(div);
+      btn.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const layout = document.querySelector('.local-map-layout');
+        setLocalPanelCollapsed(!(layout && layout.classList.contains('panel-collapsed')));
+      });
+      refreshLocalPanelButton();
+      return div;
+    };
+    App.localPanelControl.addTo(App.map);
+    const saved = window.rfSafeStorage.getItem(LOCAL_PANEL_COLLAPSE_KEY);
+    if (saved === '1') setLocalPanelCollapsed(true);
+    else refreshLocalPanelButton();
+  }
+
+  function locationControlLabel() {
+    return (typeof mapLang === 'function' && mapLang() === 'en') ? 'Show my location' : 'Mostrar minha localização';
+  }
+
+  function setLocationButtonLoading(loading) {
+    const btn = document.querySelector('.map-location-button');
+    if (!btn) return;
+    btn.classList.toggle('is-loading', !!loading);
+    btn.disabled = !!loading;
+  }
+
+  function showUserLocation(position) {
+    if (!App.map || !position || !position.coords) return;
+    const lat = Number(position.coords.latitude);
+    const lng = Number(position.coords.longitude);
+    const accuracy = Number(position.coords.accuracy);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    const latlng = [lat, lng];
+    if (App.userLocationAccuracy) {
+      try { App.map.removeLayer(App.userLocationAccuracy); } catch (_) {}
+    }
+    if (App.userLocationMarker) {
+      try { App.map.removeLayer(App.userLocationMarker); } catch (_) {}
+    }
+    if (Number.isFinite(accuracy) && accuracy > 0) {
+      App.userLocationAccuracy = L.circle(latlng, {
+        radius: accuracy,
+        color: '#1a73e8',
+        weight: 1.4,
+        opacity: 0.45,
+        fillColor: '#1a73e8',
+        fillOpacity: 0.10,
+        interactive: false
+      }).addTo(App.map);
+    }
+    App.userLocationMarker = L.circleMarker(latlng, {
+      radius: 7,
+      color: '#ffffff',
+      weight: 2.4,
+      opacity: 1,
+      fillColor: '#1a73e8',
+      fillOpacity: 1
+    }).addTo(App.map);
+    App.userLocationMarker.bindPopup((typeof mapLang === 'function' && mapLang() === 'en') ? 'Your location' : 'Sua localização');
+    if (App.userLocationMarker.bringToFront) App.userLocationMarker.bringToFront();
+    App.map.flyTo(latlng, Math.max(App.map.getZoom() || TILE_Z, 16), {duration: 0.65});
+  }
+
+  function requestUserLocation() {
+    if (!navigator.geolocation) {
+      alert((typeof mapLang === 'function' && mapLang() === 'en') ? 'Location is not available in this browser.' : 'Localização não disponível neste navegador.');
+      return;
+    }
+    setLocationButtonLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        setLocationButtonLoading(false);
+        showUserLocation(position);
+      },
+      error => {
+        setLocationButtonLoading(false);
+        const denied = error && error.code === error.PERMISSION_DENIED;
+        const msg = (typeof mapLang === 'function' && mapLang() === 'en')
+          ? (denied ? 'Location permission was denied by the browser.' : 'Could not get your location.')
+          : (denied ? 'A permissão de localização foi negada pelo navegador.' : 'Não foi possível obter sua localização.');
+        alert(msg);
+      },
+      {enableHighAccuracy: true, timeout: 12000, maximumAge: 30000}
+    );
+  }
+
+  function refreshLocationButton() {
+    const btn = document.querySelector('.map-location-button');
+    if (!btn) return;
+    const label = locationControlLabel();
+    btn.title = label;
+    btn.setAttribute('aria-label', label);
+  }
+
+  function ensureLocationControl() {
+    if (!App.map || App.locationControl) return;
+    App.locationControl = L.control({position: 'topleft'});
+    App.locationControl.onAdd = function() {
+      const div = L.DomUtil.create('div', 'map-location-control leaflet-control');
+      const btn = L.DomUtil.create('button', 'map-location-button', div);
+      btn.type = 'button';
+      btn.textContent = '◎';
+      L.DomEvent.disableClickPropagation(div);
+      L.DomEvent.disableScrollPropagation(div);
+      btn.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        requestUserLocation();
+      });
+      refreshLocationButton();
+      return div;
+    };
+    App.locationControl.addTo(App.map);
+  }
+
   function isGatedViewport() {
     if (!window.matchMedia) return false;
     return window.matchMedia('(max-width: 1100px)').matches || window.matchMedia('(pointer: coarse)').matches;
@@ -3583,18 +3978,48 @@ window.addEventListener('unhandledrejection', function(event) {
     };
   }
 
+  function finalFlyToCellTwoStage(lat, lng) {
+    if (!App.map || !Number.isFinite(Number(lat)) || !Number.isFinite(Number(lng))) return;
+    const latlng = [Number(lat), Number(lng)];
+    const currentZoom = App.map.getZoom() || TILE_Z;
+    const contextZoom = Math.max(currentZoom, 14);
+    if (App.__rfCellZoomTimer) clearTimeout(App.__rfCellZoomTimer);
+    if (currentZoom < 16) {
+      App.map.flyTo(latlng, contextZoom, {duration: 0.55});
+      App.__rfCellZoomTimer = setTimeout(() => {
+        App.__rfCellZoomTimer = null;
+        if (App.map) App.map.flyTo(latlng, 17, {duration: 0.75});
+      }, 680);
+    } else {
+      App.map.flyTo(latlng, Math.max(currentZoom, 17), {duration: 0.45});
+    }
+  }
+
+  window.__rfFlyToCellTwoStage = finalFlyToCellTwoStage;
+
+  function selectCellSampleExplicit(sample, showPopup = true) {
+    if (!sample || typeof selectSample !== 'function') return;
+    const previousAllow = !!(App && App.finalAllowCellZoom);
+    if (typeof App !== 'undefined') App.finalAllowCellZoom = true;
+    try {
+      selectSample(sample);
+      if (showPopup && typeof showPointPopup === 'function') showPointPopup(sample);
+    } finally {
+      if (typeof App !== 'undefined') App.finalAllowCellZoom = previousAllow;
+    }
+  }
+
+  window.__rfSelectCellSample = selectCellSampleExplicit;
+
   function openSampleFromPoint(point) {
     const areaName = areaNameByColumn(point.a);
     const sameArea = App && App.currentPolo && App.currentPolo.area_col === point.a;
     const openHere = () => {
       const sample = pointToSample(point);
       const mergedSample = finalMergeSampleWithLocalExplanation(sample, point);
-      selectSample(mergedSample);
+      selectCellSampleExplicit(mergedSample, false);
       if (typeof loadFcusForCurrentArea === 'function') setTimeout(loadFcusForCurrentArea, 180);
       showPointPopup(mergedSample);
-      if (App.map && Number.isFinite(sample.lat) && Number.isFinite(sample.lng)) {
-        App.map.flyTo([sample.lat, sample.lng], Math.max(App.map.getZoom() || TILE_Z, TILE_Z), {duration: 0.45});
-      }
     };
     if (areaName && !sameArea && typeof loadPolo === 'function') {
       if (typeof App !== 'undefined') App.finalPendingPointOpen = true;
@@ -3631,6 +4056,492 @@ window.addEventListener('unhandledrejection', function(event) {
     el.dataset.id = lookupId(record);
     el.onclick = () => openSampleFromLookup(record);
     return el;
+  }
+
+  const MAP_SEARCH_COLLAPSE_KEY = 'revelando-map-search-collapsed-v1';
+
+  function mapOverlayLang() {
+    return (typeof mapLang === 'function' && mapLang() === 'en') ? 'en' : 'pt';
+  }
+
+  function mapOverlayText(key) {
+    const labels = {
+      pt: {
+        label: 'Buscar localização ou célula',
+        placeholder: 'Buscar localização ou célula',
+        minimize: 'Minimizar busca',
+        expand: 'Abrir busca',
+        loading: 'Buscando...',
+        empty: 'Nenhum resultado encontrado',
+        hint: 'Digite ao menos 3 letras ou 8 caracteres do ID.',
+        currentArea: 'área atual',
+        cell: 'célula',
+        municipio: 'município',
+        areaEstudo: 'área de estudo',
+        bairro: 'bairro',
+        fcu: 'FCU',
+        cells: 'células',
+        fcuCells: 'células FCU',
+        maxProb: 'maior probabilidade',
+        noNeighborhood: 'Bairro não consta na base atual'
+      },
+      en: {
+        label: 'Search location or cell',
+        placeholder: 'Search location or cell',
+        minimize: 'Minimize search',
+        expand: 'Open search',
+        loading: 'Searching...',
+        empty: 'No results found',
+        hint: 'Type at least 3 letters or 8 ID characters.',
+        currentArea: 'current area',
+        cell: 'cell',
+        municipio: 'municipality',
+        areaEstudo: 'study area',
+        bairro: 'neighborhood',
+        fcu: 'FCU',
+        cells: 'cells',
+        fcuCells: 'FCU cells',
+        maxProb: 'highest probability',
+        noNeighborhood: 'Neighborhood is not available in the current data'
+      }
+    };
+    return labels[mapOverlayLang()][key] || labels.pt[key] || key;
+  }
+
+  function setMapOverlaySearchCollapsed(collapsed) {
+    const overlay = document.getElementById('map-search-overlay');
+    const toggle = document.getElementById('map-search-toggle');
+    const input = document.getElementById('map-search-box');
+    const results = document.getElementById('map-search-results');
+    if (!overlay || !toggle) return;
+    overlay.classList.toggle('collapsed', !!collapsed);
+    toggle.textContent = collapsed ? '+' : '-';
+    toggle.title = collapsed ? mapOverlayText('expand') : mapOverlayText('minimize');
+    toggle.setAttribute('aria-label', toggle.title);
+    toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    if (collapsed && results) results.classList.remove('active');
+    try { localStorage.setItem(MAP_SEARCH_COLLAPSE_KEY, collapsed ? '1' : '0'); } catch (_) {}
+    if (!collapsed && input) setTimeout(() => input.focus(), 80);
+  }
+
+  function updateMapOverlaySearchLabels() {
+    const label = document.querySelector('label[for="map-search-box"]');
+    const input = document.getElementById('map-search-box');
+    const collapsed = document.getElementById('map-search-overlay')?.classList.contains('collapsed');
+    if (label) label.textContent = mapOverlayText('label');
+    if (input) input.placeholder = mapOverlayText('placeholder');
+    setMapOverlaySearchCollapsed(!!collapsed);
+  }
+
+  function renderMapOverlayMessage(box, text) {
+    if (!box) return;
+    box.innerHTML = `<button type="button" class="map-search-result"><strong>${escapeHtml(text)}</strong><span>${escapeHtml(mapOverlayText('hint'))}</span></button>`;
+    box.classList.add('active');
+  }
+
+  function mapSearchResultButton(title, subtitle, onSelect) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'map-search-result';
+    btn.innerHTML = `<strong>${escapeHtml(title)}</strong><span>${escapeHtml(subtitle)}</span>`;
+    btn.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      const box = document.getElementById('map-search-results');
+      if (box) box.classList.remove('active');
+      onSelect();
+    });
+    return btn;
+  }
+
+  function normalizeMapSearchText(value) {
+    return String(value || '')
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[_-]+/g, ' ')
+      .replace(/\s+/g, ' ');
+  }
+
+  function mapSearchTypeLabel(type) {
+    if (type === 'cell') return mapOverlayText('cell');
+    if (type === 'municipio') return mapOverlayText('municipio');
+    if (type === 'area_estudo') return mapOverlayText('areaEstudo');
+    if (type === 'bairro') return mapOverlayText('bairro');
+    if (type === 'fcu') return mapOverlayText('fcu');
+    return type || '';
+  }
+
+  function mapSearchBoundsArray(bounds) {
+    if (!bounds) return null;
+    const south = Number(bounds.min_lat);
+    const north = Number(bounds.max_lat);
+    const west = Number(bounds.min_lng ?? bounds.min_lon);
+    const east = Number(bounds.max_lng ?? bounds.max_lon);
+    if (![south, north, west, east].every(Number.isFinite)) return null;
+    return [[south, west], [north, east]];
+  }
+
+  function mapSearchSubtitle(item) {
+    const parts = [];
+    if (item.area_label) parts.push(item.area_label);
+    if (item.municipio && item.municipio !== item.label) parts.push(item.municipio);
+    if (Number.isFinite(Number(item.n))) parts.push(`${Number(item.n).toLocaleString(mapLang() === 'en' ? 'en-US' : 'pt-BR')} ${mapOverlayText('cells')}`);
+    if (Number.isFinite(Number(item.n_fcu)) && Number(item.n_fcu) > 0) parts.push(`${Number(item.n_fcu).toLocaleString(mapLang() === 'en' ? 'en-US' : 'pt-BR')} ${mapOverlayText('fcuCells')}`);
+    if (Number.isFinite(Number(item.max_prob))) parts.push(`${mapOverlayText('maxProb')}: ${percentLabel(Number(item.max_prob))}`);
+    return parts.filter(Boolean).join(' · ');
+  }
+
+  function rankedMapSearchEntries(entries, raw) {
+    const term = normalizeMapSearchText(raw);
+    const currentArea = App && App.currentPolo ? App.currentPolo.area_col : '';
+    return (entries || [])
+      .filter(item => item && item.term && item.term.includes(term))
+      .sort((a, b) => {
+        const aTerm = String(a.term || '');
+        const bTerm = String(b.term || '');
+        const exact = Number(bTerm === term) - Number(aTerm === term);
+        if (exact) return exact;
+        const starts = Number(bTerm.startsWith(term)) - Number(aTerm.startsWith(term));
+        if (starts) return starts;
+        const current = Number(b.area_col === currentArea) - Number(a.area_col === currentArea);
+        if (current) return current;
+        const typeRank = type => type === 'municipio' ? 0 : type === 'area_estudo' ? 1 : type === 'bairro' ? 2 : type === 'fcu' ? 3 : 4;
+        const type = typeRank(a.type) - typeRank(b.type);
+        if (type) return type;
+        return Number(b.n || 0) - Number(a.n || 0);
+      })
+      .slice(0, 12);
+  }
+
+  function clearMapSearchOutline() {
+    if (searchOutlineLayer && App.map) {
+      try { App.map.removeLayer(searchOutlineLayer); } catch (_) {}
+    }
+    searchOutlineLayer = null;
+  }
+
+  function mapSearchOutlineStyle(item) {
+    const type = item && item.type;
+    return {
+      color: type === 'fcu' ? '#08324f' : type === 'area_estudo' ? '#075985' : '#020617',
+      weight: type === 'fcu' ? 3.0 : type === 'area_estudo' ? 2.7 : 3.0,
+      opacity: type === 'area_estudo' ? 0.92 : 1,
+      fill: false,
+      dashArray: type === 'area_estudo' ? '8 5' : '3 7',
+      interactive: false
+    };
+  }
+
+  function studyAreaOutlineStyle() {
+    return {
+      color: '#075985',
+      weight: 2.2,
+      opacity: 0.78,
+      fill: false,
+      dashArray: '9 7',
+      interactive: false
+    };
+  }
+
+  function fcuFeatureMatchesSearch(feature, item) {
+    const props = feature && feature.properties ? feature.properties : {};
+    const key = String(item && (item.feature_key || item.code || '') || '');
+    return key && (
+      String(props.id_fcu || '') === key ||
+      String(props.cd_fcu || '') === key ||
+      String(props.cd_fcu || props.id_fcu || '').toLowerCase() === key.toLowerCase()
+    );
+  }
+
+  function clearStudyAreaOutline() {
+    if (studyAreaOutlineLayer && App.map) {
+      try { App.map.removeLayer(studyAreaOutlineLayer); } catch (_) {}
+    }
+    studyAreaOutlineLayer = null;
+  }
+
+  function refreshStudyAreaOutline(areaCol) {
+    const currentArea = areaCol || finalCanvasAreaCol();
+    if (!App.map || !currentArea) return;
+    searchGeometryByKey(`area|${currentArea}`).then(feature => {
+      if (!App.map || finalCanvasAreaCol() !== currentArea) return;
+      clearStudyAreaOutline();
+      if (!feature) return;
+      studyAreaOutlineLayer = L.geoJSON(feature, {
+        style: studyAreaOutlineStyle,
+        interactive: false
+      }).addTo(App.map);
+      if (studyAreaOutlineLayer.bringToBack) studyAreaOutlineLayer.bringToBack();
+    });
+  }
+
+  function zoomMapToSearchBounds(bounds) {
+    if (!App.map || !bounds) return;
+    let leafletBounds = bounds;
+    if (!leafletBounds.getNorth) leafletBounds = L.latLngBounds(bounds);
+    if (!leafletBounds || !leafletBounds.isValid || !leafletBounds.isValid()) return;
+    const latSpan = Math.abs(leafletBounds.getNorth() - leafletBounds.getSouth());
+    const lngSpan = Math.abs(leafletBounds.getEast() - leafletBounds.getWest());
+    if (latSpan < 0.0008 && lngSpan < 0.0008) {
+      App.map.setView(leafletBounds.getCenter(), 17);
+    } else {
+      App.map.fitBounds(leafletBounds, {padding: [32, 32], maxZoom: 15, animate: true});
+    }
+  }
+
+  function showMapSearchPopup(item, latlng) {
+    if (!App.map || !item || !latlng) return;
+    const content = `<div style="font:12px Inter,sans-serif;color:#2c3e50;line-height:1.45">` +
+      `<b>${escapeHtml(item.label || '')}</b><br>` +
+      `${escapeHtml(mapSearchTypeLabel(item.type))}` +
+      (item.area_label ? `<br>${escapeHtml(item.area_label)}` : '') +
+      (item.municipio && item.municipio !== item.label ? `<br>${escapeHtml(item.municipio)}` : '') +
+      (Number.isFinite(Number(item.n)) ? `<br>${Number(item.n).toLocaleString(mapLang() === 'en' ? 'en-US' : 'pt-BR')} ${escapeHtml(mapOverlayText('cells'))}` : '') +
+      `</div>`;
+    L.popup({maxWidth: 280, autoPan: true, keepInView: true})
+      .setLatLng(latlng)
+      .setContent(content)
+      .openOn(App.map);
+  }
+
+  function showMapSearchOutline(item) {
+    if (!App.map || !item) return;
+    clearMapSearchOutline();
+    const boundsArray = mapSearchBoundsArray(item.bounds);
+    if (!boundsArray) return;
+    const fallbackBounds = L.latLngBounds(boundsArray);
+    const fallbackCenter = fallbackBounds.getCenter();
+    const finishWithBounds = layerBounds => {
+      const bounds = layerBounds && layerBounds.isValid && layerBounds.isValid() ? layerBounds : fallbackBounds;
+      zoomMapToSearchBounds(bounds);
+      showMapSearchPopup(item, bounds.getCenter ? bounds.getCenter() : fallbackCenter);
+    };
+    if (item.type === 'fcu') {
+      if (!fcuDataPromise) {
+        fcuDataPromise = fetch(FCU_URL).then(r => r.ok ? r.json() : {type:'FeatureCollection', features:[]});
+      }
+      fcuDataPromise.then(data => {
+        const feature = (data.features || []).find(f => fcuFeatureMatchesSearch(f, item));
+        if (feature) {
+          searchOutlineLayer = L.geoJSON(feature, {style: mapSearchOutlineStyle(item), interactive: false}).addTo(App.map);
+          if (searchOutlineLayer.bringToFront) searchOutlineLayer.bringToFront();
+          finishWithBounds(searchOutlineLayer.getBounds());
+        } else {
+          searchOutlineLayer = L.rectangle(boundsArray, mapSearchOutlineStyle(item)).addTo(App.map);
+          finishWithBounds(fallbackBounds);
+        }
+      });
+      return;
+    }
+    if (item.geometry_key) {
+      searchGeometryByKey(item.geometry_key).then(feature => {
+        if (feature) {
+          searchOutlineLayer = L.geoJSON(feature, {
+            style: mapSearchOutlineStyle(item),
+            interactive: false
+          }).addTo(App.map);
+          if (searchOutlineLayer.bringToFront) searchOutlineLayer.bringToFront();
+          finishWithBounds(searchOutlineLayer.getBounds());
+        } else {
+          searchOutlineLayer = L.rectangle(boundsArray, mapSearchOutlineStyle(item)).addTo(App.map);
+          finishWithBounds(fallbackBounds);
+        }
+      });
+      return;
+    }
+    searchOutlineLayer = L.rectangle(boundsArray, mapSearchOutlineStyle(item)).addTo(App.map);
+    finishWithBounds(fallbackBounds);
+  }
+
+  function openMapSearchEntry(item) {
+    if (!item || item.type === 'cell') return;
+    const input = document.getElementById('map-search-box');
+    const box = document.getElementById('map-search-results');
+    if (input) input.value = item.label || '';
+    if (box) box.classList.remove('active');
+    const areaName = areaNameByColumn(item.area_col);
+    const sameArea = App && App.currentPolo && App.currentPolo.area_col === item.area_col;
+    const openHere = () => {
+      App.mapSearchItem = item;
+      showMapSearchOutline(item);
+      if (typeof loadFcusForCurrentArea === 'function') setTimeout(loadFcusForCurrentArea, 160);
+    };
+    if (areaName && !sameArea && typeof loadPolo === 'function') {
+      loadPolo(areaName);
+      setTimeout(openHere, 540);
+    } else {
+      openHere();
+    }
+  }
+
+  function renderMapOverlayResults(termRaw, seq, getSeq) {
+    const box = document.getElementById('map-search-results');
+    if (!box) return;
+    const raw = String(termRaw || '').trim();
+    const term = raw.toLowerCase();
+    const normTerm = normalizeMapSearchText(raw);
+    box.innerHTML = '';
+    if (!term) {
+      box.classList.remove('active');
+      return;
+    }
+
+    const added = new Set();
+    const addButton = (key, title, subtitle, onSelect, typeLabel) => {
+      const cleanKey = String(key || title || '').toLowerCase();
+      if (cleanKey && added.has(cleanKey)) return;
+      if (cleanKey) added.add(cleanKey);
+      const btn = mapSearchResultButton(title, subtitle, onSelect);
+      if (typeLabel) {
+        const span = btn.querySelector('span');
+        if (span) span.innerHTML = `<em class="map-search-type">${escapeHtml(typeLabel)}</em> ${escapeHtml(subtitle)}`;
+      }
+      box.appendChild(btn);
+    };
+    const sorted = (App.currentPolo && App.currentPolo.local_explanations ? App.currentPolo.local_explanations : [])
+      .slice()
+      .sort((a, b) => (Number(b.proba) || 0) - (Number(a.proba) || 0));
+    sorted
+      .filter(s => String(s.id || '').toLowerCase().includes(term))
+      .slice(0, 8)
+      .forEach(sample => {
+        const id = String(sample.id || '');
+        addButton(
+          id,
+          `${id} (${percentLabel(sample.proba)})`,
+          mapOverlayText('currentArea'),
+          () => selectCellSampleExplicit(sample, true),
+          mapOverlayText('cell')
+        );
+      });
+
+    const jobs = [];
+    if (normTerm.length >= 3) {
+      jobs.push(fetchSearchIndex().then(data => ({kind: 'places', data})));
+    }
+    if (raw.length >= LOOKUP_PREFIX_LEN) {
+      jobs.push(fetchLookup(raw.slice(0, LOOKUP_PREFIX_LEN)).then(data => ({kind: 'cells', data})));
+    }
+    if (!jobs.length) {
+      if (box.children.length) box.classList.add('active');
+      else renderMapOverlayMessage(box, mapOverlayText('hint'));
+      return;
+    }
+
+    if (!box.children.length) renderMapOverlayMessage(box, mapOverlayText('loading'));
+    Promise.all(jobs).then(results => {
+      if (seq !== getSeq()) return;
+      box.innerHTML = '';
+      added.clear();
+      sorted
+        .filter(s => String(s.id || '').toLowerCase().includes(term))
+        .slice(0, 8)
+        .forEach(sample => {
+          const id = String(sample.id || '');
+          addButton(
+            id,
+            `${id} (${percentLabel(sample.proba)})`,
+            mapOverlayText('currentArea'),
+            () => selectCellSampleExplicit(sample, true),
+            mapOverlayText('cell')
+          );
+        });
+
+      const places = results.find(result => result.kind === 'places');
+      if (places) {
+        rankedMapSearchEntries(places.data.entries || [], raw).forEach(item => {
+          addButton(
+            `${item.type}:${item.area_col}:${item.code || item.label}`,
+            item.label,
+            mapSearchSubtitle(item),
+            () => openMapSearchEntry(item),
+            mapSearchTypeLabel(item.type)
+          );
+        });
+      }
+
+      const cells = results.find(result => result.kind === 'cells');
+      if (cells) {
+        const lookupMatches = (cells.data.p || [])
+          .filter(record => {
+            const id = lookupId(record);
+            return id.toLowerCase().includes(term) || normalizeMapSearchText(id).includes(normTerm);
+          })
+          .sort((a, b) => lookupProb(b) - lookupProb(a))
+          .slice(0, 12);
+        lookupMatches.forEach(record => {
+          const areaName = areaNameByColumn(lookupArea(record));
+          const meta = [
+            percentLabel(lookupProb(record)),
+            areaName || '',
+            lookupMunicipio(record) || ''
+          ].filter(Boolean).join(' · ');
+          addButton(
+            lookupId(record),
+            lookupId(record),
+            meta,
+            () => openSampleFromLookup(record),
+            mapOverlayText('cell')
+          );
+        });
+      }
+
+      if (normTerm.length >= 3 && !box.children.length && normalizeMapSearchText(mapOverlayText('bairro')).includes(normTerm)) {
+        renderMapOverlayMessage(box, mapOverlayText('noNeighborhood'));
+        return;
+      }
+      if (box.children.length) box.classList.add('active');
+      else renderMapOverlayMessage(box, mapOverlayText('empty'));
+    }).catch(() => {
+      if (seq === getSeq()) renderMapOverlayMessage(box, mapOverlayText('empty'));
+    });
+  }
+
+  function initMapOverlaySearch() {
+    const overlay = document.getElementById('map-search-overlay');
+    const toggle = document.getElementById('map-search-toggle');
+    const input = document.getElementById('map-search-box');
+    const box = document.getElementById('map-search-results');
+    if (!overlay || !toggle || !input || !box) return;
+
+    if (typeof L !== 'undefined' && L.DomEvent) {
+      L.DomEvent.disableClickPropagation(overlay);
+      L.DomEvent.disableScrollPropagation(overlay);
+    }
+    updateMapOverlaySearchLabels();
+
+    if (overlay.dataset.bound === '1') return;
+    overlay.dataset.bound = '1';
+    let searchSeq = 0;
+    let debounceTimer = null;
+    const getSeq = () => searchSeq;
+
+    toggle.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      setMapOverlaySearchCollapsed(!overlay.classList.contains('collapsed'));
+    });
+    input.addEventListener('input', () => {
+      const seq = ++searchSeq;
+      window.clearTimeout(debounceTimer);
+      debounceTimer = window.setTimeout(() => renderMapOverlayResults(input.value, seq, getSeq), 120);
+    });
+    input.addEventListener('keydown', event => {
+      if (event.key !== 'Enter') return;
+      const first = box.querySelector('.map-search-result');
+      if (first) {
+        event.preventDefault();
+        first.click();
+      }
+    });
+    document.addEventListener('click', event => {
+      if (!overlay.contains(event.target)) box.classList.remove('active');
+    });
+    let collapsed = false;
+    try { collapsed = localStorage.getItem(MAP_SEARCH_COLLAPSE_KEY) === '1'; } catch (_) {}
+    setMapOverlaySearchCollapsed(collapsed);
   }
 
   function setBandChipLabel(chip, sample, bandLabel) {
@@ -3962,6 +4873,7 @@ window.addEventListener('unhandledrejection', function(event) {
       (App.selectedSample && App.selectedSample.scope) ||
       (App.currentPoloName && App.data && App.data[App.currentPoloName] ? App.data[App.currentPoloName].area_col : null);
     if (!areaCol) return;
+    refreshStudyAreaOutline(areaCol);
     if (App.map) {
       if (App.fcuBasePolygonsLayer && !App.map.hasLayer(App.fcuBasePolygonsLayer)) App.fcuBasePolygonsLayer.addTo(App.map);
       if (App.fcuPolygonsLayer && !App.map.hasLayer(App.fcuPolygonsLayer)) App.fcuPolygonsLayer.addTo(App.map);
@@ -4043,6 +4955,9 @@ window.addEventListener('unhandledrejection', function(event) {
           applyEbmTranslations();
           refreshAllPointsLegend();
           refreshMapSizeButton();
+          refreshLocalPanelButton();
+          refreshLocationButton();
+          initMapOverlaySearch();
         }, 300);
       };
     }
@@ -4052,7 +4967,10 @@ window.addEventListener('unhandledrejection', function(event) {
       previousInitMap();
       ensureBasemapControl();
       ensureMapSizeControl();
+      ensureLocalPanelControl();
+      ensureLocationControl();
       ensureOverviewLayer();
+      initMapOverlaySearch();
       if (!App.fcuCanvasLayer) {
         App.fcuCanvasLayer = new FinalFcuCanvasLayer({tileSize: 256, opacity: 0.98, zIndex: 360});
         App.fcuCanvasLayer.addTo(App.map);
@@ -4093,9 +5011,8 @@ window.addEventListener('unhandledrejection', function(event) {
         if (App.selectionMarker && App.map && App.map.hasLayer(App.selectionMarker)) {
           App.map.removeLayer(App.selectionMarker);
         }
-        if (sample && App.map && Number.isFinite(Number(sample.lat)) && Number.isFinite(Number(sample.lng))) {
-          const targetZoom = Math.max(App.map.getZoom() || TILE_Z, TILE_Z);
-          setTimeout(() => App.map.flyTo([Number(sample.lat), Number(sample.lng)], targetZoom, {duration: 0.35}), 80);
+        if (sample && App.finalAllowCellZoom && App.map && Number.isFinite(Number(sample.lat)) && Number.isFinite(Number(sample.lng))) {
+          setTimeout(() => finalFlyToCellTwoStage(Number(sample.lat), Number(sample.lng)), 80);
         }
         if (sample && typeof renderTermGraphs === 'function' && App.currentPolo && App.currentPolo.term_graphs) {
           const rankedLocal = Object.entries(sample.contributions || {})
@@ -4120,7 +5037,7 @@ window.addEventListener('unhandledrejection', function(event) {
         if (isSuggestion && Number(sample.proba || 0) >= 0.10) el.classList.add('risk-high');
         el.innerText = `${sample.id} (${percentLabel(sample.proba)})`;
         el.dataset.id = sample.id;
-        el.onclick = () => { selectSample(sample); showPointPopup(sample); };
+        el.onclick = () => selectCellSampleExplicit(sample, true);
         return el;
       };
     }
@@ -4156,6 +5073,7 @@ window.addEventListener('unhandledrejection', function(event) {
         if (App.fcuCanvasLayer) App.fcuCanvasLayer.redraw();
         if (App.allPointsLayer) App.allPointsLayer.redraw();
         loadFcusForCurrentArea();
+        initMapOverlaySearch();
         setTimeout(refreshTouchInteractionGates, 260);
         setTimeout(bindFeatureClickHandlers, 360);
       };
@@ -4165,6 +5083,7 @@ window.addEventListener('unhandledrejection', function(event) {
       initMap();
       updateMapMarkers(App.currentPolo.local_explanations || []);
       renderBandSampleControls(App.currentPolo.local_explanations || []);
+      initMapOverlaySearch();
       if (App.fcuCanvasLayer) App.fcuCanvasLayer.redraw();
       if (App.allPointsLayer) App.allPointsLayer.redraw();
       loadFcusForCurrentArea();
@@ -4182,6 +5101,7 @@ window.addEventListener('unhandledrejection', function(event) {
     if (patchDone && typeof App !== 'undefined' && App.currentPolo) {
       updateMapMarkers(App.currentPolo.local_explanations || []);
       renderBandSampleControls(App.currentPolo.local_explanations || []);
+      initMapOverlaySearch();
       refreshBandChipLabels();
       if (App.fcuCanvasLayer) App.fcuCanvasLayer.redraw();
       if (App.allPointsLayer) App.allPointsLayer.redraw();
