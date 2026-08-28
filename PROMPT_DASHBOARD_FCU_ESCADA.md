@@ -124,6 +124,20 @@ Ao clicar em uma célula, mostre:
 - sobrepor FCU Tipo 1 e Tipo 2 em cinza translúcido;
 - preservar seleção, popup, filtros, rotação, inclinação e retorno ao mapa 2D.
 
+## Guia de uso
+
+- criar uma página `guia.html`, ligada ao dashboard pela aba `Guia de uso`;
+- usar linguagem institucional e natural, orientada à análise territorial, sem apresentar a página como manual exclusivo de uma instituição ou equipe específica;
+- organizar o conteúdo em: roteiro rápido, interpretação da legenda, regra da escada, leitura da célula, orientação para decisão, imagens/3D e FAQ;
+- apresentar o fluxo `área de estudo → classe de ação → concordância dos três modelos → situação FCU → imagens/3D → decisão`;
+- incluir a tabela integral da escada e um simulador de F, E, limite prioritário e atenção seguinte;
+- explicar que cada área possui ranking próprio e que posições brutas de áreas diferentes não são diretamente comparáveis;
+- explicar que vermelho indica prioridade relativa, não confirmação;
+- explicar a independência entre classe de ação e situação territorial;
+- usar recortes reais do dashboard para ilustrar legenda, painel da célula e 3D;
+- permitir ampliar os recortes, pesquisar o FAQ e navegar de volta ao mapa;
+- garantir layout limpo, responsivo, acessível por teclado e sem rolagem horizontal indevida em telas estreitas.
+
 ## Arquivos de entrega
 
 Produza:

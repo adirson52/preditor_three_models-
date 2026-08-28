@@ -21,6 +21,8 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 ## Conteudo publicado
 
 - `index.html`: dashboard final.
+- `guia.html`: guia visual de leitura e priorização, com roteiro, legenda, regra da escada, simulador, leitura da célula, orientação analítica e FAQ.
+- `assets/guia/`: recortes reais do mapa 2D, painel da célula e visualização 3D usados no guia.
 - `data_tiles/`: tiles estaticos do mapa, pontos, lookup de busca e FCUs originais.
 - `vercel.json`: headers de cache e gzip para os tiles.
 - `data_tiles/final/ranking_rules_escada.json`: limites e contagens por área.
@@ -37,6 +39,7 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 - `tools/validar_overview_qml.py`: valida contagens, paleta e opacidades dos tiles QML.
 - `tools/validar_camadas_areas.py`: valida, célula a célula, as classes e os limites da escada nas 11 áreas de estudo.
 - `VALIDACAO_OFFLINE_LEGENDA_FCU_20260828.md`: relatório reproduzível dos testes funcionais do mapa, FCUs e 3D.
+- `VALIDACAO_OFFLINE_GUIA_V1_20260828.md`: relatório da validação visual e funcional do guia em desktop e tela estreita.
 
 ## Execução offline
 

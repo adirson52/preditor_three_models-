@@ -1291,7 +1291,7 @@ window.addEventListener('unhandledrejection', function(event) {
                         Framework de IA Explicável para Mapeamento de Favelas.<br><span style="font-size:0.92rem;color:var(--text-muted);">Cenario: Modelo completo. Modelo completo com variáveis candidatas selecionadas por área de estudo.</span>
                     </p>
                 </header>
-<nav class="site-nav-links" aria-label="Navegacao principal"><a class="active" href="index.html">Início</a><a href="https://cefavela.ufabc.edu.br/revelando-favelas-arcabouco-metodologico-para-identificacao-e-caracterizacao-de-favelas/" target="_blank" rel="noopener noreferrer">Saiba mais</a></nav>
+<nav class="site-nav-links" aria-label="Navegacao principal"><a class="active" href="index.html">Início</a><a href="guia.html">Guia de uso</a><a href="https://cefavela.ufabc.edu.br/revelando-favelas-arcabouco-metodologico-para-identificacao-e-caracterizacao-de-favelas/" target="_blank" rel="noopener noreferrer">Saiba mais</a></nav>
 
                 <div class="tab-nav">
                     <button class="tab-btn active" onclick="switchTab(1)"> Insights Analysis</button>
@@ -3080,6 +3080,7 @@ window.addEventListener('unhandledrejection', function(event) {
       navFull: 'Modelo completo',
       navMorph: 'Modelo morfológico',
       navAnalysis: 'Análise dos modelos',
+      navGuide: 'Guia de uso',
       navMore: 'Saiba mais',
       footerText: '<strong>Projeto Revelando Favelas</strong>, CEFAVELA/Universidade Federal do ABC - UFABC. Autores: Freitas Junior, Flávia Feitosa, Gabriel Marques e Marcos Medeiros.',
       footerMore: 'Saiba mais sobre o projeto',
@@ -3142,6 +3143,7 @@ window.addEventListener('unhandledrejection', function(event) {
         navFull: 'Full model',
         navMorph: 'Morphological model',
         navAnalysis: 'Model analysis',
+        navGuide: 'User guide',
         navMore: 'Learn more',
         footerText: '<strong>Revealing Favelas Project</strong>, CEFAVELA/Federal University of ABC - UFABC. Authors: Freitas Junior, Flávia Feitosa, Gabriel Marques, and Marcos Medeiros.',
         footerMore: 'Learn more about the project',
@@ -3422,7 +3424,7 @@ window.addEventListener('unhandledrejection', function(event) {
     const lang = mapLang();
     document.documentElement.lang = lang === 'en' ? 'en' : 'pt-BR';
     document.querySelectorAll('[data-i18n="scope_label"]').forEach(el => el.textContent = mapText('studyAreas'));
-    const navKeys = ['navHome', 'navMore'];
+    const navKeys = ['navHome', 'navGuide', 'navMore'];
     document.querySelectorAll('.site-nav-links a').forEach((a, idx) => {
       if (navKeys[idx]) a.textContent = mapText(navKeys[idx]);
     });
@@ -5815,6 +5817,7 @@ window.addEventListener('unhandledrejection', function(event) {
     if (nav) {
       nav.innerHTML =
         '<a class="active" href="index.html">Início</a>' +
+        '<a href="guia.html">Guia de uso</a>' +
         '<a href="https://cefavela.ufabc.edu.br/revelando-favelas-arcabouco-metodologico-para-identificacao-e-caracterizacao-de-favelas/" target="_blank" rel="noopener noreferrer">Saiba mais</a>';
     }
     const title = document.querySelector('#dashboard-content header h1');
@@ -5835,8 +5838,8 @@ window.addEventListener('unhandledrejection', function(event) {
   function finalNavLabels() {
     const en = window.CURR_LANG === 'en' || (window.rfSafeStorage && window.rfSafeStorage.getItem('revelando_lang') === 'en');
     return en
-      ? ['Home', 'Model', 'Model analysis', 'Learn more', 'FCU Predictor - final result']
-      : ['Início', 'Modelo', 'Análise dos modelos', 'Saiba mais', 'Preditor FCU - resultado final'];
+      ? ['Home', 'Model', 'Model analysis', 'Learn more', 'FCU Predictor - final result', 'User guide']
+      : ['Início', 'Modelo', 'Análise dos modelos', 'Saiba mais', 'Preditor FCU - resultado final', 'Guia de uso'];
   }
   function fixFinalNavigation() {
     const labels = finalNavLabels();
@@ -5844,6 +5847,7 @@ window.addEventListener('unhandledrejection', function(event) {
     if (nav) {
       nav.innerHTML =
         `<a class="active" href="index.html">${labels[0]}</a>` +
+        `<a href="guia.html">${labels[5]}</a>` +
         `<a href="https://cefavela.ufabc.edu.br/revelando-favelas-arcabouco-metodologico-para-identificacao-e-caracterizacao-de-favelas/" target="_blank" rel="noopener noreferrer">${labels[3]}</a>`;
     }
     const title = document.querySelector('#dashboard-content header h1');

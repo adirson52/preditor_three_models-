@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Guia de leitura do mapa, da legenda e das regras de priorização do Preditor FCU.">
+  <title>Guia de uso — Preditor FCU</title>
+  <style>
+    :root {
+      --ink: #102a3a;
+      --ink-soft: #405767;
+      --muted: #6d7f8b;
+      --line: #dce7ec;
+      --line-strong: #c7d8df;
+      --paper: #ffffff;
+      --canvas: #f3f7f9;
+      --teal: #087d96;
+      --teal-dark: #07576b;
+      --teal-pale: #e4f3f5;
+      --red: #d7191c;
+      --orange: #f28e2b;
+      --yellow: #f8cf66;
+      --blue: #2b83ba;
+      --green: #7fcdbb;
+      --fcu-one: #374151;
+      --fcu-two: #cbd5e1;
+      --shadow: 0 12px 30px rgba(20, 57, 75, .08);
+      --radius: 18px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 1%, rgba(8, 125, 150, .08), transparent 26rem),
+        var(--canvas);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.58;
+    }
+    a { color: inherit; }
+    img { display: block; max-width: 100%; }
+    button, input { font: inherit; }
+
+    .skip-link {
+      position: fixed;
+      left: 1rem;
+      top: -4rem;
+      z-index: 1000;
+      padding: .7rem 1rem;
+      border-radius: 8px;
+      color: #fff;
+      background: var(--ink);
+      transition: top .2s ease;
+    }
+    .skip-link:focus { top: 1rem; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid rgba(199, 216, 223, .9);
+      background: rgba(255, 255, 255, .92);
+      backdrop-filter: blur(14px);
+    }
+    .topbar-inner {
+      width: min(calc(100% - 2rem), var(--max));
+      min-height: 68px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: .7rem;
+      text-decoration: none;
+      font-weight: 850;
+      letter-spacing: -.02em;
+    }
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background:
+        linear-gradient(135deg, transparent 0 42%, rgba(255,255,255,.92) 42% 48%, transparent 48% 100%),
+        linear-gradient(135deg, #0d425f, #0a8aa2);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.22);
+    }
+    .site-nav { display: flex; align-items: center; gap: .35rem; }
+    .site-nav a {
+      padding: .52rem .78rem;
+      border-radius: 8px;
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-size: .88rem;
+      font-weight: 720;
+    }
+    .site-nav a:hover, .site-nav a:focus-visible { background: #eef4f6; outline: none; }
+    .site-nav a.active { color: #fff; background: var(--ink); }
+
+    .hero {
+      width: min(calc(100% - 2rem), var(--max));
+      margin: 2.25rem auto 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(360px, .96fr);
+      gap: 2rem;
+      align-items: center;
+      padding: clamp(1.5rem, 4vw, 3.25rem);
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: linear-gradient(135deg, #fff 0%, #f7fbfc 62%, #eaf5f7 100%);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      margin-bottom: .8rem;
+      color: var(--teal-dark);
+      font-size: .75rem;
+      font-weight: 850;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 24px;
+      height: 3px;
+      border-radius: 9px;
+      background: var(--teal);
+    }
+    h1, h2, h3 { margin-top: 0; line-height: 1.15; letter-spacing: -.025em; }
+    h1 { margin-bottom: 1rem; font-size: clamp(2.2rem, 5vw, 4.25rem); max-width: 13ch; }
+    h2 { margin-bottom: .75rem; font-size: clamp(1.7rem, 3vw, 2.45rem); }
+    h3 { margin-bottom: .45rem; font-size: 1.08rem; }
+    .hero-copy > p { max-width: 62ch; margin: 0; color: var(--ink-soft); font-size: 1.04rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 1.35rem; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .45rem;
+      min-height: 42px;
+      padding: .68rem 1rem;
+      border: 1px solid var(--ink);
+      border-radius: 10px;
+      color: #fff;
+      background: var(--ink);
+      text-decoration: none;
+      font-size: .9rem;
+      font-weight: 800;
+    }
+    .button.secondary { color: var(--ink); background: #fff; border-color: var(--line-strong); }
+    .button:hover, .button:focus-visible { transform: translateY(-1px); box-shadow: 0 7px 18px rgba(16,42,58,.12); outline: none; }
+    .hero-visual { position: relative; }
+    .hero-visual img {
+      width: 100%;
+      aspect-ratio: 1.36;
+      object-fit: cover;
+      border: 1px solid #bdd2db;
+      border-radius: 17px;
+      box-shadow: 0 18px 45px rgba(14, 71, 94, .18);
+    }
+    .hero-caption {
+      position: absolute;
+      right: 1rem;
+      bottom: 1rem;
+      max-width: 220px;
+      padding: .65rem .8rem;
+      border: 1px solid rgba(255,255,255,.65);
+      border-radius: 11px;
+      color: #fff;
+      background: rgba(10, 40, 55, .88);
+      font-size: .76rem;
+      line-height: 1.4;
+      box-shadow: 0 8px 25px rgba(0,0,0,.18);
+    }
+
+    .section-nav-wrap {
+      position: sticky;
+      top: 68px;
+      z-index: 40;
+      margin-top: 1rem;
+      padding: .55rem 0;
+      background: linear-gradient(var(--canvas) 72%, transparent);
+    }
+    .section-nav {
+      width: min(calc(100% - 2rem), var(--max));
+      margin: 0 auto;
+      display: flex;
+      gap: .35rem;
+      overflow-x: auto;
+      padding: .45rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 7px 20px rgba(20, 57, 75, .06);
+      scrollbar-width: thin;
+    }
+    .section-nav a {
+      flex: 0 0 auto;
+      padding: .48rem .72rem;
+      border-radius: 8px;
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-size: .8rem;
+      font-weight: 800;
+    }
+    .section-nav a:hover, .section-nav a.active { color: #fff; background: var(--teal-dark); }
+
+    main { width: min(calc(100% - 2rem), var(--max)); margin: 0 auto; }
+    .section { padding: clamp(3.6rem, 7vw, 6rem) 0 0; scroll-margin-top: 120px; }
+    .section-heading { max-width: 760px; margin-bottom: 1.55rem; }
+    .section-heading p { margin: 0; color: var(--ink-soft); }
+    .kicker { margin-bottom: .55rem; color: var(--teal); font-size: .73rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: 0 6px 20px rgba(20,57,75,.05);
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: .65rem;
+    }
+    .flow-step {
+      position: relative;
+      min-height: 138px;
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fff;
+    }
+    .flow-step:not(:last-child)::after {
+      content: "›";
+      position: absolute;
+      top: 47%;
+      right: -.57rem;
+      z-index: 2;
+      width: 1.05rem;
+      height: 1.4rem;
+      color: var(--teal);
+      background: var(--canvas);
+      font-size: 1.4rem;
+      font-weight: 900;
+      line-height: 1.28rem;
+      text-align: center;
+    }
+    .flow-number {
+      display: grid;
+      place-items: center;
+      width: 29px;
+      height: 29px;
+      margin-bottom: .75rem;
+      border-radius: 9px;
+      color: #fff;
+      background: var(--teal-dark);
+      font-size: .76rem;
+      font-weight: 850;
+    }
+    .flow-step strong { display: block; margin-bottom: .22rem; font-size: .9rem; }
+    .flow-step span { display: block; color: var(--muted); font-size: .76rem; line-height: 1.42; }
+    .principle {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: .85rem;
+      align-items: start;
+      margin-top: 1rem;
+      padding: 1.1rem 1.2rem;
+      border-left: 4px solid var(--teal);
+      border-radius: 12px;
+      background: var(--teal-pale);
+      color: var(--teal-dark);
+    }
+    .principle-mark { font-size: 1.25rem; font-weight: 900; }
+    .principle p { margin: 0; }
+
+    .legend-layout, .cell-layout, .context-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(320px, .88fr);
+      gap: 1.25rem;
+      align-items: start;
+    }
+    .legend-layout > *, .cell-layout > *, .context-layout > *, .stairs-layout > * { min-width: 0; }
+    figure { margin: 0; }
+    .shot {
+      overflow: hidden;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: #eef4f6;
+      box-shadow: var(--shadow);
+    }
+    .shot img { width: 100%; height: auto; }
+    figcaption { padding: .75rem .9rem; color: var(--muted); background: #fff; font-size: .78rem; }
+    .legend-list { display: grid; gap: .7rem; }
+    .legend-item { padding: 1rem; }
+    .legend-row { display: flex; gap: .75rem; align-items: flex-start; }
+    .legend-swatch { flex: 0 0 auto; margin-top: .28rem; }
+    .ramp { width: 48px; height: 10px; border: 1px solid rgba(16,42,58,.15); border-radius: 99px; background: linear-gradient(90deg,#d7191c,#fdae61,#ffffbf,#a6dbaa,#2b83ba); }
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .dot.red { background: var(--red); }
+    .dot.orange { background: var(--orange); }
+    .dot.clear { border: 1.5px solid #94a3b8; background: transparent; }
+    .polygon { width: 18px; height: 13px; border-radius: 2px; }
+    .polygon.one { border: 2px solid #1f2937; background: rgba(55,65,81,.20); }
+    .polygon.two { border: 2px solid #64748b; background: rgba(203,213,225,.30); }
+    .legend-item p { margin: .25rem 0 0; color: var(--muted); font-size: .84rem; }
+    .layer-rule { margin-top: .75rem; padding: .85rem 1rem; border-radius: 12px; color: #4d4a26; background: #fff8d9; font-size: .83rem; }
+
+    .formula-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin-bottom: 1rem; }
+    .formula { padding: 1rem; }
+    .formula-label { color: var(--muted); font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; }
+    .formula-value { margin: .22rem 0; color: var(--teal-dark); font-size: 1.35rem; font-weight: 880; }
+    .formula p { margin: 0; color: var(--muted); font-size: .78rem; }
+    .stairs-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr); gap: 1rem; align-items: start; }
+    .table-card { overflow: hidden; }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+    th, td { padding: .72rem .8rem; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: #fff; background: var(--teal-dark); font-size: .73rem; letter-spacing: .02em; }
+    tbody tr:nth-child(even) { background: #f8fbfc; }
+    tbody tr:hover { background: var(--teal-pale); }
+    .table-note { margin: 0; padding: .75rem .85rem; color: var(--muted); background: #fff; font-size: .76rem; }
+    .calculator { position: sticky; top: 136px; padding: 1.15rem; }
+    .calculator h3 { font-size: 1.18rem; }
+    .calculator > p { margin: 0 0 1rem; color: var(--muted); font-size: .83rem; }
+    .range-line { display: flex; align-items: center; gap: .8rem; margin-bottom: 1rem; }
+    input[type="range"] { width: 100%; accent-color: var(--teal); }
+    .f-value { min-width: 76px; padding: .36rem .5rem; border: 1px solid var(--line); border-radius: 8px; color: var(--teal-dark); background: #f7fbfc; font-weight: 850; text-align: center; }
+    .calc-results { display: grid; grid-template-columns: repeat(2, 1fr); gap: .55rem; }
+    .calc-result { padding: .78rem; border-radius: 11px; background: #f5f8fa; }
+    .calc-result.priority { background: #fdeceb; }
+    .calc-result.attention { background: #fff1dc; }
+    .calc-result small { display: block; color: var(--muted); font-size: .68rem; font-weight: 800; text-transform: uppercase; }
+    .calc-result strong { display: block; margin-top: .1rem; font-size: 1.14rem; }
+    .calc-result.priority strong { color: #a61b1d; }
+    .calc-result.attention strong { color: #a95709; }
+    .calc-cells { margin-top: .75rem; padding: .8rem; border: 1px dashed var(--line-strong); border-radius: 10px; color: var(--ink-soft); font-size: .78rem; }
+    .examples { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-top: 1rem; }
+    .example { padding: 1rem; }
+    .example strong { color: var(--teal-dark); font-size: 1.05rem; }
+    .example p { margin: .3rem 0 0; color: var(--muted); font-size: .8rem; }
+
+    .cell-shot { padding: .7rem; background: #eef4f6; }
+    .cell-shot img { border-radius: 10px; background: #fff; }
+    .reading-list { display: grid; gap: .55rem; }
+    .reading-item { display: grid; grid-template-columns: 31px 1fr; gap: .7rem; padding: .8rem; }
+    .reading-number { display: grid; place-items: center; width: 31px; height: 31px; border-radius: 9px; color: #fff; background: var(--ink); font-size: .75rem; font-weight: 850; }
+    .reading-item p { margin: .2rem 0 0; color: var(--muted); font-size: .8rem; }
+    .models { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin-top: 1rem; }
+    .model { padding: 1rem; border-top: 4px solid var(--teal); }
+    .model:nth-child(2) { border-color: #788b53; }
+    .model:nth-child(3) { border-color: #b77422; }
+    .model p { margin: .3rem 0 0; color: var(--muted); font-size: .8rem; }
+    .level-rule { margin-top: 1rem; padding: 1rem 1.15rem; }
+    .levels { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .65rem; }
+    .level { padding: .3rem .55rem; border-radius: 999px; font-size: .73rem; font-weight: 850; }
+    .level.high { color: #9c1c12; background: #fee2e2; }
+    .level.medium { color: #95510d; background: #ffedd5; }
+    .level.low { color: #51616c; background: #edf1f3; }
+    .level-rule p { margin: .7rem 0 0; color: var(--muted); font-size: .82rem; }
+
+    .decision-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+    .decision { position: relative; min-height: 165px; padding: 1.15rem; overflow: hidden; }
+    .decision::after { content: ""; position: absolute; inset: auto -35px -55px auto; width: 120px; height: 120px; border-radius: 50%; background: rgba(8,125,150,.06); }
+    .decision-tag { display: inline-block; margin-bottom: .7rem; padding: .28rem .5rem; border-radius: 999px; color: var(--teal-dark); background: var(--teal-pale); font-size: .68rem; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
+    .decision p { margin: .35rem 0 0; color: var(--muted); font-size: .84rem; }
+    .caution { margin-top: .9rem; padding: 1.1rem 1.2rem; border: 1px solid #f2c9c4; border-radius: 14px; color: #74211b; background: #fff5f3; }
+    .caution strong { display: block; margin-bottom: .2rem; }
+    .caution p { margin: 0; font-size: .85rem; }
+
+    .context-layout { align-items: stretch; }
+    .context-copy { display: grid; align-content: center; gap: .7rem; padding: 1.25rem; }
+    .context-copy p { margin: 0; color: var(--muted); font-size: .86rem; }
+    .checklist { display: grid; gap: .5rem; margin-top: .25rem; }
+    .check { display: grid; grid-template-columns: 23px 1fr; gap: .55rem; align-items: start; color: var(--ink-soft); font-size: .82rem; }
+    .check::before { content: "✓"; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 7px; color: #fff; background: var(--teal); font-size: .7rem; font-weight: 900; }
+
+    .faq-tools { display: flex; gap: .7rem; margin-bottom: .8rem; }
+    .faq-search { width: min(100%, 520px); padding: .72rem .85rem; border: 1px solid var(--line-strong); border-radius: 10px; color: var(--ink); background: #fff; outline: none; }
+    .faq-search:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(8,125,150,.13); }
+    .faq-list { display: grid; gap: .55rem; }
+    details { border: 1px solid var(--line); border-radius: 13px; background: #fff; overflow: hidden; }
+    summary { position: relative; padding: 1rem 3rem 1rem 1rem; cursor: pointer; list-style: none; font-weight: 800; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; position: absolute; right: 1rem; top: .8rem; color: var(--teal); font-size: 1.35rem; }
+    details[open] summary::after { content: "−"; }
+    details[open] summary { border-bottom: 1px solid var(--line); background: #f8fbfc; }
+    .answer { padding: 1rem; color: var(--ink-soft); font-size: .88rem; }
+    .answer p { margin: 0; }
+    .faq-empty { display: none; padding: 1rem; color: var(--muted); text-align: center; }
+
+    .closing {
+      margin: 5rem 0 2rem;
+      padding: clamp(1.4rem, 4vw, 2.5rem);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      border-radius: 22px;
+      color: #fff;
+      background: linear-gradient(130deg, #0c354c, #087d96);
+      box-shadow: var(--shadow);
+    }
+    .closing h2 { margin-bottom: .45rem; }
+    .closing p { max-width: 70ch; margin: 0; color: rgba(255,255,255,.78); }
+    .closing .button { color: var(--ink); background: #fff; border-color: #fff; }
+    footer { padding: 1.3rem 0 2rem; color: var(--muted); font-size: .78rem; text-align: center; }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      place-items: center;
+      padding: 1.25rem;
+      background: rgba(7, 23, 34, .86);
+    }
+    .lightbox.open { display: grid; }
+    .lightbox img { max-width: min(96vw, 1500px); max-height: 88vh; border: 1px solid rgba(255,255,255,.25); border-radius: 12px; box-shadow: 0 28px 70px rgba(0,0,0,.38); }
+    .lightbox button { position: fixed; top: 1rem; right: 1rem; width: 42px; height: 42px; border: 0; border-radius: 50%; color: #fff; background: rgba(255,255,255,.16); cursor: pointer; font-size: 1.45rem; }
+    [data-zoom] { cursor: zoom-in; }
+
+    @media (max-width: 980px) {
+      .hero, .legend-layout, .cell-layout, .context-layout, .stairs-layout { grid-template-columns: 1fr; }
+      .hero-visual { order: -1; }
+      .hero-visual img { aspect-ratio: 1.7; }
+      .flow { grid-template-columns: repeat(3, 1fr); }
+      .flow-step:nth-child(3)::after { display: none; }
+      .calculator { position: static; }
+    }
+    @media (max-width: 720px) {
+      .topbar-inner { align-items: flex-start; padding: .72rem 0; }
+      .site-nav { flex-wrap: wrap; justify-content: flex-end; }
+      .site-nav a { padding: .42rem .58rem; font-size: .76rem; }
+      .brand span:last-child { display: none; }
+      .section-nav-wrap { top: 59px; }
+      .hero { margin-top: 1rem; padding: 1.15rem; border-radius: 18px; }
+      .hero-visual img { aspect-ratio: 1.3; }
+      .hero-caption { position: static; max-width: none; margin-top: .5rem; color: var(--ink-soft); background: transparent; box-shadow: none; border-color: var(--line); }
+      .flow, .models, .examples, .formula-strip, .decision-grid { grid-template-columns: 1fr; }
+      .flow-step { min-height: 0; display: grid; grid-template-columns: 33px 1fr; column-gap: .7rem; }
+      .flow-number { grid-row: span 2; margin: 0; }
+      .flow-step::after { display: none !important; }
+      .closing { grid-template-columns: 1fr; }
+      .calc-results { grid-template-columns: 1fr 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; }
+    }
+    @media print {
+      .topbar, .section-nav-wrap, .hero-actions, .faq-tools, .lightbox, .closing .button { display: none !important; }
+      body { background: #fff; }
+      .hero, .card, .shot, .closing { box-shadow: none; }
+      .section { break-inside: avoid; }
+      details { break-inside: avoid; }
+      details .answer { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html" aria-label="Voltar ao Preditor FCU">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Preditor FCU</span>
+      </a>
+      <nav class="site-nav" aria-label="Navegação principal">
+        <a href="index.html">Início</a>
+        <a class="active" href="guia.html" aria-current="page">Guia de uso</a>
+        <a href="https://cefavela.ufabc.edu.br/revelando-favelas-arcabouco-metodologico-para-identificacao-e-caracterizacao-de-favelas/" target="_blank" rel="noopener noreferrer">Saiba mais</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero" aria-labelledby="page-title">
+    <div class="hero-copy">
+      <div class="eyebrow">Guia de uso · versão 1</div>
+      <h1 id="page-title">Guia de leitura e priorização</h1>
+      <p>Um roteiro para passar da visão geral da área à interpretação de uma célula, combinando ranking, classe de ação, concordância dos modelos, situação territorial e imagens de contexto.</p>
+      <div class="hero-actions">
+        <a class="button" href="#roteiro">Começar pelo roteiro</a>
+        <a class="button secondary" href="index.html">Abrir o mapa</a>
+      </div>
+    </div>
+    <figure class="hero-visual">
+      <img src="assets/guia/mapa-legenda.png" alt="Mapa de Salvador com ranking QML, classes de ação e polígonos FCU" data-zoom>
+      <figcaption class="hero-caption">As camadas respondem a perguntas diferentes. Leia-as em conjunto, sem transformar uma cor isolada em confirmação.</figcaption>
+    </figure>
+  </section>
+
+  <div class="section-nav-wrap" aria-label="Atalhos do guia">
+    <nav class="section-nav">
+      <a href="#roteiro">Roteiro</a>
+      <a href="#legenda">Legenda</a>
+      <a href="#escada">Regra da escada</a>
+      <a href="#celula">Leitura da célula</a>
+      <a href="#decisao">Decisão</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+  </div>
+
+  <main id="conteudo">
+    <section class="section" id="roteiro">
+      <div class="section-heading">
+        <div class="kicker">01 · Roteiro rápido</div>
+        <h2>Da área de estudo à decisão</h2>
+        <p>A leitura funciona melhor quando segue uma sequência. Cada etapa acrescenta contexto à anterior e reduz interpretações apressadas.</p>
+      </div>
+      <div class="flow" aria-label="Sequência recomendada de leitura">
+        <div class="flow-step"><span class="flow-number">1</span><strong>Área de estudo</strong><span>Escolha o universo territorial que será analisado.</span></div>
+        <div class="flow-step"><span class="flow-number">2</span><strong>Classe de ação</strong><span>Localize as faixas prioritária, de atenção e restante.</span></div>
+        <div class="flow-step"><span class="flow-number">3</span><strong>Três modelos</strong><span>Observe concordâncias e diferenças entre as evidências.</span></div>
+        <div class="flow-step"><span class="flow-number">4</span><strong>Situação FCU</strong><span>Separe a classe de ação da condição territorial original.</span></div>
+        <div class="flow-step"><span class="flow-number">5</span><strong>Imagens e 3D</strong><span>Acrescente forma urbana, entorno e contexto visual.</span></div>
+        <div class="flow-step"><span class="flow-number">6</span><strong>Decisão</strong><span>Registre a leitura combinada e o próximo encaminhamento.</span></div>
+      </div>
+      <div class="principle">
+        <span class="principle-mark" aria-hidden="true">i</span>
+        <p><strong>Princípio central:</strong> nenhuma camada deve ser lida sozinha. O valor do painel está na combinação entre posição no ranking, modelos, situação territorial e evidências de contexto.</p>
+      </div>
+    </section>
+
+    <section class="section" id="legenda">
+      <div class="section-heading">
+        <div class="kicker">02 · Legenda</div>
+        <h2>Três grupos, três perguntas</h2>
+        <p>Ranking, prioridade e FCU são camadas independentes. Ativar ou desativar uma delas não muda o cálculo das outras.</p>
+      </div>
+      <div class="legend-layout">
+        <figure class="shot">
+          <img src="assets/guia/mapa-legenda.png" alt="Recorte real do mapa com a legenda aberta" data-zoom>
+          <figcaption>Recorte real do dashboard. Clique na imagem para ampliar.</figcaption>
+        </figure>
+        <div>
+          <div class="legend-list">
+            <article class="card legend-item">
+              <div class="legend-row"><span class="legend-swatch ramp" aria-hidden="true"></span><div><h3>Ranking QML</h3><p>Mostra a posição contínua no ranking geral da área em 50 cores. Vermelho representa as primeiras posições; azul, as posições mais distantes.</p></div></div>
+            </article>
+            <article class="card legend-item">
+              <div class="legend-row"><span class="legend-swatch dot red" aria-hidden="true"></span><div><h3>Atenção prioritária</h3><p>Primeira faixa operacional definida pela regra da escada e pela ordem do ranking geral.</p></div></div>
+            </article>
+            <article class="card legend-item">
+              <div class="legend-row"><span class="legend-swatch dot orange" aria-hidden="true"></span><div><h3>Atenção</h3><p>Faixa seguinte do ranking. Indica evidência relevante, abaixo da primeira faixa.</p></div></div>
+            </article>
+            <article class="card legend-item">
+              <div class="legend-row"><span class="legend-swatch dot clear" aria-hidden="true"></span><div><h3>Demais áreas</h3><p>Permanece transparente na camada de ação para reduzir ruído visual, mas suas células continuam consultáveis quando a subcamada está ativada.</p></div></div>
+            </article>
+            <article class="card legend-item">
+              <div class="legend-row"><span class="legend-swatch polygon one" aria-hidden="true"></span><div><h3>FCU Tipo 1</h3><p>FCU original mantida. É uma situação territorial e pode coincidir com qualquer classe de ação.</p></div></div>
+            </article>
+            <article class="card legend-item">
+              <div class="legend-row"><span class="legend-swatch polygon two" aria-hidden="true"></span><div><h3>FCU Tipo 2</h3><p>FCU original em revisão. Pelo menos 50% de suas células válidas apresentam baixa evidência combinada.</p></div></div>
+            </article>
+          </div>
+          <div class="layer-rule"><strong>Não confunda:</strong> o Ranking QML colore todas as células. “Demais áreas” é transparente apenas no grupo separado de Prioridade do modelo.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="escada">
+      <div class="section-heading">
+        <div class="kicker">03 · Regra da escada</div>
+        <h2>Como o tamanho das faixas é definido</h2>
+        <p>A participação da FCU original dimensiona o volume destacado. A posição no ranking geral continua decidindo quais células entram em cada faixa.</p>
+      </div>
+      <div class="formula-strip">
+        <article class="card formula"><span class="formula-label">F</span><div class="formula-value">FCU original</div><p>Percentual de células da área pertencente à FCU original.</p></article>
+        <article class="card formula"><span class="formula-label">E</span><div class="formula-value">Expansão</div><p>Percentual adicional escolhido pela escada conforme o valor de F.</p></article>
+        <article class="card formula"><span class="formula-label">Limites</span><div class="formula-value">F + E/2 → F + E</div><p>A primeira expressão fecha a faixa prioritária; a segunda fecha o total destacado.</p></article>
+      </div>
+      <div class="stairs-layout">
+        <div>
+          <div class="card table-card">
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th>FCU original F</th><th>Expansão E</th><th>Prioritária até</th><th>Atenção seguinte</th><th>Total destacado</th></tr></thead>
+                <tbody>
+                  <tr><td>5%</td><td>5%</td><td>7,5%</td><td>2,5%</td><td>10%</td></tr>
+                  <tr><td>8%</td><td>8%</td><td>12%</td><td>4%</td><td>16%</td></tr>
+                  <tr><td>10%</td><td>10%</td><td>15%</td><td>5%</td><td>20%</td></tr>
+                  <tr><td>12%</td><td>10%</td><td>17%</td><td>5%</td><td>22%</td></tr>
+                  <tr><td>14%</td><td>11%</td><td>19,5%</td><td>5,5%</td><td>25%</td></tr>
+                  <tr><td>16%</td><td>12%</td><td>22%</td><td>6%</td><td>28%</td></tr>
+                  <tr><td>18%</td><td>13%</td><td>24,5%</td><td>6,5%</td><td>31%</td></tr>
+                  <tr><td>21%</td><td>14%</td><td>28%</td><td>7%</td><td>35%</td></tr>
+                  <tr><td>25%</td><td>15%</td><td>32,5%</td><td>7,5%</td><td>40%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="table-note">Escada completa: até 10%, E = F; de 10% a 12,5%, E = 10%; de 12,5% a 15%, E = 11%; de 15% a 17,5%, E = 12%; de 17,5% a 20%, E = 13%; de 20% a 22,5%, E = 14%; acima de 22,5%, E = 15%.</p>
+          </div>
+          <div class="examples">
+            <article class="card example"><strong>F = 8%</strong><p>E = 8%. Prioritária até 12%; atenção nos 4% seguintes; total destacado de 16%.</p></article>
+            <article class="card example"><strong>F = 14%</strong><p>E = 11%. Prioritária até 19,5%; atenção nos 5,5% seguintes; total de 25%.</p></article>
+            <article class="card example"><strong>F = 25%</strong><p>E = 15%. Prioritária até 32,5%; atenção nos 7,5% seguintes; total de 40%.</p></article>
+          </div>
+        </div>
+        <aside class="card calculator" aria-labelledby="calc-title">
+          <h3 id="calc-title">Simule a escada</h3>
+          <p>Ajuste F para observar como os limites percentuais se comportam.</p>
+          <div class="range-line">
+            <input id="f-range" type="range" min="0" max="40" step="0.1" value="14" aria-label="Percentual de FCU original">
+            <output class="f-value" id="f-value" for="f-range">14,0%</output>
+          </div>
+          <div class="calc-results">
+            <div class="calc-result"><small>Expansão E</small><strong id="e-result">11,0%</strong></div>
+            <div class="calc-result priority"><small>Prioritária até</small><strong id="p-result">19,5%</strong></div>
+            <div class="calc-result attention"><small>Atenção seguinte</small><strong id="a-result">5,5%</strong></div>
+            <div class="calc-result"><small>Total destacado</small><strong id="t-result">25,0%</strong></div>
+          </div>
+          <div class="calc-cells" id="cells-result">Em 10.000 células: 1.950 prioritárias, 550 de atenção e 7.500 em demais áreas.</div>
+        </aside>
+      </div>
+      <div class="principle">
+        <span class="principle-mark" aria-hidden="true">≠</span>
+        <p><strong>F define quantidades, não pertencimento.</strong> Uma célula da FCU original não entra automaticamente em atenção. Todas as células — dentro e fora da FCU — são ordenadas pelo ranking geral da própria área.</p>
+      </div>
+    </section>
+
+    <section class="section" id="celula">
+      <div class="section-heading">
+        <div class="kicker">04 · Leitura da célula</div>
+        <h2>O painel reúne a evidência essencial</h2>
+        <p>Ao selecionar uma célula, leia primeiro a classificação geral e depois verifique como os três modelos e a situação territorial compõem essa indicação.</p>
+      </div>
+      <div class="cell-layout">
+        <figure class="shot cell-shot">
+          <img src="assets/guia/painel-celula.png" alt="Painel de uma célula de Salvador com classe prioritária, três modelos, ranking, situação territorial, município e links" data-zoom>
+          <figcaption>Exemplo real: célula prioritária em Salvador, com concordância alta entre os três modelos.</figcaption>
+        </figure>
+        <div class="reading-list">
+          <article class="card reading-item"><span class="reading-number">1</span><div><h3>Classe de ação</h3><p>Resultado do ranking geral: atenção prioritária, atenção ou demais áreas.</p></div></article>
+          <article class="card reading-item"><span class="reading-number">2</span><div><h3>Posição no ranking</h3><p>Ordem local da célula dentro da área de estudo. Menor posição significa maior prioridade relativa.</p></div></article>
+          <article class="card reading-item"><span class="reading-number">3</span><div><h3>Três modelos</h3><p>Modelo completo, Morfologia e IBGE/Espectral mostram alto, médio ou baixo segundo seus próprios rankings.</p></div></article>
+          <article class="card reading-item"><span class="reading-number">4</span><div><h3>Situação territorial</h3><p>Indica se a célula está fora da FCU original, em FCU Tipo 1 ou em FCU Tipo 2.</p></div></article>
+          <article class="card reading-item"><span class="reading-number">5</span><div><h3>Contexto e localização</h3><p>Município, Google Maps, Street View e 3D ajudam a contextualizar a leitura.</p></div></article>
+        </div>
+      </div>
+      <div class="models">
+        <article class="card model"><h3>Modelo completo</h3><p>Síntese das famílias de evidência disponíveis. É a referência principal para o ranking geral.</p></article>
+        <article class="card model"><h3>Morfologia</h3><p>Destaca sinais associados à forma urbana, ocupação, edificações e organização espacial.</p></article>
+        <article class="card model"><h3>IBGE/Espectral</h3><p>Reúne evidências censitárias, domiciliares, de infraestrutura e espectrais disponíveis.</p></article>
+      </div>
+      <div class="card level-rule">
+        <h3>O que significam alto, médio e baixo?</h3>
+        <div class="levels"><span class="level high">Alto · primeira faixa</span><span class="level medium">Médio · faixa seguinte</span><span class="level low">Baixo · fora das duas faixas</span></div>
+        <p>Cada modelo ordena todas as células da área com sua própria pontuação, usando as mesmas quantidades da escada. Portanto, “alto” descreve posição relativa naquele modelo — não é uma confirmação isolada nem uma probabilidade universal.</p>
+      </div>
+    </section>
+
+    <section class="section" id="decisao">
+      <div class="section-heading">
+        <div class="kicker">05 · Orientação para decisão</div>
+        <h2>Transforme sinais em hipóteses verificáveis</h2>
+        <p>O painel ajuda a organizar prioridades e dúvidas. A leitura mais robusta é aquela que registra também discordâncias e contexto territorial.</p>
+      </div>
+      <div class="decision-grid">
+        <article class="card decision"><span class="decision-tag">Sinal convergente</span><h3>Os três modelos concordam</h3><p>Quando completo, morfológico e IBGE/Espectral aparecem altos, a indicação ganha consistência entre famílias diferentes de evidência.</p></article>
+        <article class="card decision"><span class="decision-tag">Sinal a investigar</span><h3>Os modelos divergem</h3><p>A discordância não invalida a célula. Ela mostra qual dimensão sustenta a indicação e qual exige interpretação adicional.</p></article>
+        <article class="card decision"><span class="decision-tag">Revisão territorial</span><h3>A célula está em FCU Tipo 2</h3><p>A FCU original apresenta predominância de baixa evidência combinada e merece leitura cuidadosa de limites, heterogeneidade e atualização.</p></article>
+        <article class="card decision"><span class="decision-tag">Candidata relevante</span><h3>A célula prioritária está fora da FCU</h3><p>É uma candidata importante para análise porque reúne posição elevada no ranking sem já pertencer ao universo territorial original.</p></article>
+      </div>
+      <div class="caution"><strong>Vermelho não significa “favela confirmada”.</strong><p>A cor representa prioridade relativa no modelo. O mapa orienta a análise e a seleção de evidências, mas não substitui verificação técnica, atualização cartográfica e conhecimento territorial.</p></div>
+    </section>
+
+    <section class="section" id="contexto">
+      <div class="section-heading">
+        <div class="kicker">06 · Imagens e 3D</div>
+        <h2>Use o contexto visual como complemento</h2>
+        <p>As imagens ajudam a compreender densidade, forma construída, acessos, continuidade urbana e relação com o entorno.</p>
+      </div>
+      <div class="context-layout">
+        <figure class="shot">
+          <img src="assets/guia/mapa-3d.png" alt="Visualização 3D real de uma célula selecionada em Salvador" data-zoom>
+          <figcaption>Visualização 3D da célula selecionada. O volume construído acrescenta contexto, mas não confirma a classe.</figcaption>
+        </figure>
+        <article class="card context-copy">
+          <h3>Uma sequência útil de observação</h3>
+          <p>Use Google Maps, Street View e 3D para responder perguntas específicas, não apenas para “validar a cor”.</p>
+          <div class="checklist">
+            <div class="check">A ocupação parece contínua ou fragmentada?</div>
+            <div class="check">A forma construída acompanha a indicação morfológica?</div>
+            <div class="check">Existem barreiras, áreas vazias ou mudanças recentes?</div>
+            <div class="check">O limite da FCU representa bem o conjunto observado?</div>
+            <div class="check">Há elementos que expliquem a divergência entre modelos?</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="section-heading">
+        <div class="kicker">07 · Perguntas frequentes</div>
+        <h2>Dúvidas comuns de interpretação</h2>
+        <p>Pesquise por uma palavra ou abra as perguntas abaixo.</p>
+      </div>
+      <div class="faq-tools"><input class="faq-search" id="faq-search" type="search" placeholder="Pesquisar no FAQ" aria-label="Pesquisar perguntas frequentes"></div>
+      <div class="faq-list" id="faq-list">
+        <details data-search="comparar ranking áreas local posição percentil"><summary>Posso comparar diretamente os rankings entre áreas?</summary><div class="answer"><p>Não pela posição bruta. Cada área possui seu próprio universo e seu próprio ranking, de 1 até o total local. A posição 1.000 em Salvador e a posição 1.000 em São Paulo não representam a mesma fração da área. Para comparações, prefira a classe, a faixa percentual e o contexto de cada área.</p></div></details>
+        <details data-search="três modelos completo morfologia ibge espectral concordância divergência"><summary>O que significa ter três modelos diferentes?</summary><div class="answer"><p>Cada modelo organiza as células por uma família de evidências. O completo sintetiza o conjunto disponível; o morfológico enfatiza forma urbana e ocupação; o IBGE/Espectral destaca informações censitárias, de infraestrutura e espectrais. A concordância fortalece a indicação; a divergência mostra onde a interpretação precisa ser aprofundada.</p></div></details>
+        <details data-search="demais áreas transparente clicar consultável ativada"><summary>Por que “demais áreas” é transparente?</summary><div class="answer"><p>Para manter o mapa legível e destacar as duas primeiras faixas de ação. A transparência é apenas visual: as células continuam existindo, podem ser ativadas e permanecem consultáveis. Na camada Ranking QML, todas as células recebem uma das 50 cores.</p></div></details>
+        <details data-search="clicar fcu popup polígono célula informações nome código"><summary>O que acontece ao clicar em uma FCU?</summary><div class="answer"><p>Com a camada FCU ativa, o clique prioriza o polígono e abre suas informações territoriais, como nome, código, tipo e número de células. Para consultar a célula que está abaixo do polígono, desative temporariamente o tipo de FCU correspondente.</p></div></details>
+        <details data-search="3d confirma classificação imagem contexto"><summary>O 3D confirma a classificação?</summary><div class="answer"><p>Não. O 3D oferece contexto sobre forma e volume construído. Ele ajuda a interpretar a indicação e a formular perguntas, mas não funciona como confirmação automática.</p></div></details>
+        <details data-search="fcu atenção prioritária ranking geral todas células"><summary>Uma célula da FCU original pode receber atenção?</summary><div class="answer"><p>Sim. Classe de ação e situação territorial são dimensões independentes. Todas as células entram no ranking geral da área, inclusive as FCUs originais. Uma FCU pode aparecer em atenção prioritária, atenção ou demais áreas.</p></div></details>
+        <details data-search="alto médio baixo certeza probabilidade faixa quantidade"><summary>“Alto” significa certeza alta?</summary><div class="answer"><p>Não. Alto significa que a célula entrou na primeira faixa do ranking daquele modelo. Médio significa a faixa seguinte e baixo, o restante. É uma posição relativa dentro da área de estudo.</p></div></details>
+        <details data-search="fcu tipo 1 tipo 2 baixa evidência 50 revisão"><summary>Como são definidos FCU Tipo 1 e Tipo 2?</summary><div class="answer"><p>Uma célula tem baixa evidência combinada quando apresenta três modelos baixos ou dois baixos e um médio. A FCU é Tipo 2 quando pelo menos 50% de suas células com resultado válido atendem a esse critério. As demais FCUs originais são Tipo 1.</p></div></details>
+        <details data-search="ranking qml 50 cores vermelho azul"><summary>O que representam as 50 cores do Ranking QML?</summary><div class="answer"><p>Elas dividem o ranking local de cada área em 50 intervalos. As primeiras posições aparecem em vermelho, avançando por laranja, amarelo e verde até azul. A rampa permite enxergar continuidade, enquanto as classes de ação simplificam a decisão em três grupos.</p></div></details>
+      </div>
+      <div class="card faq-empty" id="faq-empty">Nenhuma pergunta corresponde à pesquisa.</div>
+    </section>
+
+    <section class="closing">
+      <div><h2>Pronto para aplicar o roteiro?</h2><p>Escolha uma área, observe as camadas separadamente e termine pela leitura combinada da célula e de seu contexto.</p></div>
+      <a class="button" href="index.html">Voltar ao mapa</a>
+    </section>
+  </main>
+
+  <footer><strong>Projeto Revelando Favelas</strong> · CEFAVELA / Universidade Federal do ABC — UFABC.</footer>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Imagem ampliada">
+    <button type="button" aria-label="Fechar imagem">×</button>
+    <img src="assets/guia/mapa-legenda.png" alt="">
+  </div>
+
+  <script>
+    (() => {
+      const formatPct = value => `${Number(value).toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1})}%`;
+      const expansion = f => {
+        let e;
+        if (f <= 10) e = f;
+        else if (f <= 12.5) e = 10;
+        else if (f <= 15) e = 11;
+        else if (f <= 17.5) e = 12;
+        else if (f <= 20) e = 13;
+        else if (f <= 22.5) e = 14;
+        else e = 15;
+        return Math.max(0, Math.min(e, 100 - f));
+      };
+
+      const range = document.querySelector('#f-range');
+      const updateCalculator = () => {
+        const f = Number(range.value);
+        const e = expansion(f);
+        const priority = f + e / 2;
+        const attention = e / 2;
+        const total = f + e;
+        const other = Math.max(0, 100 - total);
+        document.querySelector('#f-value').textContent = formatPct(f);
+        document.querySelector('#e-result').textContent = formatPct(e);
+        document.querySelector('#p-result').textContent = formatPct(priority);
+        document.querySelector('#a-result').textContent = formatPct(attention);
+        document.querySelector('#t-result').textContent = formatPct(total);
+        const cells = value => Math.round(value * 100).toLocaleString('pt-BR');
+        document.querySelector('#cells-result').textContent = `Em 10.000 células: ${cells(priority)} prioritárias, ${cells(attention)} de atenção e ${cells(other)} em demais áreas.`;
+      };
+      range.addEventListener('input', updateCalculator);
+      updateCalculator();
+
+      const search = document.querySelector('#faq-search');
+      const items = Array.from(document.querySelectorAll('#faq-list details'));
+      search.addEventListener('input', () => {
+        const query = search.value.trim().toLocaleLowerCase('pt-BR');
+        let visible = 0;
+        items.forEach(item => {
+          const haystack = `${item.textContent} ${item.dataset.search || ''}`.toLocaleLowerCase('pt-BR');
+          const show = !query || haystack.includes(query);
+          item.hidden = !show;
+          if (show) visible += 1;
+        });
+        document.querySelector('#faq-empty').style.display = visible ? 'none' : 'block';
+      });
+
+      const lightbox = document.querySelector('#lightbox');
+      const lightboxImage = lightbox.querySelector('img');
+      const closeLightbox = () => {
+        lightbox.classList.remove('open');
+        document.body.style.overflow = '';
+      };
+      document.querySelectorAll('[data-zoom]').forEach(image => image.addEventListener('click', () => {
+        lightboxImage.src = image.src;
+        lightboxImage.alt = image.alt;
+        lightbox.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        lightbox.querySelector('button').focus();
+      }));
+      lightbox.querySelector('button').addEventListener('click', closeLightbox);
+      lightbox.addEventListener('click', event => { if (event.target === lightbox) closeLightbox(); });
+      document.addEventListener('keydown', event => { if (event.key === 'Escape') closeLightbox(); });
+
+      const sectionLinks = Array.from(document.querySelectorAll('.section-nav a'));
+      const sections = sectionLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      const observer = new IntersectionObserver(entries => {
+        const active = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!active) return;
+        sectionLinks.forEach(link => link.classList.toggle('active', link.getAttribute('href') === `#${active.target.id}`));
+      }, {rootMargin: '-28% 0px -60% 0px', threshold: [0, .2, .5]});
+      sections.forEach(section => observer.observe(section));
+    })();
+  </script>
+</body>
+</html>
