@@ -2806,7 +2806,7 @@ window.addEventListener('unhandledrejection', function(event) {
   const SCENARIO_KEY = "final";
   const TILE_Z = 12;
   const TILE_BASE = `data_tiles/${SCENARIO_KEY}/points/${TILE_Z}`;
-  const OVERVIEW_QML_BASE = `data_tiles/${SCENARIO_KEY}/overview_qml/{z}/{x}/{y}.png?v=qml_antigo_20260828_v2`;
+  const OVERVIEW_QML_BASE = `data_tiles/${SCENARIO_KEY}/overview_qml/{z}/{x}/{y}.png?v=ranking_geral_20260828_v3`;
   const EMPTY_TILE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
   const LOOKUP_PREFIX_LEN = 8;
   const LOOKUP_BASE = `data_tiles/${SCENARIO_KEY}/id_lookup/${LOOKUP_PREFIX_LEN}`;
@@ -3552,7 +3552,7 @@ window.addEventListener('unhandledrejection', function(event) {
     const key = candidateClassKeyFromRank(actionRankingValue(p), areaCol);
     const value = qgisRankingValue(p);
     const color = qgisRankingColor(value);
-    const alpha = qgisRankingAlpha(value);
+    const alpha = key === 'other' ? 0 : qgisRankingAlpha(value);
     return {color, radius: FINAL_POINT_RADIUS, alpha, key, mode: 'qml'};
   }
 
@@ -3605,7 +3605,8 @@ window.addEventListener('unhandledrejection', function(event) {
     if (wrap.firstElementChild) details.appendChild(wrap.firstElementChild);
   }
 
-  const FINAL_LOCKED_HIDDEN_CLASSES = {};
+  const FINAL_RANKING_STATE = {visible: true};
+  const FINAL_LOCKED_HIDDEN_CLASSES = {other: true};
   const FINAL_VISIBLE_CLASSES = {priority: true, attention: true, other: false, mappedFcu: true, mappedLow: true};
 
   function finalScenarioLabel(value) {
@@ -4073,6 +4074,10 @@ window.addEventListener('unhandledrejection', function(event) {
   function refreshOverviewLayer() {
     if (!App.map || !App.overviewLayer) return;
     if (App.overviewLayer.setUrl) App.overviewLayer.setUrl(OVERVIEW_QML_BASE, false);
+    if (!FINAL_RANKING_STATE.visible) {
+      if (App.map.hasLayer(App.overviewLayer)) App.map.removeLayer(App.overviewLayer);
+      return;
+    }
     if (!App.map.hasLayer(App.overviewLayer)) App.overviewLayer.addTo(App.map);
     if (App.overviewLayer.setOpacity) App.overviewLayer.setOpacity(0.95);
   }
@@ -5266,6 +5271,10 @@ window.addEventListener('unhandledrejection', function(event) {
       const fallbackAreaCol = App.currentPolo ? App.currentPolo.area_col : null;
 
       fetchTile(sourceX, sourceY).then(data => {
+        if (!FINAL_RANKING_STATE.visible) {
+          done(null, tile);
+          return;
+        }
         const points = data.p || [];
         for (const p of points) {
           const areaCol = p.a || fallbackAreaCol;
@@ -5281,20 +5290,24 @@ window.addEventListener('unhandledrejection', function(event) {
 
   function allPointsLegendHtml(open) {
     const dot = (color, alpha = 1) => `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};opacity:${alpha};margin-right:6px;vertical-align:middle;"></span>`;
+    const transparentDot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:transparent;border:1px dashed #94a3b8;margin-right:6px;vertical-align:middle;"></span>`;
     const fill = (color, border = '#636363', alpha = 1) => `<span style="display:inline-block;width:13px;height:10px;border-radius:2px;background:${color};border:2px solid ${border};opacity:${alpha};margin-right:6px;vertical-align:middle;"></span>`;
     const qmlRamp = `<span style="display:block;width:88px;height:9px;border-radius:5px;margin:4px 4px 7px;border:1px solid rgba(15,23,42,.18);background:linear-gradient(90deg,#d7191c 0%,#fdae61 22%,#ffffbf 42%,#a6dbaa 62%,#2b83ba 100%);"></span>`;
     const prioritySwatch = (key, alpha = 1) => dot(finalPointClassColor(key), alpha);
     const groupTitle = (pt, en) => `<div style="font:800 10px Inter,sans-serif;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin:8px 4px 3px 4px;">${escapeHtml(mapLang() === 'en' ? en : pt)}</div>`;
     const rowHtml = rows => rows.map(row => {
       const locked = FINAL_LOCKED_HIDDEN_CLASSES[row[0]] === true;
-      const active = finalClassVisible(row[0]);
-      const title = locked ? 'camada mantida invisível para aliviar o mapa' : 'mostrar/ocultar';
+      const permanentlyTransparent = row[0] === 'other';
+      const active = permanentlyTransparent || finalClassVisible(row[0]);
+      const title = permanentlyTransparent
+        ? (mapLang() === 'en' ? 'always transparent; cells remain clickable' : 'sempre transparente; células continuam clicáveis')
+        : (locked ? 'camada mantida invisível para aliviar o mapa' : 'mostrar/ocultar');
       return `<div class="legend-filter" data-class="${row[0]}" title="${title}" style="cursor:${locked ? 'default' : 'pointer'};pointer-events:auto;opacity:${active ? 1 : .42};padding:3px 4px;border-radius:5px;background:${active ? 'transparent' : '#edf2f7'};text-decoration:${active ? 'none' : 'line-through'};">${row[1]}${finalClassLabel(row[0])}</div>`;
     }).join('');
     const priorityRows = [
       ['priority', prioritySwatch('priority', 1)],
       ['attention', prioritySwatch('attention', .95)],
-      ['other', prioritySwatch('other', .65)]
+      ['other', transparentDot]
     ];
     const fcuRows = [
       ['mappedFcu', fill('rgba(55,65,81,.17)', '#1f2937', 1)],
@@ -5305,8 +5318,9 @@ window.addEventListener('unhandledrejection', function(event) {
       `<button type="button" class="legend-toggle" style="border:0;background:transparent;padding:0;font:700 12px Inter,sans-serif;color:#2c3e50;cursor:pointer;text-align:left;flex:1;">${mapText('legend')}</button>` +
       `</div>` +
       `<div class="legend-body" style="display:${open ? 'block' : 'none'};padding:0 0.65rem 0.55rem 0.65rem;line-height:1.35;min-width:225px;">` +
-      groupTitle('Ranking geral', 'General ranking') +
-      qmlRamp +
+      `<div class="legend-ranking-toggle" title="${escapeHtml(mapLang() === 'en' ? 'show/hide general ranking' : 'mostrar/ocultar ranking geral')}" style="cursor:pointer;pointer-events:auto;opacity:${FINAL_RANKING_STATE.visible ? 1 : .42};padding:1px 2px;border-radius:6px;background:${FINAL_RANKING_STATE.visible ? 'transparent' : '#edf2f7'};">` +
+      groupTitle('Ranking geral', 'General ranking') + qmlRamp +
+      `</div>` +
       groupTitle('Classe de ação', 'Action class') +
       rowHtml(priorityRows) +
       groupTitle('Situação territorial', 'Territorial status') +
@@ -5337,6 +5351,14 @@ window.addEventListener('unhandledrejection', function(event) {
     if (refreshBtn) refreshBtn.addEventListener('click', event => {
       event.preventDefault();
       event.stopPropagation();
+      refreshFilteredLayers();
+    });
+    const rankingToggle = div.querySelector('.legend-ranking-toggle');
+    if (rankingToggle) rankingToggle.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      FINAL_RANKING_STATE.visible = !FINAL_RANKING_STATE.visible;
+      refreshAllPointsLegend();
       refreshFilteredLayers();
     });
     div.querySelectorAll('.legend-filter').forEach(item => {
@@ -5430,7 +5452,7 @@ window.addEventListener('unhandledrejection', function(event) {
 
   function handleAllPointsClick(e) {
     if (e && e.originalEvent && typeof L !== 'undefined') L.DomEvent.stop(e.originalEvent);
-    if (typeof App === 'undefined' || !App.map || App.map.getZoom() < TILE_Z) return;
+    if (typeof App === 'undefined' || !App.map || !FINAL_RANKING_STATE.visible || App.map.getZoom() < TILE_Z) return;
     const c = tileCoord(e.latlng.lat, e.latlng.lng, TILE_Z);
     const fallbackAreaCol = App.currentPolo ? App.currentPolo.area_col : null;
     fetchTile(c.x, c.y).then(data => {
@@ -5440,8 +5462,7 @@ window.addEventListener('unhandledrejection', function(event) {
       for (const p of (data.p || [])) {
         const areaCol = p.a || fallbackAreaCol;
         const style = qgisOverlayStyle(p, areaCol);
-        const visible = !!(style && finalClassVisible(style.key) && style.alpha && style.alpha > 0);
-        if (!visible) continue;
+        if (!style) continue;
         const pc = tileCoord(Number(p.lat), Number(p.lng), TILE_Z);
         const dx = pc.px - c.px;
         const dy = pc.py - c.py;

@@ -6,8 +6,9 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 
 - A classe de ação considera todas as células da área no `ranking_total`.
 - O mapa usa sempre o `Ranking geral`, preservando a rampa QML contínua vermelho–amarelo–verde–azul no intervalo fixo de 1 a 104.032.
+- O grupo `Ranking geral` da legenda liga e desliga a camada QML, sem trocar de simbologia.
 - `Classe de ação` aparece somente como grupo de filtros da legenda: atenção prioritária, atenção e demais áreas.
-- Atenção prioritária é vermelha, atenção é laranja e demais áreas ficam transparentes.
+- Atenção prioritária é vermelha, atenção é laranja e demais áreas ficam sempre transparentes, mas continuam clicáveis.
 - A situação territorial é independente da classe de ação: fora da FCU, FCU Tipo 1 ou FCU Tipo 2.
 - FCU Tipo 2 ocorre quando pelo menos 50% das células válidas da FCU têm três modelos baixos ou dois baixos e um médio; as demais são FCU Tipo 1.
 - O painel de cada célula mostra Completo, Morfológico e IBGE/Espectral como alto, médio ou baixo.
