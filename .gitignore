@@ -10,3 +10,6 @@ analise_modelos.html
 _check_*.png
 predeploy_*.png
 validation_*.png
+
+.vercel
+.env*

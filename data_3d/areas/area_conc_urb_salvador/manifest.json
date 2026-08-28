@@ -1,0 +1,11 @@
+{
+  "area": "area_conc_urb_salvador",
+  "label": "Salvador - Conc. Urbana",
+  "zoom": 15,
+  "model_cells": 225164,
+  "buildings": 1191739,
+  "tiles": 1059,
+  "tile_template": "tiles/15/{x}/{y}.pbf.gz",
+  "source_layer": "buildings",
+  "bounds": [-38.7002881, -13.0172689, -37.9005914, -12.3925383]
+}

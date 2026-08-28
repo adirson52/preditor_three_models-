@@ -25,6 +25,19 @@
           "value": "public, max-age=31536000, immutable"
         }
       ]
+    },
+    {
+      "source": "/data_3d/areas/(.*)/tiles/(.*).pbf.gz",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/vnd.mapbox-vector-tile"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ]
 }
