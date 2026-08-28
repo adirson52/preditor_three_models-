@@ -1576,23 +1576,26 @@ window.addEventListener('unhandledrejection', function(event) {
                     interactive: false,
                     pane: 'fcuBasePane',
                     style: function (feature) {
-                        return fcuOriginalBaseStyle(feature);
+                        return (typeof window.fcuOriginalBaseStyle === 'function')
+                            ? window.fcuOriginalBaseStyle(feature)
+                            : {color: '#111827', weight: 0.7, opacity: 0.18, fillOpacity: 0};
                     }
                 });
 
                 App.fcuPolygonsLayer = L.geoJSON(null, {
-                    interactive: false,
+                    interactive: true,
+                    bubblingMouseEvents: false,
                     pane: 'fcuStatusPane',
                     style: function (feature) {
-                        return fcuOriginalPolygonStyle(feature);
+                        return (typeof window.fcuOriginalPolygonStyle === 'function')
+                            ? window.fcuOriginalPolygonStyle(feature)
+                            : {color: '#111827', weight: 2.2, opacity: 0.9, fillColor: '#374151', fillOpacity: 0.18};
                     },
                     onEachFeature: function (feature, layer) {
-                        if (feature.properties && feature.properties.nm_fcu) {
-                            const html = (typeof finalFcuPopupHtml === 'function')
-                                ? finalFcuPopupHtml(feature)
-                                : "<b>FCU:</b> " + feature.properties.nm_fcu;
-                            layer.bindPopup(html);
-                        }
+                        const html = (typeof window.finalFcuPopupHtml === 'function')
+                            ? window.finalFcuPopupHtml(feature)
+                            : "<b>FCU:</b> " + ((feature.properties && feature.properties.nm_fcu) || 'FCU');
+                        layer.bindPopup(html, {maxWidth: 320, autoPan: true, keepInView: true});
                     }
                 });
 
@@ -1607,8 +1610,8 @@ window.addEventListener('unhandledrejection', function(event) {
                     }
                     if (!App.map.getPane('fcuStatusPane')) {
                         App.map.createPane('fcuStatusPane');
-                        App.map.getPane('fcuStatusPane').style.zIndex = 620;
-                        App.map.getPane('fcuStatusPane').style.pointerEvents = 'none';
+                        App.map.getPane('fcuStatusPane').style.zIndex = 650;
+                        App.map.getPane('fcuStatusPane').style.pointerEvents = 'auto';
                     }
                     if (App.fcuBasePolygonsLayer && !App.map.hasLayer(App.fcuBasePolygonsLayer)) {
                         App.fcuBasePolygonsLayer.addTo(App.map);
@@ -2806,7 +2809,11 @@ window.addEventListener('unhandledrejection', function(event) {
   const SCENARIO_KEY = "final";
   const TILE_Z = 12;
   const TILE_BASE = `data_tiles/${SCENARIO_KEY}/points/${TILE_Z}`;
-  const OVERVIEW_QML_BASE = `data_tiles/${SCENARIO_KEY}/overview_qml/{z}/{x}/{y}.png?v=ranking_geral_20260828_v3`;
+  const OVERVIEW_QML_CLASS_BASES = {
+    priority: `data_tiles/${SCENARIO_KEY}/overview_qml_classes/priority/{z}/{x}/{y}.png?v=ranking_qml_classes_20260828_v1`,
+    attention: `data_tiles/${SCENARIO_KEY}/overview_qml_classes/attention/{z}/{x}/{y}.png?v=ranking_qml_classes_20260828_v1`,
+    other: `data_tiles/${SCENARIO_KEY}/overview_qml_classes/other/{z}/{x}/{y}.png?v=ranking_qml_classes_20260828_v1`
+  };
   const EMPTY_TILE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
   const LOOKUP_PREFIX_LEN = 8;
   const LOOKUP_BASE = `data_tiles/${SCENARIO_KEY}/id_lookup/${LOOKUP_PREFIX_LEN}`;
@@ -3552,7 +3559,7 @@ window.addEventListener('unhandledrejection', function(event) {
     const key = candidateClassKeyFromRank(actionRankingValue(p), areaCol);
     const value = qgisRankingValue(p);
     const color = qgisRankingColor(value);
-    const alpha = key === 'other' ? 0 : qgisRankingAlpha(value);
+    const alpha = qgisRankingAlpha(value);
     return {color, radius: FINAL_POINT_RADIUS, alpha, key, mode: 'qml'};
   }
 
@@ -3606,7 +3613,7 @@ window.addEventListener('unhandledrejection', function(event) {
   }
 
   const FINAL_RANKING_STATE = {visible: true};
-  const FINAL_LOCKED_HIDDEN_CLASSES = {other: true};
+  const FINAL_LOCKED_HIDDEN_CLASSES = {};
   const FINAL_VISIBLE_CLASSES = {priority: true, attention: true, other: false, mappedFcu: true, mappedLow: true};
 
   function finalScenarioLabel(value) {
@@ -3704,7 +3711,7 @@ window.addEventListener('unhandledrejection', function(event) {
     const pctLow = Number(props.pct_celulas_baixa_evidencia);
     const rows = [];
     if (idFcu) rows.push([mapOverlayText('fcuId'), idFcu]);
-    if (codeFcu && String(codeFcu) !== String(idFcu)) rows.push([mapOverlayText('fcuCode'), codeFcu]);
+    if (codeFcu) rows.push([mapOverlayText('fcuCode'), codeFcu]);
     rows.push([mapOverlayText('modelResult'), modelResult]);
     if (Number.isFinite(pctLow)) rows.push([mapLang() === 'en' ? 'Low-evidence cells' : 'Células com baixa evidência', percentLabel(pctLow)]);
     if (Number.isFinite(nLow) && Number.isFinite(nValid)) rows.push([mapLang() === 'en' ? 'Low / valid cells' : 'Baixas / válidas', `${nLow.toLocaleString(mapLang() === 'en' ? 'en-US' : 'pt-BR')} / ${nValid.toLocaleString(mapLang() === 'en' ? 'en-US' : 'pt-BR')}`]);
@@ -3751,6 +3758,17 @@ window.addEventListener('unhandledrejection', function(event) {
       dashArray: low ? '6 4' : null
     };
   }
+  window.fcuOriginalBaseStyle = fcuOriginalBaseStyle;
+  window.fcuOriginalPolygonStyle = fcuOriginalPolygonStyle;
+
+  function syncFcuPolygonInteractivity(layer) {
+    if (!layer || !layer.feature) return;
+    const active = finalClassVisible(fcuFeatureClass(layer.feature));
+    layer.options.interactive = active;
+    layer.options.bubblingMouseEvents = false;
+    const element = layer.getElement ? layer.getElement() : null;
+    if (element) element.style.pointerEvents = active ? 'auto' : 'none';
+  }
 
   function refreshFcuPolygonsStyle() {
     if (typeof App === 'undefined') return;
@@ -3769,6 +3787,7 @@ window.addEventListener('unhandledrejection', function(event) {
     });
     if (App.fcuPolygonsLayer) App.fcuPolygonsLayer.eachLayer(layer => {
       if (layer && layer.setStyle) layer.setStyle(fcuOriginalPolygonStyle(layer.feature));
+      syncFcuPolygonInteractivity(layer);
     });
   }
 
@@ -4054,32 +4073,37 @@ window.addEventListener('unhandledrejection', function(event) {
   }
 
   function ensureOverviewLayer() {
-    if (!App.map || App.overviewLayer) return;
-    App.overviewLayer = L.tileLayer(OVERVIEW_QML_BASE, {
-      tileSize: 256,
-      opacity: 0.95,
-      minZoom: 8,
-      maxZoom: TILE_Z - 1,
-      minNativeZoom: 6,
-      maxNativeZoom: TILE_Z - 1,
-      errorTileUrl: EMPTY_TILE,
-      zIndex: 330,
-      keepBuffer: 1,
-      updateWhenIdle: true,
-      updateWhenZooming: false
+    if (!App.map || App.overviewLayers) return;
+    App.overviewLayers = {};
+    Object.entries(OVERVIEW_QML_CLASS_BASES).forEach(([key, url], index) => {
+      App.overviewLayers[key] = L.tileLayer(url, {
+        tileSize: 256,
+        opacity: 0.95,
+        minZoom: 6,
+        maxZoom: TILE_Z - 1,
+        minNativeZoom: 6,
+        maxNativeZoom: TILE_Z - 1,
+        errorTileUrl: EMPTY_TILE,
+        zIndex: 330 + index,
+        keepBuffer: 1,
+        updateWhenIdle: true,
+        updateWhenZooming: false
+      });
     });
     refreshOverviewLayer();
   }
 
   function refreshOverviewLayer() {
-    if (!App.map || !App.overviewLayer) return;
-    if (App.overviewLayer.setUrl) App.overviewLayer.setUrl(OVERVIEW_QML_BASE, false);
-    if (!FINAL_RANKING_STATE.visible) {
-      if (App.map.hasLayer(App.overviewLayer)) App.map.removeLayer(App.overviewLayer);
-      return;
-    }
-    if (!App.map.hasLayer(App.overviewLayer)) App.overviewLayer.addTo(App.map);
-    if (App.overviewLayer.setOpacity) App.overviewLayer.setOpacity(0.95);
+    if (!App.map || !App.overviewLayers) return;
+    Object.entries(App.overviewLayers).forEach(([key, layer]) => {
+      const shouldShow = FINAL_RANKING_STATE.visible && finalClassVisible(key);
+      if (!shouldShow) {
+        if (App.map.hasLayer(layer)) App.map.removeLayer(layer);
+        return;
+      }
+      if (!App.map.hasLayer(layer)) layer.addTo(App.map);
+      if (layer.setOpacity) layer.setOpacity(0.95);
+    });
   }
 
   function recenterSelectedSample(keepZoom = true) {
@@ -5290,24 +5314,20 @@ window.addEventListener('unhandledrejection', function(event) {
 
   function allPointsLegendHtml(open) {
     const dot = (color, alpha = 1) => `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};opacity:${alpha};margin-right:6px;vertical-align:middle;"></span>`;
-    const transparentDot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:transparent;border:1px dashed #94a3b8;margin-right:6px;vertical-align:middle;"></span>`;
     const fill = (color, border = '#636363', alpha = 1) => `<span style="display:inline-block;width:13px;height:10px;border-radius:2px;background:${color};border:2px solid ${border};opacity:${alpha};margin-right:6px;vertical-align:middle;"></span>`;
-    const qmlRamp = `<span style="display:block;width:88px;height:9px;border-radius:5px;margin:4px 4px 7px;border:1px solid rgba(15,23,42,.18);background:linear-gradient(90deg,#d7191c 0%,#fdae61 22%,#ffffbf 42%,#a6dbaa 62%,#2b83ba 100%);"></span>`;
+    const qmlRamp = `<span style="display:inline-block;width:34px;height:8px;border-radius:5px;margin-right:7px;vertical-align:middle;border:1px solid rgba(15,23,42,.18);background:linear-gradient(90deg,#d7191c 0%,#fdae61 22%,#ffffbf 42%,#a6dbaa 62%,#2b83ba 100%);"></span>`;
     const prioritySwatch = (key, alpha = 1) => dot(finalPointClassColor(key), alpha);
     const groupTitle = (pt, en) => `<div style="font:800 10px Inter,sans-serif;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin:8px 4px 3px 4px;">${escapeHtml(mapLang() === 'en' ? en : pt)}</div>`;
     const rowHtml = rows => rows.map(row => {
       const locked = FINAL_LOCKED_HIDDEN_CLASSES[row[0]] === true;
-      const permanentlyTransparent = row[0] === 'other';
-      const active = permanentlyTransparent || finalClassVisible(row[0]);
-      const title = permanentlyTransparent
-        ? (mapLang() === 'en' ? 'always transparent; cells remain clickable' : 'sempre transparente; células continuam clicáveis')
-        : (locked ? 'camada mantida invisível para aliviar o mapa' : 'mostrar/ocultar');
+      const active = finalClassVisible(row[0]);
+      const title = locked ? 'camada mantida invisível para aliviar o mapa' : 'mostrar/ocultar';
       return `<div class="legend-filter" data-class="${row[0]}" title="${title}" style="cursor:${locked ? 'default' : 'pointer'};pointer-events:auto;opacity:${active ? 1 : .42};padding:3px 4px;border-radius:5px;background:${active ? 'transparent' : '#edf2f7'};text-decoration:${active ? 'none' : 'line-through'};">${row[1]}${finalClassLabel(row[0])}</div>`;
     }).join('');
     const priorityRows = [
       ['priority', prioritySwatch('priority', 1)],
       ['attention', prioritySwatch('attention', .95)],
-      ['other', transparentDot]
+      ['other', dot('#cbd5e1', .9)]
     ];
     const fcuRows = [
       ['mappedFcu', fill('rgba(55,65,81,.17)', '#1f2937', 1)],
@@ -5318,12 +5338,13 @@ window.addEventListener('unhandledrejection', function(event) {
       `<button type="button" class="legend-toggle" style="border:0;background:transparent;padding:0;font:700 12px Inter,sans-serif;color:#2c3e50;cursor:pointer;text-align:left;flex:1;">${mapText('legend')}</button>` +
       `</div>` +
       `<div class="legend-body" style="display:${open ? 'block' : 'none'};padding:0 0.65rem 0.55rem 0.65rem;line-height:1.35;min-width:225px;">` +
-      `<div class="legend-ranking-toggle" title="${escapeHtml(mapLang() === 'en' ? 'show/hide general ranking' : 'mostrar/ocultar ranking geral')}" style="cursor:pointer;pointer-events:auto;opacity:${FINAL_RANKING_STATE.visible ? 1 : .42};padding:1px 2px;border-radius:6px;background:${FINAL_RANKING_STATE.visible ? 'transparent' : '#edf2f7'};">` +
-      groupTitle('Ranking geral', 'General ranking') + qmlRamp +
+      groupTitle('Estilo QML', 'QML style') +
+      `<div class="legend-ranking-toggle" title="${escapeHtml(mapLang() === 'en' ? 'show/hide QML ranking' : 'mostrar/ocultar ranking QML')}" style="cursor:pointer;pointer-events:auto;opacity:${FINAL_RANKING_STATE.visible ? 1 : .42};padding:3px 4px;border-radius:5px;background:${FINAL_RANKING_STATE.visible ? 'transparent' : '#edf2f7'};text-decoration:${FINAL_RANKING_STATE.visible ? 'none' : 'line-through'};">` +
+      qmlRamp + escapeHtml(mapLang() === 'en' ? 'QML ranking' : 'ranking QML') +
       `</div>` +
-      groupTitle('Classe de ação', 'Action class') +
+      groupTitle('Prioridade do modelo', 'Model priority') +
       rowHtml(priorityRows) +
-      groupTitle('Situação territorial', 'Territorial status') +
+      groupTitle('FCU', 'FCU') +
       rowHtml(fcuRows) +
       `</div>`
     );

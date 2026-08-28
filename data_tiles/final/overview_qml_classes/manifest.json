@@ -1,0 +1,99 @@
+{
+  "mode": "ranking_qml_por_classe",
+  "source": "E:\\Banco de dados Preditor Br\\03_preditor_grade31_teste0407\\03_outputs\\05_dashboard_b_salvador_fcu_tipos_online\\data_tiles\\final\\points\\12",
+  "field": "ranking_total",
+  "classes": [
+    "priority",
+    "attention",
+    "other"
+  ],
+  "qml_min": 1,
+  "qml_max": 104032,
+  "palette_size": 50,
+  "zooms": {
+    "6": {
+      "priority": {
+        "tiles": 13,
+        "points": 367581
+      },
+      "attention": {
+        "tiles": 12,
+        "points": 110741
+      },
+      "other": {
+        "tiles": 13,
+        "points": 3295816
+      }
+    },
+    "7": {
+      "priority": {
+        "tiles": 20,
+        "points": 367581
+      },
+      "attention": {
+        "tiles": 19,
+        "points": 110741
+      },
+      "other": {
+        "tiles": 20,
+        "points": 3295816
+      }
+    },
+    "8": {
+      "priority": {
+        "tiles": 35,
+        "points": 367581
+      },
+      "attention": {
+        "tiles": 35,
+        "points": 110741
+      },
+      "other": {
+        "tiles": 38,
+        "points": 3295816
+      }
+    },
+    "9": {
+      "priority": {
+        "tiles": 63,
+        "points": 367581
+      },
+      "attention": {
+        "tiles": 60,
+        "points": 110741
+      },
+      "other": {
+        "tiles": 73,
+        "points": 3295816
+      }
+    },
+    "10": {
+      "priority": {
+        "tiles": 133,
+        "points": 367581
+      },
+      "attention": {
+        "tiles": 129,
+        "points": 110741
+      },
+      "other": {
+        "tiles": 160,
+        "points": 3295816
+      }
+    },
+    "11": {
+      "priority": {
+        "tiles": 256,
+        "points": 367581
+      },
+      "attention": {
+        "tiles": 253,
+        "points": 110741
+      },
+      "other": {
+        "tiles": 341,
+        "points": 3295816
+      }
+    }
+  }
+}

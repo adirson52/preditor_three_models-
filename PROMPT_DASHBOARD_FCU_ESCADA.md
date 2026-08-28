@@ -79,19 +79,20 @@ Uma célula possui baixa evidência quando apresenta três modelos baixos ou doi
 ## Visualização 2D
 
 - usar o `Ranking geral` como única visualização dos pontos, sem seletor de modo;
-- permitir ligar e desligar a camada do Ranking geral ao clicar no respectivo grupo da legenda;
+- permitir ligar e desligar a camada ao clicar na linha `ranking QML`, dentro do grupo `Estilo QML`;
 - no Ranking geral, usar `ranking_total`, intervalo fixo de 1 a 104.032 e 50 classes da rampa vermelho → amarelo → verde → azul;
 - manter `Classe de ação` somente como grupo de filtros da legenda, nunca como modo alternativo de visualização;
 - no Ranking geral, rankings menores são vermelhos, rankings maiores são azuis, as primeiras 10 classes têm opacidade 0,88 e as demais 0,15;
 - atenção prioritária: vermelho `#d7191c`;
 - atenção: laranja `#f28e2b`;
-- demais áreas: sempre transparentes, sem opção de torná-las visíveis, mas com células ainda clicáveis no mapa;
+- permitir ligar e desligar separadamente atenção prioritária, atenção e demais áreas no grupo `Prioridade do modelo`;
 - sem resultado: transparente;
 - preservar o tamanho atual dos pontos e deixá-los clicáveis;
 - FCU Tipo 1: cinza-escuro com preenchimento translúcido e contorno contínuo;
 - FCU Tipo 2: cinza-claro com preenchimento translúcido e contorno tracejado;
 - desenhar as FCUs sem bloquear o clique nos pontos abaixo;
-- legenda organizada somente em “Ranking geral”, “Classe de ação” e “Situação territorial”;
+- legenda organizada somente em `Estilo QML`, `Prioridade do modelo` e `FCU`;
+- quando uma FCU visível for clicada, priorizar o popup da FCU sobre o clique da célula e mostrar nome, código, identificador, tipo, município, área de estudo, número de células e estatísticas disponíveis;
 - filtros independentes para as duas dimensões;
 
 ## Painel da célula

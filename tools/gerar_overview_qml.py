@@ -13,6 +13,7 @@ from PIL import Image
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 POINTS_DIR = PROJECT_DIR / "data_tiles" / "final" / "points" / "12"
 OUTPUT_DIR = PROJECT_DIR / "data_tiles" / "final" / "overview_qml"
+OUTPUT_CLASS_DIR = PROJECT_DIR / "data_tiles" / "final" / "overview_qml_classes"
 OUTPUT_ACTION_DIR = PROJECT_DIR / "data_tiles" / "final" / "overview_action"
 RULES_PATH = PROJECT_DIR / "data_tiles" / "final" / "ranking_rules_2608.json"
 ZOOMS = range(6, 12)
@@ -99,7 +100,7 @@ def webmercator_tile(lat: float, lng: float, zoom: int) -> tuple[int, int, int, 
 
 def clear_output() -> None:
     root = PROJECT_DIR.resolve()
-    for output in (OUTPUT_DIR, OUTPUT_ACTION_DIR):
+    for output in (OUTPUT_DIR, OUTPUT_CLASS_DIR, OUTPUT_ACTION_DIR):
         target = output.resolve()
         if root not in target.parents:
             raise RuntimeError(f"Saida fora do projeto: {target}")
@@ -125,17 +126,20 @@ def marker_radius(zoom: int) -> int:
     return 2
 
 
-def paint_overview_zoom(zoom: int) -> tuple[int, int]:
+def paint_overview_zoom(zoom: int) -> tuple[int, int, int, dict[str, dict[str, int]]]:
     qml_tiles: dict[tuple[int, int], np.ndarray] = {}
+    qml_class_tiles: dict[str, dict[tuple[int, int], np.ndarray]] = {
+        "priority": {},
+        "attention": {},
+        "other": {},
+    }
     action_tiles: dict[tuple[int, int], np.ndarray] = {}
     radius = marker_radius(zoom)
     count = 0
     skipped_other = 0
+    class_counts = {"priority": 0, "attention": 0, "other": 0}
     for point in iter_points():
         cls_key = candidate_class_key(point)
-        if cls_key == "other":
-            skipped_other += 1
-            continue
         try:
             lat = float(point["lat"])
             lng = float(point["lng"])
@@ -145,16 +149,26 @@ def paint_overview_zoom(zoom: int) -> tuple[int, int]:
         if tile is None:
             continue
         tx, ty, px, py = tile
-        qml_arr = qml_tiles.setdefault((tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8))
-        action_arr = action_tiles.setdefault((tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8))
+        class_arr = qml_class_tiles[cls_key].setdefault(
+            (tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8)
+        )
         qml_r, qml_g, qml_b = qgis_color(point.get("rt", point.get("r")))
-        action_r, action_g, action_b = ACTION_COLORS[cls_key]
         x0, x1 = max(0, px - radius), min(TILE_SIZE, px + radius + 1)
         y0, y1 = max(0, py - radius), min(TILE_SIZE, py + radius + 1)
-        qml_arr[y0:y1, x0:x1, 0] = qml_r
-        qml_arr[y0:y1, x0:x1, 1] = qml_g
-        qml_arr[y0:y1, x0:x1, 2] = qml_b
-        qml_arr[y0:y1, x0:x1, 3] = 225
+        class_arr[y0:y1, x0:x1, 0] = qml_r
+        class_arr[y0:y1, x0:x1, 1] = qml_g
+        class_arr[y0:y1, x0:x1, 2] = qml_b
+        class_arr[y0:y1, x0:x1, 3] = 225
+        class_counts[cls_key] += 1
+
+        if cls_key == "other":
+            skipped_other += 1
+            continue
+
+        qml_arr = qml_tiles.setdefault((tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8))
+        action_arr = action_tiles.setdefault((tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8))
+        action_r, action_g, action_b = ACTION_COLORS[cls_key]
+        qml_arr[y0:y1, x0:x1, :] = class_arr[y0:y1, x0:x1, :]
         action_arr[y0:y1, x0:x1, 0] = action_r
         action_arr[y0:y1, x0:x1, 1] = action_g
         action_arr[y0:y1, x0:x1, 2] = action_b
@@ -166,19 +180,28 @@ def paint_overview_zoom(zoom: int) -> tuple[int, int]:
             out_dir = output / str(zoom) / str(tx)
             out_dir.mkdir(parents=True, exist_ok=True)
             Image.fromarray(arr, mode="RGBA").save(out_dir / f"{ty}.png", optimize=True)
-    return len(qml_tiles), count, skipped_other
+    class_summary = {}
+    for cls_key, tiles in qml_class_tiles.items():
+        for (tx, ty), arr in tiles.items():
+            out_dir = OUTPUT_CLASS_DIR / cls_key / str(zoom) / str(tx)
+            out_dir.mkdir(parents=True, exist_ok=True)
+            Image.fromarray(arr, mode="RGBA").save(out_dir / f"{ty}.png", optimize=True)
+        class_summary[cls_key] = {"tiles": len(tiles), "points": class_counts[cls_key]}
+    return len(qml_tiles), count, skipped_other, class_summary
 
 
 def main() -> None:
     clear_output()
     summary = {}
+    class_summary = {}
     for zoom in ZOOMS:
-        tile_count, point_count, skipped_other = paint_overview_zoom(zoom)
+        tile_count, point_count, skipped_other, zoom_class_summary = paint_overview_zoom(zoom)
         summary[str(zoom)] = {
             "tiles": tile_count,
             "points_rendered": point_count,
             "points_skipped_other": skipped_other,
         }
+        class_summary[str(zoom)] = zoom_class_summary
         print(f"zoom {zoom}: {tile_count} tiles, {point_count} pontos renderizados, {skipped_other} demais areas ocultos")
     manifests = {
         OUTPUT_DIR: {
@@ -204,6 +227,17 @@ def main() -> None:
     for output, manifest in manifests.items():
         with (output / "manifest.json").open("w", encoding="utf-8") as f:
             json.dump(manifest, f, ensure_ascii=False, indent=2)
+    with (OUTPUT_CLASS_DIR / "manifest.json").open("w", encoding="utf-8") as f:
+        json.dump({
+            "mode": "ranking_qml_por_classe",
+            "source": str(POINTS_DIR),
+            "field": "ranking_total",
+            "classes": ["priority", "attention", "other"],
+            "qml_min": QGIS_RANKING_MIN,
+            "qml_max": QGIS_RANKING_MAX,
+            "palette_size": len(QGIS_PALETTE),
+            "zooms": class_summary,
+        }, f, ensure_ascii=False, indent=2)
 
 
 if __name__ == "__main__":

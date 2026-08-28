@@ -6,7 +6,7 @@ if (-not $pythonCommand) {
     Read-Host 'Pressione Enter para sair'
     exit 1
 }
-$port = 8765
+$port = 8767
 $url = "http://127.0.0.1:$port/index.html"
 Write-Host "Dashboard offline: $url" -ForegroundColor Green
 Write-Host 'Mantenha esta janela aberta durante a navegacao.'
