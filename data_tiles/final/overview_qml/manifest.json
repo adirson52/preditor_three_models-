@@ -1,46 +1,101 @@
 {
-  "mode": "ranking_qml_antigo",
+  "mode": "ranking_qml_por_area",
   "source": "E:\\Banco de dados Preditor Br\\03_preditor_grade31_teste0407\\03_outputs\\05_dashboard_b_salvador_fcu_tipos_online\\data_tiles\\final\\points\\12",
   "field": "ranking_total",
   "classes_rendered": [
     "priority",
-    "attention"
-  ],
-  "classes_hidden": [
+    "attention",
     "other"
   ],
+  "classes_hidden": [],
   "qml_min": 1,
-  "qml_max": 104032,
+  "qml_ranges_by_area": {
+    "area_arranjo_pop_rj": {
+      "min": 1,
+      "max": 101166,
+      "classes": 50
+    },
+    "area_conc_urb_curitiba": {
+      "min": 1,
+      "max": 363467,
+      "classes": 50
+    },
+    "area_conc_urb_fortaleza": {
+      "min": 1,
+      "max": 257306,
+      "classes": 50
+    },
+    "area_conc_urb_goiania": {
+      "min": 1,
+      "max": 306292,
+      "classes": 50
+    },
+    "area_conc_urb_rio_de_janeiro": {
+      "min": 1,
+      "max": 799668,
+      "classes": 50
+    },
+    "area_conc_urb_salvador": {
+      "min": 1,
+      "max": 225164,
+      "classes": 50
+    },
+    "area_conc_urb_sao_paulo": {
+      "min": 1,
+      "max": 1015035,
+      "classes": 50
+    },
+    "area_medias_conc_urb_rj": {
+      "min": 1,
+      "max": 364678,
+      "classes": 50
+    },
+    "area_rgint_belem": {
+      "min": 1,
+      "max": 206709,
+      "classes": 50
+    },
+    "area_rgint_macapa": {
+      "min": 1,
+      "max": 60100,
+      "classes": 50
+    },
+    "area_rgint_redencao": {
+      "min": 1,
+      "max": 74553,
+      "classes": 50
+    }
+  },
   "zooms": {
     "6": {
       "tiles": 13,
-      "points_rendered": 478322,
-      "points_skipped_other": 3295816
+      "points_rendered": 3774138,
+      "points_hidden": 0
     },
     "7": {
       "tiles": 20,
-      "points_rendered": 478322,
-      "points_skipped_other": 3295816
+      "points_rendered": 3774138,
+      "points_hidden": 0
     },
     "8": {
-      "tiles": 36,
-      "points_rendered": 478322,
-      "points_skipped_other": 3295816
+      "tiles": 38,
+      "points_rendered": 3774138,
+      "points_hidden": 0
     },
     "9": {
-      "tiles": 64,
-      "points_rendered": 478322,
-      "points_skipped_other": 3295816
+      "tiles": 73,
+      "points_rendered": 3774138,
+      "points_hidden": 0
     },
     "10": {
-      "tiles": 140,
-      "points_rendered": 478322,
-      "points_skipped_other": 3295816
+      "tiles": 160,
+      "points_rendered": 3774138,
+      "points_hidden": 0
     },
     "11": {
-      "tiles": 277,
-      "points_rendered": 478322,
-      "points_skipped_other": 3295816
+      "tiles": 342,
+      "points_rendered": 3774138,
+      "points_hidden": 0
     }
   }
 }

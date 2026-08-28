@@ -2809,7 +2809,7 @@ window.addEventListener('unhandledrejection', function(event) {
   const SCENARIO_KEY = "final";
   const TILE_Z = 12;
   const TILE_BASE = `data_tiles/${SCENARIO_KEY}/points/${TILE_Z}`;
-  const OVERVIEW_QML_BASE = `data_tiles/${SCENARIO_KEY}/overview_qml/{z}/{x}/{y}.png?v=ranking_qml_unico_20260828_v1`;
+  const OVERVIEW_QML_BASE = `data_tiles/${SCENARIO_KEY}/overview_qml/{z}/{x}/{y}.png?v=ranking_qml_qgis_20260828_v3`;
   const OVERVIEW_PRIORITY_BASES = {
     priority: `data_tiles/${SCENARIO_KEY}/overview_action_classes/priority/{z}/{x}/{y}.png?v=prioridade_subcamadas_20260828_v1`,
     attention: `data_tiles/${SCENARIO_KEY}/overview_action_classes/attention/{z}/{x}/{y}.png?v=prioridade_subcamadas_20260828_v1`
@@ -3508,25 +3508,30 @@ window.addEventListener('unhandledrejection', function(event) {
     return 'other';
   }
 
-  function qgisRankingColor(value) {
-    const idx = qgisRankingIndex(value);
+  function qgisRankingMax(areaCol) {
+    const rule = areaRankRule(areaCol);
+    const total = Number(rule && rule.total);
+    return Number.isFinite(total) && total > QGIS_RANKING_MIN ? total : QGIS_RANKING_MAX;
+  }
+
+  function qgisRankingColor(value, areaCol) {
+    const idx = qgisRankingIndex(value, areaCol);
     if (idx === null) return '#ffeda0';
     const color = QGIS_RANKING_PALETTE[idx] || QGIS_RANKING_PALETTE[QGIS_RANKING_PALETTE.length - 1];
     return `rgb(${color[0]},${color[1]},${color[2]})`;
   }
 
-  function qgisRankingIndex(value) {
+  function qgisRankingIndex(value, areaCol) {
     const rank = Number(value);
     if (!Number.isFinite(rank)) return null;
-    const span = Math.max(1, QGIS_RANKING_MAX - QGIS_RANKING_MIN);
+    const span = Math.max(1, qgisRankingMax(areaCol) - QGIS_RANKING_MIN);
     const t = Math.max(0, Math.min(1, (rank - QGIS_RANKING_MIN) / span));
     return Math.max(0, Math.min(QGIS_RANKING_PALETTE.length - 1, Math.floor(t * QGIS_RANKING_PALETTE.length)));
   }
 
-  function qgisRankingAlpha(value) {
-    const idx = qgisRankingIndex(value);
-    if (idx === null) return 0.15;
-    return idx >= 10 ? 0.15 : 0.88;
+  function qgisRankingAlpha(value, areaCol) {
+    const idx = qgisRankingIndex(value, areaCol);
+    return idx === null ? 0 : 1;
   }
 
   function qgisRankingValue(p) {
@@ -3558,8 +3563,8 @@ window.addEventListener('unhandledrejection', function(event) {
   function qgisOverlayStyle(p, areaCol) {
     const key = candidateClassKeyFromRank(actionRankingValue(p), areaCol);
     const value = qgisRankingValue(p);
-    const color = qgisRankingColor(value);
-    const alpha = qgisRankingAlpha(value);
+    const color = qgisRankingColor(value, areaCol);
+    const alpha = qgisRankingAlpha(value, areaCol);
     return {color, radius: FINAL_POINT_RADIUS, alpha, key, mode: 'qml'};
   }
 
@@ -5375,8 +5380,8 @@ window.addEventListener('unhandledrejection', function(event) {
           const areaCol = p.a || fallbackAreaCol;
           const key = candidateClassKeyFromRank(actionRankingValue(p), areaCol);
           if (renderMode === 'qml') {
-            // O QML é uma única camada e aplica a regra: somente as faixas destacadas.
-            if (key === 'other') continue;
+            // O QML é uma única camada contínua: todas as células usam uma das
+            // 50 classes do ranking local da respectiva área de estudo.
             drawFinalPoint(ctx, p, coords, size, qgisOverlayStyle(p, areaCol), false);
             continue;
           }

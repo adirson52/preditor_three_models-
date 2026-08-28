@@ -8,7 +8,63 @@
     "other"
   ],
   "qml_min": 1,
-  "qml_max": 104032,
+  "qml_ranges_by_area": {
+    "area_arranjo_pop_rj": {
+      "min": 1,
+      "max": 101166,
+      "classes": 50
+    },
+    "area_conc_urb_curitiba": {
+      "min": 1,
+      "max": 363467,
+      "classes": 50
+    },
+    "area_conc_urb_fortaleza": {
+      "min": 1,
+      "max": 257306,
+      "classes": 50
+    },
+    "area_conc_urb_goiania": {
+      "min": 1,
+      "max": 306292,
+      "classes": 50
+    },
+    "area_conc_urb_rio_de_janeiro": {
+      "min": 1,
+      "max": 799668,
+      "classes": 50
+    },
+    "area_conc_urb_salvador": {
+      "min": 1,
+      "max": 225164,
+      "classes": 50
+    },
+    "area_conc_urb_sao_paulo": {
+      "min": 1,
+      "max": 1015035,
+      "classes": 50
+    },
+    "area_medias_conc_urb_rj": {
+      "min": 1,
+      "max": 364678,
+      "classes": 50
+    },
+    "area_rgint_belem": {
+      "min": 1,
+      "max": 206709,
+      "classes": 50
+    },
+    "area_rgint_macapa": {
+      "min": 1,
+      "max": 60100,
+      "classes": 50
+    },
+    "area_rgint_redencao": {
+      "min": 1,
+      "max": 74553,
+      "classes": 50
+    }
+  },
   "palette_size": 50,
   "rendering": {
     "marker_radius_by_zoom": {
@@ -29,9 +85,9 @@
       "11": 1.0
     },
     "qml_alpha": {
-      "first_10_colors": 225,
-      "remaining_40_colors": 38
-    }
+      "all_50_colors": 255
+    },
+    "action_alpha": 225
   },
   "zooms": {
     "6": {

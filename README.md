@@ -5,7 +5,7 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 ## Versão ranking em escadas
 
 - A classe de ação considera todas as células da área no `ranking_total`.
-- O mapa usa sempre o `Ranking geral`, preservando a rampa QML contínua vermelho–amarelo–verde–azul no intervalo fixo de 1 a 104.032.
+- O mapa usa sempre o `Ranking geral`, calculado separadamente em cada área. Cada área distribui todas as suas células no próprio intervalo de 1 até o total local, em 50 faixas, preservando as cores e a opacidade integral do `estilo_revelando2608.qml`.
 - A linha `ranking QML`, no grupo `Estilo QML`, liga e desliga uma única camada QML com os 50 tons.
 - `Prioridade do modelo` é outra camada, separada do QML, composta pelas subcamadas atenção prioritária, atenção e demais áreas.
 - QML e prioridade são independentes: desligar uma prioridade não modifica o QML, e desligar o QML não modifica as três prioridades.
@@ -25,7 +25,9 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 - `vercel.json`: headers de cache e gzip para os tiles.
 - `data_tiles/final/ranking_rules_escada.json`: limites e contagens por área.
 - `data_tiles/final/estilos_qgis/`: estilos QML públicos.
-- `data_tiles/final/overview_qml/`: camada única da visão geral com a rampa QML original.
+- `data_tiles/final/estilos_qgis/estilo_revelando2608.qml`: cópia canônica do estilo QGIS usado pela camada `ranking QML`.
+- `data_tiles/final/estilos_qgis/por_area/`: onze QMLs com as 50 faixas recalculadas para o ranking de cada área de estudo.
+- `data_tiles/final/overview_qml/`: camada única da visão geral com todas as células na rampa QML original.
 - `data_tiles/final/overview_action/`: visão geral categórica gerada como ativo técnico, sem uso na visualização principal.
 - `data_tiles/final/overview_action_classes/`: subcamadas independentes de prioridade e atenção; demais áreas é lógica e transparente.
 - `PROMPT_DASHBOARD_FCU_ESCADA.md`: prompt reutilizável da especificação completa.

@@ -80,10 +80,10 @@ Uma célula possui baixa evidência quando apresenta três modelos baixos ou doi
 
 - usar o `Ranking geral` como única visualização dos pontos, sem seletor de modo;
 - implementar `ranking QML` como uma única camada, ligada e desligada pela linha correspondente dentro de `Estilo QML`;
-- no Ranking geral, usar `ranking_total`, intervalo fixo de 1 a 104.032 e 50 classes da rampa vermelho → amarelo → verde → azul;
+- no Ranking geral, usar `ranking_total` calculado separadamente dentro de cada área de estudo; todas as células da área entram na própria faixa de 1 até o total local, dividida em 50 classes da mesma rampa vermelho → amarelo → verde → azul do `estilo_revelando2608.qml`;
 - implementar `Prioridade do modelo` como outra camada, separada do QML, com três subcamadas: atenção prioritária, atenção e demais áreas;
 - garantir independência completa: desligar o QML não altera as subcamadas de prioridade, e desligar qualquer prioridade não altera o QML;
-- no Ranking geral, rankings menores são vermelhos, rankings maiores são azuis, as primeiras 10 classes têm opacidade 0,88 e as demais 0,15;
+- no Ranking geral, rankings menores são vermelhos e rankings maiores são azuis; as 50 classes usam a opacidade integral definida no arquivo `estilo_revelando2608.qml`;
 - atenção prioritária: vermelho `#d7191c`;
 - atenção: laranja `#f28e2b`;
 - permitir ligar e desligar separadamente atenção prioritária, atenção e demais áreas no grupo `Prioridade do modelo`; demais áreas permanece transparente, mas conserva sua função lógica e de clique;
@@ -91,7 +91,7 @@ Uma célula possui baixa evidência quando apresenta três modelos baixos ou doi
 - preservar o tamanho atual dos pontos no zoom próximo e deixá-los clicáveis;
 - nos zooms 6–9, renderizar cada ponto em 1 pixel;
 - nos zooms 10–11, usar marcador compacto em cruz de 5 pixels;
-- aplicar fatores de opacidade 0,50; 0,58; 0,66; 0,75; 0,86; 1,00 nos zooms 6 a 11, preservando as duas faixas QML de opacidade 0,88 e 0,15;
+- aplicar fatores globais de opacidade 0,50; 0,58; 0,66; 0,75; 0,86; 1,00 nos zooms 6 a 11; no zoom 11 e nos níveis próximos, preservar a opacidade integral e as 50 cores do QGIS;
 - a partir do zoom 12, preservar o raio atual da visualização próxima;
 - FCU Tipo 1: cinza-escuro com preenchimento translúcido e contorno contínuo;
 - FCU Tipo 2: cinza-claro com preenchimento translúcido e contorno tracejado;

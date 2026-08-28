@@ -30,6 +30,9 @@ LEGACY_RULES_PATH = PROJECT_DIR / "data_tiles" / "final" / "ranking_rules_2608.j
 FCU_PATH = PROJECT_DIR / "data_tiles" / "fcu_aderencia.geojson"
 INDEX_PATH = PROJECT_DIR / "index.html"
 OUTPUT_DIR = PROJECT_DIR / "downloads"
+CANONICAL_QML_PATH = (
+    PROJECT_DIR / "data_tiles" / "final" / "estilos_qgis" / "estilo_revelando2608.qml"
+)
 
 SALVADOR_SOURCE = (
     PROJECT_DIR.parent
@@ -465,7 +468,7 @@ def qml_ranking_old() -> str:
         lower = QML_RANKING_MIN + index * width
         upper = 999999999 if index == len(QML_RANKING_PALETTE) - 1 else QML_RANKING_MIN + (index + 1) * width
         label_upper = QML_RANKING_MAX if index == len(QML_RANKING_PALETTE) - 1 else upper
-        alpha = 225 if index < 10 else 38
+        alpha = 255
         ranges.append(
             f'      <range lower="{lower:.6f}" upper="{upper:.6f}" symbol="{index}" '
             f'label="{lower:.0f} - {label_upper:.0f}" render="true"/>'
@@ -491,8 +494,14 @@ def write_qml_files() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     public_styles = RULES_PATH.parent / "estilos_qgis"
     public_styles.mkdir(parents=True, exist_ok=True)
+    ranking_qml = (
+        CANONICAL_QML_PATH.read_text(encoding="utf-8")
+        if CANONICAL_QML_PATH.exists()
+        else qml_ranking_old()
+    )
     for folder in (OUTPUT_DIR, public_styles):
-        (folder / "estilo_ranking_total_qml_antigo.qml").write_text(qml_ranking_old(), encoding="utf-8")
+        (folder / "estilo_revelando2608.qml").write_text(ranking_qml, encoding="utf-8")
+        (folder / "estilo_ranking_total_qml_antigo.qml").write_text(ranking_qml, encoding="utf-8")
         (folder / "estilo_celulas_acao_escada.qml").write_text(qml_action(), encoding="utf-8")
         (folder / "estilo_fcu_tipos_transparente.qml").write_text(qml_fcu(), encoding="utf-8")
 

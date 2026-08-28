@@ -25,32 +25,32 @@
     "6": {
       "tiles": 13,
       "points_rendered": 478322,
-      "points_skipped_other": 3295816
+      "points_transparent_other": 3295816
     },
     "7": {
       "tiles": 20,
       "points_rendered": 478322,
-      "points_skipped_other": 3295816
+      "points_transparent_other": 3295816
     },
     "8": {
       "tiles": 36,
       "points_rendered": 478322,
-      "points_skipped_other": 3295816
+      "points_transparent_other": 3295816
     },
     "9": {
       "tiles": 64,
       "points_rendered": 478322,
-      "points_skipped_other": 3295816
+      "points_transparent_other": 3295816
     },
     "10": {
       "tiles": 140,
       "points_rendered": 478322,
-      "points_skipped_other": 3295816
+      "points_transparent_other": 3295816
     },
     "11": {
       "tiles": 277,
       "points_rendered": 478322,
-      "points_skipped_other": 3295816
+      "points_transparent_other": 3295816
     }
   }
 }
