@@ -3477,22 +3477,6 @@ window.addEventListener('unhandledrejection', function(event) {
   const FINAL_POINT_RADIUS = 4.2;
   const FINAL_POINT_RADIUS_MAX = 12.5;
   const FINAL_POINT_ZOOM_BOOST = 0.62;
-  const SALVADOR_AREA_COL = 'area_conc_urb_salvador';
-  const WEB_MERCATOR_WORLD_METERS = 40075016.68557849;
-  // A grade de 50 m de Salvador fica alinhada aos eixos no Web Mercator.
-  // As dimensoes abaixo foram medidas nas geometrias originais do GeoPackage.
-  const SALVADOR_CELL_MERCATOR_WIDTH_M = 54.882;
-  const SALVADOR_CELL_MERCATOR_HEIGHT_M = 50.926;
-
-  function salvadorCellPixelSize(p, zoom) {
-    const areaCol = (p && (p.a || p.scope)) || finalCanvasAreaCol();
-    if (areaCol !== SALVADOR_AREA_COL) return null;
-    const metersPerPixel = WEB_MERCATOR_WORLD_METERS / (256 * Math.pow(2, zoom));
-    return {
-      width: SALVADOR_CELL_MERCATOR_WIDTH_M / metersPerPixel,
-      height: SALVADOR_CELL_MERCATOR_HEIGHT_M / metersPerPixel
-    };
-  }
 
   function actionRankingValue(p) {
     if (!p) return null;
@@ -5126,29 +5110,16 @@ window.addEventListener('unhandledrejection', function(event) {
     const projected = App.map.project([lat, lng], coords.z);
     const x = projected.x - coords.x * size.x;
     const y = projected.y - coords.y * size.y;
-    const cellSize = salvadorCellPixelSize(p, coords.z);
-    const drawPadding = cellSize ? Math.max(cellSize.width, cellSize.height) / 2 + 1 : 8;
-    if (x < -drawPadding || x > size.x + drawPadding || y < -drawPadding || y > size.y + drawPadding) return;
+    if (x < -8 || x > size.x + 8 || y < -8 || y > size.y + 8) return;
     const zoomBoost = Math.max(0, coords.z - TILE_Z);
     const drawRadius = Math.min(FINAL_POINT_RADIUS_MAX, style.radius + zoomBoost * FINAL_POINT_ZOOM_BOOST);
+    ctx.beginPath();
+    ctx.arc(x, y, drawRadius, 0, Math.PI * 2);
     ctx.fillStyle = style.color;
     ctx.globalAlpha = style.key === 'priority' || style.key === 'attention'
       ? Math.max(0.62, style.alpha - Math.min(0.16, zoomBoost * 0.02))
       : style.alpha;
-    if (cellSize) {
-      // Pequena sobreposicao elimina frestas de antialias entre celulas vizinhas.
-      const seamOverlap = 0.7;
-      ctx.fillRect(
-        x - cellSize.width / 2 - seamOverlap / 2,
-        y - cellSize.height / 2 - seamOverlap / 2,
-        cellSize.width + seamOverlap,
-        cellSize.height + seamOverlap
-      );
-    } else {
-      ctx.beginPath();
-      ctx.arc(x, y, drawRadius, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    ctx.fill();
   }
 
   const AllPointsLayer = L.GridLayer.extend({
@@ -5192,10 +5163,7 @@ window.addEventListener('unhandledrejection', function(event) {
     const dot = (color, alpha = 1) => `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};opacity:${alpha};margin-right:6px;vertical-align:middle;"></span>`;
     const fill = (color, border = '#636363', alpha = 1) => `<span style="display:inline-block;width:13px;height:10px;border-radius:2px;background:${color};border:2px solid ${border};opacity:${alpha};margin-right:6px;vertical-align:middle;"></span>`;
     const gradient = `<span style="display:inline-block;width:34px;height:8px;border-radius:5px;background:linear-gradient(90deg,#d7191c,#fdae61,#ffffbf,#abdda4,#2b83ba);margin-right:6px;vertical-align:middle;border:1px solid rgba(15,23,42,.18);"></span>`;
-    const useCellPolygonSwatches = finalCanvasAreaCol() === SALVADOR_AREA_COL;
-    const prioritySwatch = (key, alpha = 1) => useCellPolygonSwatches
-      ? fill(finalPointClassColor(key), finalPointClassColor(key), alpha)
-      : dot(finalPointClassColor(key), alpha);
+    const prioritySwatch = (key, alpha = 1) => dot(finalPointClassColor(key), alpha);
     const groupTitle = (pt, en) => `<div style="font:800 10px Inter,sans-serif;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin:8px 4px 3px 4px;">${escapeHtml(mapLang() === 'en' ? en : pt)}</div>`;
     const rowHtml = rows => rows.map(row => {
       const locked = FINAL_LOCKED_HIDDEN_CLASSES[row[0]] === true;
@@ -5518,7 +5486,6 @@ window.addEventListener('unhandledrejection', function(event) {
         }
         previousLoadPolo(name);
         renderBandSampleControls(App.currentPolo.local_explanations || []);
-        refreshAllPointsLegend();
         refreshFcuCanvasLayer();
         if (App.allPointsLayer) App.allPointsLayer.redraw();
         loadFcusForCurrentArea();
