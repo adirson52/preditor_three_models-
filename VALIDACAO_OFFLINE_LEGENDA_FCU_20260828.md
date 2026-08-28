@@ -39,6 +39,28 @@ Data: 28/08/2026
 - os 50 tons e as duas faixas QML foram confirmados em todos os zooms;
 - em Salvador, no zoom 11, QML, prioridade e atenção carregaram 6 tiles cada, sem falhas.
 
+## Validação das 11 áreas de estudo
+
+Todas as áreas disponíveis no seletor foram abertas e exercitadas no navegador real. Em cada uma foram verificados o carregamento das três camadas visuais no zoom 11, a independência dos controles no zoom afastado e aproximado, os quatro canvases no zoom 13 e a leitura das FCUs vetoriais.
+
+| Área | Tiles QML / prioritária / atenção | FCU Tipo 1 | FCU Tipo 2 | Imagens quebradas | Resultado |
+|---|---:|---:|---:|---:|---|
+| Belém - RGInt | 9 / 8 / 9 | 503 | 12 | 0 | OK |
+| Curitiba - Conc. Urbana | 5 / 5 / 5 | 601 | 34 | 0 | OK |
+| Fortaleza - Conc. Urbana | 10 / 10 / 9 | 639 | 56 | 0 | OK |
+| Goiânia - Conc. Urbana | 7 / 7 / 7 | 94 | 1 | 0 | OK |
+| Macapá - RGInt | 5 / 5 / 3 | 123 | 0 | 0 | OK |
+| Redenção - RGInt | 3 / 3 / 3 | 0 | 11 | 0 | OK |
+| Rio de Janeiro - Arranjos Populacionais | 9 / 9 / 9 | 69 | 0 | 0 | OK |
+| Rio de Janeiro - Grande Conc. Urbana | 12 / 12 / 12 | 1.281 | 114 | 0 | OK |
+| Rio de Janeiro - Médias Conc. Urbanas | 8 / 7 / 6 | 432 | 5 | 0 | OK |
+| Salvador - Conc. Urbana | 6 / 6 / 6 | 400 | 0 | 0 | OK |
+| São Paulo - Conc. Urbana | 8 / 8 / 8 | 2.654 | 182 | 0 | OK |
+
+Em todas as 11 áreas, desligar `ranking QML` preservou prioridade e atenção; religar o QML e desligar somente atenção prioritária preservou QML e atenção. Não houve erro de página.
+
+O validador de dados percorreu as 3.774.138 células e confirmou, área por área, que as quantidades reais de atenção prioritária, atenção e demais áreas coincidem exatamente com os limites da escada em `ranking_rules_escada.json`.
+
 ## Independência das camadas
 
 - zoom 13, camadas simultâneas:
@@ -82,8 +104,10 @@ Data: 28/08/2026
 - FCU Tipo 1 ligada;
 - FCU Tipo 2 ligada;
 - console sem erros de página durante a validação funcional;
-- `mapa_3d_real.html` respondeu HTTP 200, abriu com canvas MapLibre e carregou os filtros das classes e das duas FCUs sem erro de página.
+- `mapa_3d_real.html` foi aberto com uma célula real de cada uma das 11 áreas; em todas houve resposta válida, um canvas MapLibre, término do carregamento, ausência de sobreposição de erro e zero erros de página.
 
 ## Validação reproduzível
 
 Execute `python tools/validar_overview_qml.py` para conferir contagens, 50 cores, opacidades e ocupação dos PNGs em todos os zooms da visão geral.
+
+Execute `python tools/validar_camadas_areas.py` para conferir as 3.774.138 células e as quantidades de cada classe nas 11 áreas de estudo.

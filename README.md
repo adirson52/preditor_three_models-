@@ -33,6 +33,8 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 - `tools/consolidate_lookup.py`: utilitario que consolida o lookup de busca para reduzir arquivos no deploy.
 - `tools/gerar_overview_qml.py`: gera a camada QML única e as subcamadas categóricas de prioridade por zoom.
 - `tools/validar_overview_qml.py`: valida contagens, paleta e opacidades dos tiles QML.
+- `tools/validar_camadas_areas.py`: valida, célula a célula, as classes e os limites da escada nas 11 áreas de estudo.
+- `VALIDACAO_OFFLINE_LEGENDA_FCU_20260828.md`: relatório reproduzível dos testes funcionais do mapa, FCUs e 3D.
 
 ## Execução offline
 
