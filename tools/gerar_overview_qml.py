@@ -15,6 +15,7 @@ POINTS_DIR = PROJECT_DIR / "data_tiles" / "final" / "points" / "12"
 OUTPUT_DIR = PROJECT_DIR / "data_tiles" / "final" / "overview_qml"
 OUTPUT_CLASS_DIR = PROJECT_DIR / "data_tiles" / "final" / "overview_qml_classes"
 OUTPUT_ACTION_DIR = PROJECT_DIR / "data_tiles" / "final" / "overview_action"
+OUTPUT_ACTION_CLASS_DIR = PROJECT_DIR / "data_tiles" / "final" / "overview_action_classes"
 RULES_PATH = PROJECT_DIR / "data_tiles" / "final" / "ranking_rules_2608.json"
 ZOOMS = range(6, 12)
 TILE_SIZE = 256
@@ -118,7 +119,7 @@ def webmercator_tile(lat: float, lng: float, zoom: int) -> tuple[int, int, int, 
 
 def clear_output() -> None:
     root = PROJECT_DIR.resolve()
-    for output in (OUTPUT_DIR, OUTPUT_CLASS_DIR, OUTPUT_ACTION_DIR):
+    for output in (OUTPUT_DIR, OUTPUT_CLASS_DIR, OUTPUT_ACTION_DIR, OUTPUT_ACTION_CLASS_DIR):
         target = output.resolve()
         if root not in target.parents:
             raise RuntimeError(f"Saida fora do projeto: {target}")
@@ -168,7 +169,9 @@ def paint_marker(
     arr[y0:y1, px, 3] = alpha
 
 
-def paint_overview_zoom(zoom: int) -> tuple[int, int, int, dict[str, dict[str, int]]]:
+def paint_overview_zoom(
+    zoom: int,
+) -> tuple[int, int, int, dict[str, dict[str, int]], dict[str, dict[str, int]]]:
     qml_tiles: dict[tuple[int, int], np.ndarray] = {}
     qml_class_tiles: dict[str, dict[tuple[int, int], np.ndarray]] = {
         "priority": {},
@@ -176,6 +179,10 @@ def paint_overview_zoom(zoom: int) -> tuple[int, int, int, dict[str, dict[str, i
         "other": {},
     }
     action_tiles: dict[tuple[int, int], np.ndarray] = {}
+    action_class_tiles: dict[str, dict[tuple[int, int], np.ndarray]] = {
+        "priority": {},
+        "attention": {},
+    }
     radius = marker_radius(zoom)
     count = 0
     skipped_other = 0
@@ -206,9 +213,13 @@ def paint_overview_zoom(zoom: int) -> tuple[int, int, int, dict[str, dict[str, i
 
         qml_arr = qml_tiles.setdefault((tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8))
         action_arr = action_tiles.setdefault((tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8))
+        action_class_arr = action_class_tiles[cls_key].setdefault(
+            (tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8)
+        )
         paint_marker(qml_arr, px, py, qml_color, qml_point_alpha, radius)
         action_alpha = round(QML_ALPHA_HIGH * ZOOM_OPACITY_FACTORS[zoom])
         paint_marker(action_arr, px, py, ACTION_COLORS[cls_key], action_alpha, radius)
+        paint_marker(action_class_arr, px, py, ACTION_COLORS[cls_key], action_alpha, radius)
         count += 1
 
     for output, tiles in ((OUTPUT_DIR, qml_tiles), (OUTPUT_ACTION_DIR, action_tiles)):
@@ -223,21 +234,31 @@ def paint_overview_zoom(zoom: int) -> tuple[int, int, int, dict[str, dict[str, i
             out_dir.mkdir(parents=True, exist_ok=True)
             Image.fromarray(arr, mode="RGBA").save(out_dir / f"{ty}.png", optimize=True)
         class_summary[cls_key] = {"tiles": len(tiles), "points": class_counts[cls_key]}
-    return len(qml_tiles), count, skipped_other, class_summary
+    action_class_summary = {}
+    for cls_key, tiles in action_class_tiles.items():
+        for (tx, ty), arr in tiles.items():
+            out_dir = OUTPUT_ACTION_CLASS_DIR / cls_key / str(zoom) / str(tx)
+            out_dir.mkdir(parents=True, exist_ok=True)
+            Image.fromarray(arr, mode="RGBA").save(out_dir / f"{ty}.png", optimize=True)
+        action_class_summary[cls_key] = {"tiles": len(tiles), "points": class_counts[cls_key]}
+    action_class_summary["other"] = {"tiles": 0, "points": class_counts["other"]}
+    return len(qml_tiles), count, skipped_other, class_summary, action_class_summary
 
 
 def main() -> None:
     clear_output()
     summary = {}
     class_summary = {}
+    action_class_summary = {}
     for zoom in ZOOMS:
-        tile_count, point_count, skipped_other, zoom_class_summary = paint_overview_zoom(zoom)
+        tile_count, point_count, skipped_other, zoom_class_summary, zoom_action_class_summary = paint_overview_zoom(zoom)
         summary[str(zoom)] = {
             "tiles": tile_count,
             "points_rendered": point_count,
             "points_skipped_other": skipped_other,
         }
         class_summary[str(zoom)] = zoom_class_summary
+        action_class_summary[str(zoom)] = zoom_action_class_summary
         print(f"zoom {zoom}: {tile_count} tiles, {point_count} pontos renderizados, {skipped_other} demais areas ocultos")
     manifests = {
         OUTPUT_DIR: {
@@ -258,6 +279,15 @@ def main() -> None:
                 "classes_hidden": ["other"],
                 "colors": ACTION_COLORS,
                 "zooms": summary,
+            },
+        OUTPUT_ACTION_CLASS_DIR: {
+                "mode": "prioridade_modelo_por_subcamada",
+                "source": str(POINTS_DIR),
+                "field": "ranking_total",
+                "classes_rendered": ["priority", "attention"],
+                "classes_transparent": ["other"],
+                "colors": ACTION_COLORS,
+                "zooms": action_class_summary,
             },
     }
     for output, manifest in manifests.items():

@@ -79,13 +79,14 @@ Uma célula possui baixa evidência quando apresenta três modelos baixos ou doi
 ## Visualização 2D
 
 - usar o `Ranking geral` como única visualização dos pontos, sem seletor de modo;
-- permitir ligar e desligar a camada ao clicar na linha `ranking QML`, dentro do grupo `Estilo QML`;
+- implementar `ranking QML` como uma única camada, ligada e desligada pela linha correspondente dentro de `Estilo QML`;
 - no Ranking geral, usar `ranking_total`, intervalo fixo de 1 a 104.032 e 50 classes da rampa vermelho → amarelo → verde → azul;
-- manter `Prioridade do modelo` somente como grupo de filtros da legenda, nunca como modo alternativo de visualização;
+- implementar `Prioridade do modelo` como outra camada, separada do QML, com três subcamadas: atenção prioritária, atenção e demais áreas;
+- garantir independência completa: desligar o QML não altera as subcamadas de prioridade, e desligar qualquer prioridade não altera o QML;
 - no Ranking geral, rankings menores são vermelhos, rankings maiores são azuis, as primeiras 10 classes têm opacidade 0,88 e as demais 0,15;
 - atenção prioritária: vermelho `#d7191c`;
 - atenção: laranja `#f28e2b`;
-- permitir ligar e desligar separadamente atenção prioritária, atenção e demais áreas no grupo `Prioridade do modelo`;
+- permitir ligar e desligar separadamente atenção prioritária, atenção e demais áreas no grupo `Prioridade do modelo`; demais áreas permanece transparente, mas conserva sua função lógica e de clique;
 - sem resultado: transparente;
 - preservar o tamanho atual dos pontos no zoom próximo e deixá-los clicáveis;
 - nos zooms 6–9, renderizar cada ponto em 1 pixel;

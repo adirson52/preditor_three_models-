@@ -2809,10 +2809,10 @@ window.addEventListener('unhandledrejection', function(event) {
   const SCENARIO_KEY = "final";
   const TILE_Z = 12;
   const TILE_BASE = `data_tiles/${SCENARIO_KEY}/points/${TILE_Z}`;
-  const OVERVIEW_QML_CLASS_BASES = {
-    priority: `data_tiles/${SCENARIO_KEY}/overview_qml_classes/priority/{z}/{x}/{y}.png?v=ranking_qml_classes_20260828_v3_zoom_review`,
-    attention: `data_tiles/${SCENARIO_KEY}/overview_qml_classes/attention/{z}/{x}/{y}.png?v=ranking_qml_classes_20260828_v3_zoom_review`,
-    other: `data_tiles/${SCENARIO_KEY}/overview_qml_classes/other/{z}/{x}/{y}.png?v=ranking_qml_classes_20260828_v3_zoom_review`
+  const OVERVIEW_QML_BASE = `data_tiles/${SCENARIO_KEY}/overview_qml/{z}/{x}/{y}.png?v=ranking_qml_unico_20260828_v1`;
+  const OVERVIEW_PRIORITY_BASES = {
+    priority: `data_tiles/${SCENARIO_KEY}/overview_action_classes/priority/{z}/{x}/{y}.png?v=prioridade_subcamadas_20260828_v1`,
+    attention: `data_tiles/${SCENARIO_KEY}/overview_action_classes/attention/{z}/{x}/{y}.png?v=prioridade_subcamadas_20260828_v1`
   };
   const EMPTY_TILE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
   const LOOKUP_PREFIX_LEN = 8;
@@ -4103,10 +4103,23 @@ window.addEventListener('unhandledrejection', function(event) {
   }
 
   function ensureOverviewLayer() {
-    if (!App.map || App.overviewLayers) return;
-    App.overviewLayers = {};
-    Object.entries(OVERVIEW_QML_CLASS_BASES).forEach(([key, url], index) => {
-      App.overviewLayers[key] = L.tileLayer(url, {
+    if (!App.map || App.overviewQmlLayer || App.overviewPriorityLayers) return;
+    App.overviewQmlLayer = L.tileLayer(OVERVIEW_QML_BASE, {
+      tileSize: 256,
+      opacity: 0.95,
+      minZoom: 6,
+      maxZoom: TILE_Z - 1,
+      minNativeZoom: 6,
+      maxNativeZoom: TILE_Z - 1,
+      errorTileUrl: EMPTY_TILE,
+      zIndex: 330,
+      keepBuffer: 1,
+      updateWhenIdle: true,
+      updateWhenZooming: false
+    });
+    App.overviewPriorityLayers = {};
+    Object.entries(OVERVIEW_PRIORITY_BASES).forEach(([key, url], index) => {
+      App.overviewPriorityLayers[key] = L.tileLayer(url, {
         tileSize: 256,
         opacity: 0.95,
         minZoom: 6,
@@ -4114,25 +4127,47 @@ window.addEventListener('unhandledrejection', function(event) {
         minNativeZoom: 6,
         maxNativeZoom: TILE_Z - 1,
         errorTileUrl: EMPTY_TILE,
-        zIndex: 330 + index,
+        zIndex: 340 + index,
         keepBuffer: 1,
         updateWhenIdle: true,
         updateWhenZooming: false
       });
     });
+    // "Demais áreas" é uma subcamada lógica e permanece transparente.
+    App.overviewPriorityLayers.other = L.gridLayer({
+      tileSize: 256,
+      minZoom: 6,
+      maxZoom: TILE_Z - 1,
+      zIndex: 342
+    });
     refreshOverviewLayer();
   }
 
   function refreshOverviewLayer() {
-    if (!App.map || !App.overviewLayers) return;
-    Object.entries(App.overviewLayers).forEach(([key, layer]) => {
-      const shouldShow = FINAL_RANKING_STATE.visible && finalClassVisible(key);
+    if (!App.map) return;
+    if (App.overviewQmlLayer) {
+      if (FINAL_RANKING_STATE.visible) {
+        if (!App.map.hasLayer(App.overviewQmlLayer)) App.overviewQmlLayer.addTo(App.map);
+      } else if (App.map.hasLayer(App.overviewQmlLayer)) {
+        App.map.removeLayer(App.overviewQmlLayer);
+      }
+    }
+    Object.entries(App.overviewPriorityLayers || {}).forEach(([key, layer]) => {
+      const shouldShow = finalClassVisible(key);
       if (!shouldShow) {
         if (App.map.hasLayer(layer)) App.map.removeLayer(layer);
         return;
       }
       if (!App.map.hasLayer(layer)) layer.addTo(App.map);
       if (layer.setOpacity) layer.setOpacity(0.95);
+    });
+  }
+
+  function redrawFinalPointLayers() {
+    if (typeof App === 'undefined') return;
+    if (App.qmlPointsLayer && App.qmlPointsLayer.redraw) App.qmlPointsLayer.redraw();
+    Object.values(App.priorityPointsLayers || {}).forEach(layer => {
+      if (layer && layer.redraw) layer.redraw();
     });
   }
 
@@ -4155,7 +4190,7 @@ window.addEventListener('unhandledrejection', function(event) {
         App.map.invalidateSize();
       }
       if (recenter) recenterSelectedSample(true);
-      if (App.allPointsLayer) App.allPointsLayer.redraw();
+      redrawFinalPointLayers();
     }, delay);
   }
 
@@ -5323,17 +5358,30 @@ window.addEventListener('unhandledrejection', function(event) {
       const offsetX = coords.x - sourceX * scale;
       const offsetY = coords.y - sourceY * scale;
       const fallbackAreaCol = App.currentPolo ? App.currentPolo.area_col : null;
+      const renderMode = this.options.renderMode || 'qml';
+      const classKey = this.options.classKey || null;
 
       fetchTile(sourceX, sourceY).then(data => {
-        if (!FINAL_RANKING_STATE.visible) {
+        if (renderMode === 'qml' && !FINAL_RANKING_STATE.visible) {
+          done(null, tile);
+          return;
+        }
+        if (renderMode === 'priority' && (!classKey || !finalClassVisible(classKey))) {
           done(null, tile);
           return;
         }
         const points = data.p || [];
         for (const p of points) {
           const areaCol = p.a || fallbackAreaCol;
-          const style = qgisOverlayStyle(p, areaCol);
-          drawFinalPoint(ctx, p, coords, size, style);
+          const key = candidateClassKeyFromRank(actionRankingValue(p), areaCol);
+          if (renderMode === 'qml') {
+            // O QML é uma única camada e aplica a regra: somente as faixas destacadas.
+            if (key === 'other') continue;
+            drawFinalPoint(ctx, p, coords, size, qgisOverlayStyle(p, areaCol), false);
+            continue;
+          }
+          if (key !== classKey) continue;
+          drawFinalPoint(ctx, p, coords, size, candidateVisualStyle(key, p), false);
         }
         ctx.globalAlpha = 1;
         done(null, tile);
@@ -5344,6 +5392,7 @@ window.addEventListener('unhandledrejection', function(event) {
 
   function allPointsLegendHtml(open) {
     const dot = (color, alpha = 1) => `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};opacity:${alpha};margin-right:6px;vertical-align:middle;"></span>`;
+    const transparentDot = `<span style="display:inline-block;width:8px;height:8px;box-sizing:border-box;border-radius:50%;background:transparent;border:1.5px solid #94a3b8;margin-right:6px;vertical-align:middle;"></span>`;
     const fill = (color, border = '#636363', alpha = 1) => `<span style="display:inline-block;width:13px;height:10px;border-radius:2px;background:${color};border:2px solid ${border};opacity:${alpha};margin-right:6px;vertical-align:middle;"></span>`;
     const qmlRamp = `<span style="display:inline-block;width:34px;height:8px;border-radius:5px;margin-right:7px;vertical-align:middle;border:1px solid rgba(15,23,42,.18);background:linear-gradient(90deg,#d7191c 0%,#fdae61 22%,#ffffbf 42%,#a6dbaa 62%,#2b83ba 100%);"></span>`;
     const prioritySwatch = (key, alpha = 1) => dot(finalPointClassColor(key), alpha);
@@ -5360,7 +5409,7 @@ window.addEventListener('unhandledrejection', function(event) {
     const priorityRows = [
       ['priority', prioritySwatch('priority', 1)],
       ['attention', prioritySwatch('attention', .95)],
-      ['other', dot('#cbd5e1', .9)]
+      ['other', transparentDot]
     ];
     const fcuRows = [
       ['mappedFcu', fill('rgba(55,65,81,.17)', '#1f2937', 1)],
@@ -5385,7 +5434,7 @@ window.addEventListener('unhandledrejection', function(event) {
     const refreshFilteredLayers = () => {
       refreshOverviewLayer();
       refreshFcuCanvasLayer();
-      if (App.allPointsLayer) App.allPointsLayer.redraw();
+      redrawFinalPointLayers();
       refreshFcuPolygonsStyle();
     };
     if (div.dataset.legendBound === '1') return;
@@ -5409,10 +5458,6 @@ window.addEventListener('unhandledrejection', function(event) {
         FINAL_RANKING_STATE.visible = !FINAL_RANKING_STATE.visible;
       } else if (key && !FINAL_LOCKED_HIDDEN_CLASSES[key]) {
         FINAL_VISIBLE_CLASSES[key] = FINAL_VISIBLE_CLASSES[key] === false;
-        // Ao reativar uma classe, o ranking volta junto para a ação ser visível.
-        if (FINAL_VISIBLE_CLASSES[key] && !FINAL_RANKING_STATE.visible && ['priority', 'attention', 'other'].includes(key)) {
-          FINAL_RANKING_STATE.visible = true;
-        }
       }
       refreshAllPointsLegend();
       refreshFilteredLayers();
@@ -5435,7 +5480,7 @@ window.addEventListener('unhandledrejection', function(event) {
       refreshAllPointsLegend();
       refreshOverviewLayer();
       refreshFcuCanvasLayer();
-      if (typeof App !== 'undefined' && App.allPointsLayer) App.allPointsLayer.redraw();
+      redrawFinalPointLayers();
       refreshFcuPolygonsStyle();
       return window.__RF_LAYER_DEBUG__.getState();
     }
@@ -5510,7 +5555,8 @@ window.addEventListener('unhandledrejection', function(event) {
 
   function handleAllPointsClick(e) {
     if (e && e.originalEvent && typeof L !== 'undefined') L.DomEvent.stop(e.originalEvent);
-    if (typeof App === 'undefined' || !App.map || !FINAL_RANKING_STATE.visible || App.map.getZoom() < TILE_Z) return;
+    const anyPriorityLayerVisible = ['priority', 'attention', 'other'].some(finalClassVisible);
+    if (typeof App === 'undefined' || !App.map || (!FINAL_RANKING_STATE.visible && !anyPriorityLayerVisible) || App.map.getZoom() < TILE_Z) return;
     const c = tileCoord(e.latlng.lat, e.latlng.lng, TILE_Z);
     const fallbackAreaCol = App.currentPolo ? App.currentPolo.area_col : null;
     fetchTile(c.x, c.y).then(data => {
@@ -5519,8 +5565,10 @@ window.addEventListener('unhandledrejection', function(event) {
       const tolerance = 18 / Math.max(1, Math.pow(2, App.map.getZoom() - TILE_Z));
       for (const p of (data.p || [])) {
         const areaCol = p.a || fallbackAreaCol;
-        const style = qgisOverlayStyle(p, areaCol);
-        if (!style) continue;
+        const key = candidateClassKeyFromRank(actionRankingValue(p), areaCol);
+        const visibleByQml = FINAL_RANKING_STATE.visible && key !== 'other';
+        const visibleByPriorityLayer = finalClassVisible(key);
+        if (!visibleByQml && !visibleByPriorityLayer) continue;
         const pc = tileCoord(Number(p.lat), Number(p.lng), TILE_Z);
         const dx = pc.px - c.px;
         const dy = pc.py - c.py;
@@ -5578,9 +5626,22 @@ window.addEventListener('unhandledrejection', function(event) {
       initMapOverlaySearch();
       refreshFcuCanvasLayer();
       refreshTouchInteractionGates();
-      if (!App.allPointsLayer) {
-        App.allPointsLayer = new AllPointsLayer({tileSize: 256, opacity: 0.92, zIndex: 460});
-        App.allPointsLayer.addTo(App.map);
+      if (!App.qmlPointsLayer) {
+        App.qmlPointsLayer = new AllPointsLayer({tileSize: 256, opacity: 0.92, zIndex: 460, renderMode: 'qml'});
+        App.qmlPointsLayer.addTo(App.map);
+        App.allPointsLayer = App.qmlPointsLayer;
+        App.priorityPointsLayers = {};
+        ['priority', 'attention', 'other'].forEach((key, index) => {
+          const layer = new AllPointsLayer({
+            tileSize: 256,
+            opacity: 0.94,
+            zIndex: 470 + index,
+            renderMode: 'priority',
+            classKey: key
+          });
+          App.priorityPointsLayers[key] = layer;
+          layer.addTo(App.map);
+        });
         App.map.options.closePopupOnClick = true;
         if (App.map.doubleClickZoom) App.map.doubleClickZoom.enable();
         let finalSingleClickTimer = null;
@@ -5597,10 +5658,10 @@ window.addEventListener('unhandledrejection', function(event) {
         });
         App.map.on('dblclick', clearFinalSingleClick);
         App.map.on('zoomend', () => {
-          if (App.allPointsLayer) App.allPointsLayer.redraw();
+          redrawFinalPointLayers();
           refreshFcuPolygonsStyle();
         });
-        App.map.on('moveend', () => App.allPointsLayer && App.allPointsLayer.redraw());
+        App.map.on('moveend', redrawFinalPointLayers);
         addAllPointsControl();
       }
       loadFcusForCurrentArea();
@@ -5665,7 +5726,7 @@ window.addEventListener('unhandledrejection', function(event) {
           App.map.fitBounds(L.latLngBounds(latlngs), {padding: [20, 20]});
         }
         refreshFcuCanvasLayer();
-        if (App.allPointsLayer) App.allPointsLayer.redraw();
+        redrawFinalPointLayers();
         loadFcusForCurrentArea();
       };
     }
@@ -5679,7 +5740,7 @@ window.addEventListener('unhandledrejection', function(event) {
         previousLoadPolo(name);
         renderBandSampleControls(App.currentPolo.local_explanations || []);
         refreshFcuCanvasLayer();
-        if (App.allPointsLayer) App.allPointsLayer.redraw();
+        redrawFinalPointLayers();
         loadFcusForCurrentArea();
         initMapOverlaySearch();
         setTimeout(refreshTouchInteractionGates, 260);
@@ -5693,7 +5754,7 @@ window.addEventListener('unhandledrejection', function(event) {
       renderBandSampleControls(App.currentPolo.local_explanations || []);
       initMapOverlaySearch();
       refreshFcuCanvasLayer();
-      if (App.allPointsLayer) App.allPointsLayer.redraw();
+      redrawFinalPointLayers();
       loadFcusForCurrentArea();
       setTimeout(refreshTouchInteractionGates, 260);
       setTimeout(bindFeatureClickHandlers, 360);
@@ -5712,7 +5773,7 @@ window.addEventListener('unhandledrejection', function(event) {
       initMapOverlaySearch();
       refreshBandChipLabels();
       refreshFcuCanvasLayer();
-      if (App.allPointsLayer) App.allPointsLayer.redraw();
+      redrawFinalPointLayers();
       setTimeout(bindFeatureClickHandlers, 260);
     }
   }

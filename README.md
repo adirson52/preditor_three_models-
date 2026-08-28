@@ -6,9 +6,10 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 
 - A classe de ação considera todas as células da área no `ranking_total`.
 - O mapa usa sempre o `Ranking geral`, preservando a rampa QML contínua vermelho–amarelo–verde–azul no intervalo fixo de 1 a 104.032.
-- A linha `ranking QML`, no grupo `Estilo QML`, liga e desliga a camada QML sem trocar de simbologia.
-- `Prioridade do modelo` aparece como grupo de filtros da legenda: atenção prioritária, atenção e demais áreas.
-- O grupo `Prioridade do modelo` permite ligar e desligar atenção prioritária, atenção e demais áreas de forma independente.
+- A linha `ranking QML`, no grupo `Estilo QML`, liga e desliga uma única camada QML com os 50 tons.
+- `Prioridade do modelo` é outra camada, separada do QML, composta pelas subcamadas atenção prioritária, atenção e demais áreas.
+- QML e prioridade são independentes: desligar uma prioridade não modifica o QML, e desligar o QML não modifica as três prioridades.
+- Em `Prioridade do modelo`, atenção prioritária é vermelha, atenção é laranja e demais áreas permanece transparente.
 - O grupo `FCU` permite ligar e desligar FCU Tipo 1 e FCU Tipo 2; uma FCU visível recebe o clique antes da célula e abre seu popup territorial.
 - A situação territorial é independente da classe de ação: fora da FCU, FCU Tipo 1 ou FCU Tipo 2.
 - FCU Tipo 2 ocorre quando pelo menos 50% das células válidas da FCU têm três modelos baixos ou dois baixos e um médio; as demais são FCU Tipo 1.
@@ -24,12 +25,13 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 - `vercel.json`: headers de cache e gzip para os tiles.
 - `data_tiles/final/ranking_rules_escada.json`: limites e contagens por área.
 - `data_tiles/final/estilos_qgis/`: estilos QML públicos.
-- `data_tiles/final/overview_qml/`: visão geral com a rampa QML antiga.
+- `data_tiles/final/overview_qml/`: camada única da visão geral com a rampa QML original.
 - `data_tiles/final/overview_action/`: visão geral categórica gerada como ativo técnico, sem uso na visualização principal.
+- `data_tiles/final/overview_action_classes/`: subcamadas independentes de prioridade e atenção; demais áreas é lógica e transparente.
 - `PROMPT_DASHBOARD_FCU_ESCADA.md`: prompt reutilizável da especificação completa.
 - `tools/dashboard_generator_0407.py`: copia do gerador usado neste checkpoint.
 - `tools/consolidate_lookup.py`: utilitario que consolida o lookup de busca para reduzir arquivos no deploy.
-- `tools/gerar_overview_qml.py`: gera os tiles QML separados por prioridade e por zoom.
+- `tools/gerar_overview_qml.py`: gera a camada QML única e as subcamadas categóricas de prioridade por zoom.
 - `tools/validar_overview_qml.py`: valida contagens, paleta e opacidades dos tiles QML.
 
 ## Execução offline

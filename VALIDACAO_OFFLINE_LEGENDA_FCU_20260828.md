@@ -17,7 +17,9 @@ Data: 28/08/2026
 - controle organizado somente em `Estilo QML`, `Prioridade do modelo` e `FCU`;
 - as seis linhas são botões nativos com `role="switch"` e `aria-checked`;
 - o estado permanece estável após a atualização visual da legenda;
-- reativar prioridade, atenção ou demais áreas religa automaticamente o ranking QML;
+- `ranking QML` controla somente a camada QML única;
+- atenção prioritária, atenção e demais áreas controlam somente as subcamadas de `Prioridade do modelo`;
+- os dois conjuntos são independentes e nenhum botão religa ou desliga o outro;
 - a linha desligada é indicada por fundo/opacidade e ponto de estado, sem texto adicional e sem riscar o nome.
 
 ## QML e filtros
@@ -27,18 +29,28 @@ Data: 28/08/2026
 - 110.741 células de atenção;
 - 3.295.816 células em demais áreas;
 - 50 cores QML distintas confirmadas no zoom 6;
-- tiles independentes gerados para `priority`, `attention` e `other`;
+- camada QML unificada gerada em `overview_qml`;
+- prioridade categórica separada em `overview_action_classes/priority` e `overview_action_classes/attention`;
+- demais áreas permanece como subcamada lógica transparente;
 - zooms 6–9: ponto de 1 pixel;
 - zooms 10–11: marcador compacto em cruz de 5 pixels;
 - zoom 12 ou superior: raio próximo original preservado;
 - fatores de opacidade da visão geral: 0,50; 0,58; 0,66; 0,75; 0,86; 1,00 nos zooms 6 a 11;
 - os 50 tons e as duas faixas QML foram confirmados em todos os zooms;
-- em Salvador, no zoom 11, prioridade e atenção carregaram 6 tiles cada, sem falhas;
-- no zoom 13, o canvas apresentou:
-  - prioridade + atenção: 205.966 pixels visíveis;
-  - somente atenção: 48.040 pixels visíveis;
-  - todas as classes desligadas: 0 pixels visíveis;
-  - somente demais áreas: 275.322 pixels visíveis.
+- em Salvador, no zoom 11, QML, prioridade e atenção carregaram 6 tiles cada, sem falhas.
+
+## Independência das camadas
+
+- zoom 13, camadas simultâneas:
+  - QML: 205.966 pixels;
+  - atenção prioritária: 190.575 pixels;
+  - atenção: 48.143 pixels;
+  - demais áreas: 0 pixels, por definição transparente;
+- ao desligar somente o QML, seu canvas ficou com 0 pixels e prioridade/atenção permaneceram em 190.575/48.143;
+- ao religar o QML e desligar somente atenção prioritária, o QML permaneceu com 205.966 pixels, atenção com 48.143 e prioritária ficou em 0;
+- zoom 11: 6 tiles QML, 6 tiles de atenção prioritária e 6 tiles de atenção carregados simultaneamente;
+- ao desligar somente o QML no zoom 11, os 12 tiles categóricos permaneceram;
+- ao desligar somente atenção prioritária, permaneceram 6 tiles QML e 6 tiles de atenção.
 
 ## FCUs
 
