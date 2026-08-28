@@ -1303,13 +1303,13 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
             };""",
         """            const radarDisplayLabel = (label) => {
                 const text = String(label || '');
-                if (text.length <= 18) return text;
+                if (text.length <= 14) return text;
                 const words = text.split(/\\s+/);
                 const lines = [];
                 let line = '';
                 words.forEach(word => {
                     const next = line ? `${line} ${word}` : word;
-                    if (next.length > 18 && line) {
+                    if (next.length > 14 && line) {
                         lines.push(line);
                         line = word;
                     } else {
@@ -1331,7 +1331,7 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
     )
     html = html.replace(
         "                margin: { l: 40, r: 40, t: 50, b: 40 },",
-        "                margin: { l: 84, r: 84, t: 50, b: 54 },",
+        "                margin: { l: 104, r: 104, t: 50, b: 54 },",
     )
     html = html.replace(
         '                title: { text: (typeof CURR_LANG !== \'undefined\' && CURR_LANG === \'pt\' ? "Drivers da informalidade local" : "Local Informality Drivers"), font: { size: 14 } },',
@@ -1379,7 +1379,7 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
                     }
                 },
                 showlegend: false,
-                margin: { l: 84, r: 84, t: 50, b: 54 },
+                margin: { l: 104, r: 104, t: 50, b: 54 },
                 font: { family: 'Inter, sans-serif' }
             }, { responsive: false, displayModeBar: false });
 
@@ -2007,10 +2007,13 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
     html = html.replace(
         "        appendSampleLinks(sample);\n        setTimeout(() => {",
         "        if (sample && typeof renderTermGraphs === 'function' && App.currentPolo && App.currentPolo.term_graphs) {\n"
-        "          const rankedLocal = Object.entries(sample.contributions || {})\n"
-        "            .sort((a, b) => Math.abs(Number(b[1]) || 0) - Math.abs(Number(a[1]) || 0))\n"
-        "            .slice(0, 7)\n"
-        "            .map(row => row[0]);\n"
+        "          const renderedRadarFeatures = (window.__RF_LAST_RADAR_FEATURES__ || []).filter(Boolean).slice(0, 5);\n"
+        "          const rankedLocal = renderedRadarFeatures.length\n"
+        "            ? renderedRadarFeatures\n"
+        "            : Object.entries(sample.contributions || {})\n"
+        "                .sort((a, b) => Math.abs(Number(b[1]) || 0) - Math.abs(Number(a[1]) || 0))\n"
+        "                .slice(0, 5)\n"
+        "                .map(row => row[0]);\n"
         "          window.__RF_LAST_RADAR_FEATURES__ = rankedLocal;\n"
         "          renderTermGraphs(App.currentPolo.term_graphs, sample);\n"
         "        }\n"
@@ -2352,6 +2355,79 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
 })();
 </script>
 """
+    # O radar deve escolher cinco variaveis conceitualmente distintas. Algumas
+    # bases antigas trazem simultaneamente o nome exibido e o alias da mesma
+    # coluna (por exemplo, ibge_mediapopc), o que criava eixos duplicados.
+    radar_selection_patch = r"""            const normalizeRadarIdentity = value => String(value || '')
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+            const RADAR_CANONICAL_IDS = {
+                'ibge mediapopc': 'ibge_mediapopc',
+                'moradores em casas': 'ibge_mediapopc',
+                'moradores em casa': 'ibge_mediapopc',
+                'moradores em casas por celula': 'ibge_mediapopc',
+                'populacao em casas por celula': 'ibge_mediapopc',
+                'ibge mediapopdomc': 'ibge_mediapopdomc',
+                'moradores por casa': 'ibge_mediapopdomc',
+                'moradores por domicilio tipo casa': 'ibge_mediapopdomc',
+                'ibge mediadomc': 'ibge_mediadomc',
+                'domicilios em casas': 'ibge_mediadomc',
+                'domicilios em casas por celula': 'ibge_mediadomc',
+                'domicilios tipo casa': 'ibge_mediadomc'
+            };
+            const radarCanonicalId = feature => {
+                const raw = String(feature || '');
+                const label = getLabel(raw);
+                const normalized = normalizeRadarIdentity(raw);
+                const normalizedLabel = normalizeRadarIdentity(label);
+                const known = RADAR_CANONICAL_IDS[normalized] || RADAR_CANONICAL_IDS[normalizedLabel];
+                if (known) return known;
+                if (normalized.startsWith('moradores em casas por c') || normalizedLabel.startsWith('moradores em casas por c')) {
+                    return 'ibge_mediapopc';
+                }
+                const meta = (App.currentPolo && App.currentPolo.feature_meta) || {};
+                if (meta[raw] && meta[raw].sigla) return String(meta[raw].sigla);
+                if (meta[label] && meta[label].sigla) return String(meta[label].sigla);
+                const labels = (App.currentPolo && App.currentPolo.feature_labels) || {};
+                const mapped = Object.entries(labels).find(([code, text]) => {
+                    const codeNorm = normalizeRadarIdentity(code);
+                    const textNorm = normalizeRadarIdentity(text);
+                    return codeNorm === normalized || codeNorm === normalizedLabel || textNorm === normalized || textNorm === normalizedLabel;
+                });
+                return mapped ? String(mapped[0]) : normalizedLabel || normalized;
+            };
+            const radarSeen = new Set();
+            const localContribs = Object.entries(sample.contributions)
+                .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
+                .filter(([feature]) => {
+                    const canonical = radarCanonicalId(feature);
+                    if (radarSeen.has(canonical)) return false;
+                    radarSeen.add(canonical);
+                    return true;
+                })
+                .slice(0, 5);"""
+    html = re.sub(
+        r"            const localContribs = Object\.entries\(sample\.contributions\)\s*"
+        r"\.sort\(\(a, b\) => Math\.abs\(b\[1\]\) - Math\.abs\(a\[1\]\)\)\s*"
+        r"\.slice\(0, \d+\);",
+        lambda _: radar_selection_patch,
+        html,
+        count=1,
+    )
+    html = html.replace(
+        "            const cleanLabels = top5Local.map(f => (window.rfRepairText ? window.rfRepairText(getLabel(f)) : getLabel(f)));",
+        r"""            const clearRadarLabel = feature => {
+                const canonical = radarCanonicalId(feature);
+                const english = (typeof mapLang === 'function') ? mapLang() === 'en' : window.CURR_LANG === 'en';
+                if (canonical === 'ibge_mediapopc') return english ? 'Residents in houses in the cell' : 'Moradores em casas na célula';
+                if (canonical === 'ibge_mediapopdomc') return english ? 'Average residents per house' : 'Média de moradores por casa';
+                const label = getLabel(feature);
+                return window.rfRepairText ? window.rfRepairText(label) : label;
+            };
+            const cleanLabels = top5Local.map(clearRadarLabel);""",
+        1,
+    )
+
     return html.replace("</body>", nav_patch + "\n</body>")
 
 

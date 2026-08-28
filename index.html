@@ -2175,8 +2175,53 @@ window.addEventListener('unhandledrejection', function(event) {
 
 
             // --- Patch DNA do Setor: Usar Top 5 Local ao invés de Global ---
+            const normalizeRadarIdentity = value => String(value || '')
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+            const RADAR_CANONICAL_IDS = {
+                'ibge mediapopc': 'ibge_mediapopc',
+                'moradores em casas': 'ibge_mediapopc',
+                'moradores em casa': 'ibge_mediapopc',
+                'moradores em casas por celula': 'ibge_mediapopc',
+                'populacao em casas por celula': 'ibge_mediapopc',
+                'ibge mediapopdomc': 'ibge_mediapopdomc',
+                'moradores por casa': 'ibge_mediapopdomc',
+                'moradores por domicilio tipo casa': 'ibge_mediapopdomc',
+                'ibge mediadomc': 'ibge_mediadomc',
+                'domicilios em casas': 'ibge_mediadomc',
+                'domicilios em casas por celula': 'ibge_mediadomc',
+                'domicilios tipo casa': 'ibge_mediadomc'
+            };
+            const radarCanonicalId = feature => {
+                const raw = String(feature || '');
+                const label = getLabel(raw);
+                const normalized = normalizeRadarIdentity(raw);
+                const normalizedLabel = normalizeRadarIdentity(label);
+                const known = RADAR_CANONICAL_IDS[normalized] || RADAR_CANONICAL_IDS[normalizedLabel];
+                if (known) return known;
+                if (normalized.startsWith('moradores em casas por c') || normalizedLabel.startsWith('moradores em casas por c')) {
+                    return 'ibge_mediapopc';
+                }
+                const meta = (App.currentPolo && App.currentPolo.feature_meta) || {};
+                if (meta[raw] && meta[raw].sigla) return String(meta[raw].sigla);
+                if (meta[label] && meta[label].sigla) return String(meta[label].sigla);
+                const labels = (App.currentPolo && App.currentPolo.feature_labels) || {};
+                const mapped = Object.entries(labels).find(([code, text]) => {
+                    const codeNorm = normalizeRadarIdentity(code);
+                    const textNorm = normalizeRadarIdentity(text);
+                    return codeNorm === normalized || codeNorm === normalizedLabel || textNorm === normalized || textNorm === normalizedLabel;
+                });
+                return mapped ? String(mapped[0]) : normalizedLabel || normalized;
+            };
+            const radarSeen = new Set();
             const localContribs = Object.entries(sample.contributions)
                 .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
+                .filter(([feature]) => {
+                    const canonical = radarCanonicalId(feature);
+                    if (radarSeen.has(canonical)) return false;
+                    radarSeen.add(canonical);
+                    return true;
+                })
                 .slice(0, 5);
             const top5Local = localContribs.map(c => c[0]);
             window.__RF_LAST_RADAR_FEATURES__ = top5Local.slice();
@@ -2236,7 +2281,15 @@ window.addEventListener('unhandledrejection', function(event) {
             };
 
             const rSampleVals = top5Local.map(f => radarValue(sample.values, f, 0));
-            const cleanLabels = top5Local.map(f => (window.rfRepairText ? window.rfRepairText(getLabel(f)) : getLabel(f)));
+            const clearRadarLabel = feature => {
+                const canonical = radarCanonicalId(feature);
+                const english = (typeof mapLang === 'function') ? mapLang() === 'en' : window.CURR_LANG === 'en';
+                if (canonical === 'ibge_mediapopc') return english ? 'Residents in houses in the cell' : 'Moradores em casas na célula';
+                if (canonical === 'ibge_mediapopdomc') return english ? 'Average residents per house' : 'Média de moradores por casa';
+                const label = getLabel(feature);
+                return window.rfRepairText ? window.rfRepairText(label) : label;
+            };
+            const cleanLabels = top5Local.map(clearRadarLabel);
 
             // --- Cálculos das Médias ---
             const mPolo = App.currentPolo.means;
@@ -2341,13 +2394,13 @@ window.addEventListener('unhandledrejection', function(event) {
             };
             const radarDisplayLabel = (label) => {
                 const text = String(label || '');
-                if (text.length <= 18) return text;
+                if (text.length <= 14) return text;
                 const words = text.split(/\s+/);
                 const lines = [];
                 let line = '';
                 words.forEach(word => {
                     const next = line ? `${line} ${word}` : word;
-                    if (next.length > 18 && line) {
+                    if (next.length > 14 && line) {
                         lines.push(line);
                         line = word;
                     } else {
@@ -2442,7 +2495,7 @@ window.addEventListener('unhandledrejection', function(event) {
                 },
                 showlegend: true,
                 legend: { orientation: 'h', x: 0, y: -0.25 },
-                margin: { l: 84, r: 84, t: 50, b: 54 },
+                margin: { l: 104, r: 104, t: 50, b: 54 },
                 font: { family: 'Inter, sans-serif' }
             }, { responsive: false, displayModeBar: false });
 
@@ -2488,7 +2541,7 @@ window.addEventListener('unhandledrejection', function(event) {
                     }
                 },
                 showlegend: false,
-                margin: { l: 84, r: 84, t: 50, b: 54 },
+                margin: { l: 104, r: 104, t: 50, b: 54 },
                 font: { family: 'Inter, sans-serif' }
             }, { responsive: false, displayModeBar: false });
 
@@ -5431,10 +5484,13 @@ window.addEventListener('unhandledrejection', function(event) {
           setTimeout(() => finalFlyToCellTwoStage(Number(sample.lat), Number(sample.lng)), 80);
         }
         if (sample && typeof renderTermGraphs === 'function' && App.currentPolo && App.currentPolo.term_graphs) {
-          const rankedLocal = Object.entries(sample.contributions || {})
-            .sort((a, b) => Math.abs(Number(b[1]) || 0) - Math.abs(Number(a[1]) || 0))
-            .slice(0, 5)
-            .map(row => row[0]);
+          const renderedRadarFeatures = (window.__RF_LAST_RADAR_FEATURES__ || []).filter(Boolean).slice(0, 5);
+          const rankedLocal = renderedRadarFeatures.length
+            ? renderedRadarFeatures
+            : Object.entries(sample.contributions || {})
+                .sort((a, b) => Math.abs(Number(b[1]) || 0) - Math.abs(Number(a[1]) || 0))
+                .slice(0, 5)
+                .map(row => row[0]);
           window.__RF_LAST_RADAR_FEATURES__ = rankedLocal;
           renderTermGraphs(App.currentPolo.term_graphs, sample);
         }
@@ -6385,7 +6441,7 @@ window.addEventListener('unhandledrejection', function(event) {
           nextLayout.xaxis = Object.assign({}, nextLayout.xaxis || {}, {automargin: true, tickangle: -55, tickfont: {size: 9}});
           nextLayout.yaxis = Object.assign({}, nextLayout.yaxis || {}, {automargin: true, title: {text: window.CURR_LANG === 'en' ? 'Impact (log-odds)' : 'Impacto (log-odds)', font: {size: 10}}});
         } else if (id === 'local-radar') {
-          nextLayout.margin = {l: 48, r: 48, t: 48, b: 82};
+          nextLayout.margin = {l: 100, r: 100, t: 48, b: 82};
           nextLayout.legend = Object.assign({}, nextLayout.legend || {}, {orientation: 'h', x: 0, y: -0.18, font: {size: 9}});
           if (nextLayout.polar && nextLayout.polar.angularaxis) nextLayout.polar.angularaxis.tickfont = {size: 9};
         } else if (String(id).startsWith('chart-feat-')) {
