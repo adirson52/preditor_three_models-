@@ -13,6 +13,7 @@ from PIL import Image
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 POINTS_DIR = PROJECT_DIR / "data_tiles" / "final" / "points" / "12"
 OUTPUT_DIR = PROJECT_DIR / "data_tiles" / "final" / "overview_qml"
+OUTPUT_ACTION_DIR = PROJECT_DIR / "data_tiles" / "final" / "overview_action"
 RULES_PATH = PROJECT_DIR / "data_tiles" / "final" / "ranking_rules_2608.json"
 ZOOMS = range(6, 12)
 TILE_SIZE = 256
@@ -22,6 +23,18 @@ ACTION_COLORS = {
     "priority": (215, 25, 28),
     "attention": (242, 142, 43),
 }
+QGIS_PALETTE = [
+    (215, 25, 28), (223, 55, 42), (231, 86, 56), (238, 116, 70), (246, 147, 84),
+    (253, 175, 98), (253, 187, 112), (254, 198, 125), (254, 210, 139), (254, 221, 152),
+    (254, 233, 165), (255, 245, 179), (254, 255, 191), (248, 252, 189), (241, 249, 187),
+    (234, 247, 184), (228, 244, 182), (221, 241, 180), (214, 239, 178), (208, 236, 176),
+    (201, 233, 174), (194, 230, 172), (188, 228, 169), (181, 225, 167), (174, 222, 165),
+    (168, 219, 164), (163, 215, 165), (158, 212, 166), (153, 208, 167), (147, 204, 168),
+    (142, 201, 169), (137, 197, 170), (132, 193, 171), (127, 190, 172), (121, 186, 173),
+    (116, 182, 173), (111, 179, 174), (106, 175, 175), (100, 171, 176), (95, 168, 177),
+    (90, 164, 178), (85, 160, 179), (80, 157, 180), (74, 153, 181), (69, 149, 182),
+    (64, 146, 182), (59, 142, 183), (53, 138, 184), (48, 135, 185), (43, 131, 186),
+]
 
 
 def load_ranking_rules() -> dict:
@@ -33,6 +46,17 @@ def load_ranking_rules() -> dict:
 
 
 RANKING_RULES = load_ranking_rules()
+
+
+def qgis_color(value: object) -> tuple[int, int, int]:
+    try:
+        rank = float(value)
+    except (TypeError, ValueError):
+        return 255, 237, 160
+    span = max(1.0, QGIS_RANKING_MAX - QGIS_RANKING_MIN)
+    position = min(1.0, max(0.0, (rank - QGIS_RANKING_MIN) / span))
+    index = min(len(QGIS_PALETTE) - 1, max(0, int(math.floor(position * len(QGIS_PALETTE)))))
+    return QGIS_PALETTE[index]
 
 
 def numeric(value: object) -> float | None:
@@ -75,12 +99,13 @@ def webmercator_tile(lat: float, lng: float, zoom: int) -> tuple[int, int, int, 
 
 def clear_output() -> None:
     root = PROJECT_DIR.resolve()
-    target = OUTPUT_DIR.resolve()
-    if root not in target.parents:
-        raise RuntimeError(f"Saida fora do projeto: {target}")
-    if OUTPUT_DIR.exists():
-        shutil.rmtree(OUTPUT_DIR)
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    for output in (OUTPUT_DIR, OUTPUT_ACTION_DIR):
+        target = output.resolve()
+        if root not in target.parents:
+            raise RuntimeError(f"Saida fora do projeto: {target}")
+        if output.exists():
+            shutil.rmtree(output)
+        output.mkdir(parents=True, exist_ok=True)
 
 
 def iter_points():
@@ -101,7 +126,8 @@ def marker_radius(zoom: int) -> int:
 
 
 def paint_overview_zoom(zoom: int) -> tuple[int, int]:
-    tiles: dict[tuple[int, int], np.ndarray] = {}
+    qml_tiles: dict[tuple[int, int], np.ndarray] = {}
+    action_tiles: dict[tuple[int, int], np.ndarray] = {}
     radius = marker_radius(zoom)
     count = 0
     skipped_other = 0
@@ -119,21 +145,28 @@ def paint_overview_zoom(zoom: int) -> tuple[int, int]:
         if tile is None:
             continue
         tx, ty, px, py = tile
-        arr = tiles.setdefault((tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8))
-        r, g, b = ACTION_COLORS[cls_key]
+        qml_arr = qml_tiles.setdefault((tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8))
+        action_arr = action_tiles.setdefault((tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8))
+        qml_r, qml_g, qml_b = qgis_color(point.get("rt", point.get("r")))
+        action_r, action_g, action_b = ACTION_COLORS[cls_key]
         x0, x1 = max(0, px - radius), min(TILE_SIZE, px + radius + 1)
         y0, y1 = max(0, py - radius), min(TILE_SIZE, py + radius + 1)
-        arr[y0:y1, x0:x1, 0] = r
-        arr[y0:y1, x0:x1, 1] = g
-        arr[y0:y1, x0:x1, 2] = b
-        arr[y0:y1, x0:x1, 3] = 225
+        qml_arr[y0:y1, x0:x1, 0] = qml_r
+        qml_arr[y0:y1, x0:x1, 1] = qml_g
+        qml_arr[y0:y1, x0:x1, 2] = qml_b
+        qml_arr[y0:y1, x0:x1, 3] = 225
+        action_arr[y0:y1, x0:x1, 0] = action_r
+        action_arr[y0:y1, x0:x1, 1] = action_g
+        action_arr[y0:y1, x0:x1, 2] = action_b
+        action_arr[y0:y1, x0:x1, 3] = 225
         count += 1
 
-    for (tx, ty), arr in tiles.items():
-        out_dir = OUTPUT_DIR / str(zoom) / str(tx)
-        out_dir.mkdir(parents=True, exist_ok=True)
-        Image.fromarray(arr, mode="RGBA").save(out_dir / f"{ty}.png", optimize=True)
-    return len(tiles), count, skipped_other
+    for output, tiles in ((OUTPUT_DIR, qml_tiles), (OUTPUT_ACTION_DIR, action_tiles)):
+        for (tx, ty), arr in tiles.items():
+            out_dir = output / str(zoom) / str(tx)
+            out_dir.mkdir(parents=True, exist_ok=True)
+            Image.fromarray(arr, mode="RGBA").save(out_dir / f"{ty}.png", optimize=True)
+    return len(qml_tiles), count, skipped_other
 
 
 def main() -> None:
@@ -147,9 +180,9 @@ def main() -> None:
             "points_skipped_other": skipped_other,
         }
         print(f"zoom {zoom}: {tile_count} tiles, {point_count} pontos renderizados, {skipped_other} demais areas ocultos")
-    with (OUTPUT_DIR / "manifest.json").open("w", encoding="utf-8") as f:
-        json.dump(
-            {
+    manifests = {
+        OUTPUT_DIR: {
+                "mode": "ranking_qml_antigo",
                 "source": str(POINTS_DIR),
                 "field": "ranking_total",
                 "classes_rendered": ["priority", "attention"],
@@ -158,10 +191,19 @@ def main() -> None:
                 "qml_max": QGIS_RANKING_MAX,
                 "zooms": summary,
             },
-            f,
-            ensure_ascii=False,
-            indent=2,
-        )
+        OUTPUT_ACTION_DIR: {
+                "mode": "classe_acao_escada",
+                "source": str(POINTS_DIR),
+                "field": "ranking_total",
+                "classes_rendered": ["priority", "attention"],
+                "classes_hidden": ["other"],
+                "colors": ACTION_COLORS,
+                "zooms": summary,
+            },
+    }
+    for output, manifest in manifests.items():
+        with (output / "manifest.json").open("w", encoding="utf-8") as f:
+            json.dump(manifest, f, ensure_ascii=False, indent=2)
 
 
 if __name__ == "__main__":

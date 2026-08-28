@@ -44,6 +44,21 @@ MODEL_FIELDS = {
     "nao_morfologico": "pn",
 }
 
+QML_RANKING_MIN = 1
+QML_RANKING_MAX = 104032
+QML_RANKING_PALETTE = (
+    (215, 25, 28), (223, 55, 42), (231, 86, 56), (238, 116, 70), (246, 147, 84),
+    (253, 175, 98), (253, 187, 112), (254, 198, 125), (254, 210, 139), (254, 221, 152),
+    (254, 233, 165), (255, 245, 179), (254, 255, 191), (248, 252, 189), (241, 249, 187),
+    (234, 247, 184), (228, 244, 182), (221, 241, 180), (214, 239, 178), (208, 236, 176),
+    (201, 233, 174), (194, 230, 172), (188, 228, 169), (181, 225, 167), (174, 222, 165),
+    (168, 219, 164), (163, 215, 165), (158, 212, 166), (153, 208, 167), (147, 204, 168),
+    (142, 201, 169), (137, 197, 170), (132, 193, 171), (127, 190, 172), (121, 186, 173),
+    (116, 182, 173), (111, 179, 174), (106, 175, 175), (100, 171, 176), (95, 168, 177),
+    (90, 164, 178), (85, 160, 179), (80, 157, 180), (74, 153, 181), (69, 149, 182),
+    (64, 146, 182), (59, 142, 183), (53, 138, 184), (48, 135, 185), (43, 131, 186),
+)
+
 # Casos normativos aprovados: (F, E, prioritaria_ate, atencao_seguinte, total_destacado).
 STAIR_CONTROL_POINTS = (
     (0.05, 0.05, 0.075, 0.025, 0.10),
@@ -440,11 +455,44 @@ def qml_fcu() -> str:
 """
 
 
+def qml_ranking_old() -> str:
+    """Reproduz a rampa antiga: ranking_total 1..104032, vermelho ate azul."""
+    span = QML_RANKING_MAX - QML_RANKING_MIN
+    width = span / len(QML_RANKING_PALETTE)
+    ranges: list[str] = []
+    symbols: list[str] = []
+    for index, (red, green, blue) in enumerate(QML_RANKING_PALETTE):
+        lower = QML_RANKING_MIN + index * width
+        upper = 999999999 if index == len(QML_RANKING_PALETTE) - 1 else QML_RANKING_MIN + (index + 1) * width
+        label_upper = QML_RANKING_MAX if index == len(QML_RANKING_PALETTE) - 1 else upper
+        alpha = 225 if index < 10 else 38
+        ranges.append(
+            f'      <range lower="{lower:.6f}" upper="{upper:.6f}" symbol="{index}" '
+            f'label="{lower:.0f} - {label_upper:.0f}" render="true"/>'
+        )
+        symbols.append(
+            f'      <symbol name="{index}" type="marker"><layer class="SimpleMarker">'
+            f'<Option name="name" value="circle"/><Option name="color" value="{red},{green},{blue},{alpha}"/>'
+            f'<Option name="outline_color" value="{red},{green},{blue},{alpha}"/>'
+            '<Option name="outline_width" value="0"/><Option name="size" value="2.2"/>'
+            '<Option name="size_unit" value="MM"/></layer></symbol>'
+        )
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<qgis version="3.34" styleCategories="Symbology|Labeling">\n'
+        '  <renderer-v2 type="graduatedSymbol" attr="ranking_total" graduatedMethod="GraduatedColor">\n'
+        '    <ranges>\n' + "\n".join(ranges) + '\n    </ranges>\n'
+        '    <symbols>\n' + "\n".join(symbols) + '\n    </symbols>\n'
+        '  </renderer-v2>\n</qgis>\n'
+    )
+
+
 def write_qml_files() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     public_styles = RULES_PATH.parent / "estilos_qgis"
     public_styles.mkdir(parents=True, exist_ok=True)
     for folder in (OUTPUT_DIR, public_styles):
+        (folder / "estilo_ranking_total_qml_antigo.qml").write_text(qml_ranking_old(), encoding="utf-8")
         (folder / "estilo_celulas_acao_escada.qml").write_text(qml_action(), encoding="utf-8")
         (folder / "estilo_fcu_tipos_transparente.qml").write_text(qml_fcu(), encoding="utf-8")
 
@@ -487,6 +535,7 @@ def build_salvador_gpkg(payload: dict[str, Any]) -> Path | None:
     ]
     cells = gpd.read_file(SALVADOR_SOURCE, layer="predicoes_base0407", columns=columns)
     cells["ranking_geral"] = pd.to_numeric(cells["ranking_total_winner"], errors="coerce").astype("Int64")
+    cells["ranking_total"] = cells["ranking_geral"]
     cells["classe_acao"] = [class_from_rank(value, rule) for value in cells["ranking_geral"]]
     cells["nivel_completo"] = [level_from_rank(value, rule) for value in cells["ranking_total_completo"]]
     cells["nivel_morfologico"] = [level_from_rank(value, rule) for value in cells["ranking_total_morfologico"]]

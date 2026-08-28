@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<qgis version="3.34" styleCategories="Symbology|Labeling">
+  <renderer-v2 type="graduatedSymbol" attr="ranking_total" graduatedMethod="GraduatedColor">
+    <ranges>
+      <range lower="1.000000" upper="2081.620000" symbol="0" label="1 - 2082" render="true"/>
+      <range lower="2081.620000" upper="4162.240000" symbol="1" label="2082 - 4162" render="true"/>
+      <range lower="4162.240000" upper="6242.860000" symbol="2" label="4162 - 6243" render="true"/>
+      <range lower="6242.860000" upper="8323.480000" symbol="3" label="6243 - 8323" render="true"/>
+      <range lower="8323.480000" upper="10404.100000" symbol="4" label="8323 - 10404" render="true"/>
+      <range lower="10404.100000" upper="12484.720000" symbol="5" label="10404 - 12485" render="true"/>
+      <range lower="12484.720000" upper="14565.340000" symbol="6" label="12485 - 14565" render="true"/>
+      <range lower="14565.340000" upper="16645.960000" symbol="7" label="14565 - 16646" render="true"/>
+      <range lower="16645.960000" upper="18726.580000" symbol="8" label="16646 - 18727" render="true"/>
+      <range lower="18726.580000" upper="20807.200000" symbol="9" label="18727 - 20807" render="true"/>
+      <range lower="20807.200000" upper="22887.820000" symbol="10" label="20807 - 22888" render="true"/>
+      <range lower="22887.820000" upper="24968.440000" symbol="11" label="22888 - 24968" render="true"/>
+      <range lower="24968.440000" upper="27049.060000" symbol="12" label="24968 - 27049" render="true"/>
+      <range lower="27049.060000" upper="29129.680000" symbol="13" label="27049 - 29130" render="true"/>
+      <range lower="29129.680000" upper="31210.300000" symbol="14" label="29130 - 31210" render="true"/>
+      <range lower="31210.300000" upper="33290.920000" symbol="15" label="31210 - 33291" render="true"/>
+      <range lower="33290.920000" upper="35371.540000" symbol="16" label="33291 - 35372" render="true"/>
+      <range lower="35371.540000" upper="37452.160000" symbol="17" label="35372 - 37452" render="true"/>
+      <range lower="37452.160000" upper="39532.780000" symbol="18" label="37452 - 39533" render="true"/>
+      <range lower="39532.780000" upper="41613.400000" symbol="19" label="39533 - 41613" render="true"/>
+      <range lower="41613.400000" upper="43694.020000" symbol="20" label="41613 - 43694" render="true"/>
+      <range lower="43694.020000" upper="45774.640000" symbol="21" label="43694 - 45775" render="true"/>
+      <range lower="45774.640000" upper="47855.260000" symbol="22" label="45775 - 47855" render="true"/>
+      <range lower="47855.260000" upper="49935.880000" symbol="23" label="47855 - 49936" render="true"/>
+      <range lower="49935.880000" upper="52016.500000" symbol="24" label="49936 - 52016" render="true"/>
+      <range lower="52016.500000" upper="54097.120000" symbol="25" label="52016 - 54097" render="true"/>
+      <range lower="54097.120000" upper="56177.740000" symbol="26" label="54097 - 56178" render="true"/>
+      <range lower="56177.740000" upper="58258.360000" symbol="27" label="56178 - 58258" render="true"/>
+      <range lower="58258.360000" upper="60338.980000" symbol="28" label="58258 - 60339" render="true"/>
+      <range lower="60338.980000" upper="62419.600000" symbol="29" label="60339 - 62420" render="true"/>
+      <range lower="62419.600000" upper="64500.220000" symbol="30" label="62420 - 64500" render="true"/>
+      <range lower="64500.220000" upper="66580.840000" symbol="31" label="64500 - 66581" render="true"/>
+      <range lower="66580.840000" upper="68661.460000" symbol="32" label="66581 - 68661" render="true"/>
+      <range lower="68661.460000" upper="70742.080000" symbol="33" label="68661 - 70742" render="true"/>
+      <range lower="70742.080000" upper="72822.700000" symbol="34" label="70742 - 72823" render="true"/>
+      <range lower="72822.700000" upper="74903.320000" symbol="35" label="72823 - 74903" render="true"/>
+      <range lower="74903.320000" upper="76983.940000" symbol="36" label="74903 - 76984" render="true"/>
+      <range lower="76983.940000" upper="79064.560000" symbol="37" label="76984 - 79065" render="true"/>
+      <range lower="79064.560000" upper="81145.180000" symbol="38" label="79065 - 81145" render="true"/>
+      <range lower="81145.180000" upper="83225.800000" symbol="39" label="81145 - 83226" render="true"/>
+      <range lower="83225.800000" upper="85306.420000" symbol="40" label="83226 - 85306" render="true"/>
+      <range lower="85306.420000" upper="87387.040000" symbol="41" label="85306 - 87387" render="true"/>
+      <range lower="87387.040000" upper="89467.660000" symbol="42" label="87387 - 89468" render="true"/>
+      <range lower="89467.660000" upper="91548.280000" symbol="43" label="89468 - 91548" render="true"/>
+      <range lower="91548.280000" upper="93628.900000" symbol="44" label="91548 - 93629" render="true"/>
+      <range lower="93628.900000" upper="95709.520000" symbol="45" label="93629 - 95710" render="true"/>
+      <range lower="95709.520000" upper="97790.140000" symbol="46" label="95710 - 97790" render="true"/>
+      <range lower="97790.140000" upper="99870.760000" symbol="47" label="97790 - 99871" render="true"/>
+      <range lower="99870.760000" upper="101951.380000" symbol="48" label="99871 - 101951" render="true"/>
+      <range lower="101951.380000" upper="999999999.000000" symbol="49" label="101951 - 104032" render="true"/>
+    </ranges>
+    <symbols>
+      <symbol name="0" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="215,25,28,225"/><Option name="outline_color" value="215,25,28,225"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="1" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="223,55,42,225"/><Option name="outline_color" value="223,55,42,225"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="2" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="231,86,56,225"/><Option name="outline_color" value="231,86,56,225"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="3" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="238,116,70,225"/><Option name="outline_color" value="238,116,70,225"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="4" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="246,147,84,225"/><Option name="outline_color" value="246,147,84,225"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="5" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="253,175,98,225"/><Option name="outline_color" value="253,175,98,225"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="6" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="253,187,112,225"/><Option name="outline_color" value="253,187,112,225"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="7" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="254,198,125,225"/><Option name="outline_color" value="254,198,125,225"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="8" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="254,210,139,225"/><Option name="outline_color" value="254,210,139,225"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="9" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="254,221,152,225"/><Option name="outline_color" value="254,221,152,225"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="10" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="254,233,165,38"/><Option name="outline_color" value="254,233,165,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="11" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="255,245,179,38"/><Option name="outline_color" value="255,245,179,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="12" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="254,255,191,38"/><Option name="outline_color" value="254,255,191,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="13" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="248,252,189,38"/><Option name="outline_color" value="248,252,189,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="14" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="241,249,187,38"/><Option name="outline_color" value="241,249,187,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="15" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="234,247,184,38"/><Option name="outline_color" value="234,247,184,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="16" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="228,244,182,38"/><Option name="outline_color" value="228,244,182,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="17" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="221,241,180,38"/><Option name="outline_color" value="221,241,180,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="18" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="214,239,178,38"/><Option name="outline_color" value="214,239,178,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="19" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="208,236,176,38"/><Option name="outline_color" value="208,236,176,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="20" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="201,233,174,38"/><Option name="outline_color" value="201,233,174,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="21" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="194,230,172,38"/><Option name="outline_color" value="194,230,172,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="22" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="188,228,169,38"/><Option name="outline_color" value="188,228,169,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="23" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="181,225,167,38"/><Option name="outline_color" value="181,225,167,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="24" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="174,222,165,38"/><Option name="outline_color" value="174,222,165,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="25" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="168,219,164,38"/><Option name="outline_color" value="168,219,164,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="26" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="163,215,165,38"/><Option name="outline_color" value="163,215,165,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="27" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="158,212,166,38"/><Option name="outline_color" value="158,212,166,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="28" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="153,208,167,38"/><Option name="outline_color" value="153,208,167,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="29" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="147,204,168,38"/><Option name="outline_color" value="147,204,168,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="30" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="142,201,169,38"/><Option name="outline_color" value="142,201,169,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="31" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="137,197,170,38"/><Option name="outline_color" value="137,197,170,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="32" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="132,193,171,38"/><Option name="outline_color" value="132,193,171,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="33" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="127,190,172,38"/><Option name="outline_color" value="127,190,172,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="34" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="121,186,173,38"/><Option name="outline_color" value="121,186,173,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="35" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="116,182,173,38"/><Option name="outline_color" value="116,182,173,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="36" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="111,179,174,38"/><Option name="outline_color" value="111,179,174,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="37" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="106,175,175,38"/><Option name="outline_color" value="106,175,175,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="38" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="100,171,176,38"/><Option name="outline_color" value="100,171,176,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="39" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="95,168,177,38"/><Option name="outline_color" value="95,168,177,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="40" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="90,164,178,38"/><Option name="outline_color" value="90,164,178,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="41" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="85,160,179,38"/><Option name="outline_color" value="85,160,179,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="42" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="80,157,180,38"/><Option name="outline_color" value="80,157,180,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="43" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="74,153,181,38"/><Option name="outline_color" value="74,153,181,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="44" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="69,149,182,38"/><Option name="outline_color" value="69,149,182,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="45" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="64,146,182,38"/><Option name="outline_color" value="64,146,182,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="46" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="59,142,183,38"/><Option name="outline_color" value="59,142,183,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="47" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="53,138,184,38"/><Option name="outline_color" value="53,138,184,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="48" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="48,135,185,38"/><Option name="outline_color" value="48,135,185,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+      <symbol name="49" type="marker"><layer class="SimpleMarker"><Option name="name" value="circle"/><Option name="color" value="43,131,186,38"/><Option name="outline_color" value="43,131,186,38"/><Option name="outline_width" value="0"/><Option name="size" value="2.2"/><Option name="size_unit" value="MM"/></layer></symbol>
+    </symbols>
+  </renderer-v2>
+</qgis>

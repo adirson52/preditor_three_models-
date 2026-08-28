@@ -1,0 +1,56 @@
+{
+  "mode": "classe_acao_escada",
+  "source": "E:\\Banco de dados Preditor Br\\03_preditor_grade31_teste0407\\03_outputs\\05_dashboard_b_salvador_fcu_tipos_online\\data_tiles\\final\\points\\12",
+  "field": "ranking_total",
+  "classes_rendered": [
+    "priority",
+    "attention"
+  ],
+  "classes_hidden": [
+    "other"
+  ],
+  "colors": {
+    "priority": [
+      215,
+      25,
+      28
+    ],
+    "attention": [
+      242,
+      142,
+      43
+    ]
+  },
+  "zooms": {
+    "6": {
+      "tiles": 13,
+      "points_rendered": 478322,
+      "points_skipped_other": 3295816
+    },
+    "7": {
+      "tiles": 20,
+      "points_rendered": 478322,
+      "points_skipped_other": 3295816
+    },
+    "8": {
+      "tiles": 36,
+      "points_rendered": 478322,
+      "points_skipped_other": 3295816
+    },
+    "9": {
+      "tiles": 64,
+      "points_rendered": 478322,
+      "points_skipped_other": 3295816
+    },
+    "10": {
+      "tiles": 140,
+      "points_rendered": 478322,
+      "points_skipped_other": 3295816
+    },
+    "11": {
+      "tiles": 277,
+      "points_rendered": 478322,
+      "points_skipped_other": 3295816
+    }
+  }
+}
