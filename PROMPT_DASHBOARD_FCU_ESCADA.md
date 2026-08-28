@@ -81,18 +81,25 @@ Uma célula possui baixa evidência quando apresenta três modelos baixos ou doi
 - usar o `Ranking geral` como única visualização dos pontos, sem seletor de modo;
 - permitir ligar e desligar a camada ao clicar na linha `ranking QML`, dentro do grupo `Estilo QML`;
 - no Ranking geral, usar `ranking_total`, intervalo fixo de 1 a 104.032 e 50 classes da rampa vermelho → amarelo → verde → azul;
-- manter `Classe de ação` somente como grupo de filtros da legenda, nunca como modo alternativo de visualização;
+- manter `Prioridade do modelo` somente como grupo de filtros da legenda, nunca como modo alternativo de visualização;
 - no Ranking geral, rankings menores são vermelhos, rankings maiores são azuis, as primeiras 10 classes têm opacidade 0,88 e as demais 0,15;
 - atenção prioritária: vermelho `#d7191c`;
 - atenção: laranja `#f28e2b`;
 - permitir ligar e desligar separadamente atenção prioritária, atenção e demais áreas no grupo `Prioridade do modelo`;
 - sem resultado: transparente;
-- preservar o tamanho atual dos pontos e deixá-los clicáveis;
+- preservar o tamanho atual dos pontos no zoom próximo e deixá-los clicáveis;
+- nos zooms 6–9, renderizar cada ponto em 1 pixel;
+- nos zooms 10–11, usar marcador compacto em cruz de 5 pixels;
+- aplicar fatores de opacidade 0,50; 0,58; 0,66; 0,75; 0,86; 1,00 nos zooms 6 a 11, preservando as duas faixas QML de opacidade 0,88 e 0,15;
+- a partir do zoom 12, preservar o raio atual da visualização próxima;
 - FCU Tipo 1: cinza-escuro com preenchimento translúcido e contorno contínuo;
 - FCU Tipo 2: cinza-claro com preenchimento translúcido e contorno tracejado;
-- desenhar as FCUs sem bloquear o clique nos pontos abaixo;
+- desenhar cada FCU uma única vez em camada vetorial, sem canvas ou camada-base duplicados;
+- suavizar espessura, opacidade e preenchimento das FCUs nos zooms 9, 10 e 11, preservando o estilo próximo a partir do zoom 12;
 - legenda organizada somente em `Estilo QML`, `Prioridade do modelo` e `FCU`;
 - quando uma FCU visível for clicada, priorizar o popup da FCU sobre o clique da célula e mostrar nome, código, identificador, tipo, município, área de estudo, número de células e estatísticas disponíveis;
+- quando um tipo de FCU estiver desligado, remover sua interatividade para permitir o clique na célula abaixo;
+- implementar as seis linhas da legenda como botões de alternância estáveis, com estado acessível e sem escrever “ativa/desativa” nos rótulos;
 - filtros independentes para as duas dimensões;
 
 ## Painel da célula

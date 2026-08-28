@@ -14,6 +14,8 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 - FCU Tipo 2 ocorre quando pelo menos 50% das células válidas da FCU têm três modelos baixos ou dois baixos e um médio; as demais são FCU Tipo 1.
 - O painel de cada célula mostra Completo, Morfológico e IBGE/Espectral como alto, médio ou baixo.
 - A visualização 3D de Salvador usa as mesmas classes e as geometrias contínuas das FCUs.
+- Nos zooms 6–9 os pontos usam 1 pixel; nos zooms 10–11 usam marcador compacto; a partir do zoom 12 o tamanho próximo original é preservado.
+- As FCUs usam uma única camada vetorial interativa, com contorno e transparência suavizados nos zooms afastados.
 
 ## Conteudo publicado
 
@@ -27,6 +29,8 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 - `PROMPT_DASHBOARD_FCU_ESCADA.md`: prompt reutilizável da especificação completa.
 - `tools/dashboard_generator_0407.py`: copia do gerador usado neste checkpoint.
 - `tools/consolidate_lookup.py`: utilitario que consolida o lookup de busca para reduzir arquivos no deploy.
+- `tools/gerar_overview_qml.py`: gera os tiles QML separados por prioridade e por zoom.
+- `tools/validar_overview_qml.py`: valida contagens, paleta e opacidades dos tiles QML.
 
 ## Execução offline
 

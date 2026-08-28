@@ -20,6 +20,16 @@ ZOOMS = range(6, 12)
 TILE_SIZE = 256
 QGIS_RANKING_MIN = 1
 QGIS_RANKING_MAX = 104032
+QML_ALPHA_HIGH = 225
+QML_ALPHA_LOW = 38
+ZOOM_OPACITY_FACTORS = {
+    6: 0.50,
+    7: 0.58,
+    8: 0.66,
+    9: 0.75,
+    10: 0.86,
+    11: 1.00,
+}
 ACTION_COLORS = {
     "priority": (215, 25, 28),
     "attention": (242, 142, 43),
@@ -49,15 +59,23 @@ def load_ranking_rules() -> dict:
 RANKING_RULES = load_ranking_rules()
 
 
-def qgis_color(value: object) -> tuple[int, int, int]:
+def qgis_palette_index(value: object) -> int:
     try:
         rank = float(value)
     except (TypeError, ValueError):
-        return 255, 237, 160
+        return 10
     span = max(1.0, QGIS_RANKING_MAX - QGIS_RANKING_MIN)
     position = min(1.0, max(0.0, (rank - QGIS_RANKING_MIN) / span))
-    index = min(len(QGIS_PALETTE) - 1, max(0, int(math.floor(position * len(QGIS_PALETTE)))))
-    return QGIS_PALETTE[index]
+    return min(len(QGIS_PALETTE) - 1, max(0, int(math.floor(position * len(QGIS_PALETTE)))))
+
+
+def qgis_color(value: object) -> tuple[int, int, int]:
+    return QGIS_PALETTE[qgis_palette_index(value)]
+
+
+def qgis_alpha(value: object, zoom: int) -> int:
+    base_alpha = QML_ALPHA_HIGH if qgis_palette_index(value) < 10 else QML_ALPHA_LOW
+    return max(1, min(255, round(base_alpha * ZOOM_OPACITY_FACTORS[zoom])))
 
 
 def numeric(value: object) -> float | None:
@@ -119,11 +137,35 @@ def iter_points():
 
 
 def marker_radius(zoom: int) -> int:
-    if zoom <= 7:
-        return 0
     if zoom <= 9:
-        return 1
-    return 2
+        return 0
+    return 1
+
+
+def paint_marker(
+    arr: np.ndarray,
+    px: int,
+    py: int,
+    color: tuple[int, int, int],
+    alpha: int,
+    radius: int,
+) -> None:
+    """Pinta 1 px de longe e uma cruz de 5 px nos zooms 10-11."""
+    r, g, b = color
+    if radius == 0:
+        arr[py, px, :] = (r, g, b, alpha)
+        return
+
+    x0, x1 = max(0, px - radius), min(TILE_SIZE, px + radius + 1)
+    y0, y1 = max(0, py - radius), min(TILE_SIZE, py + radius + 1)
+    arr[py, x0:x1, 0] = r
+    arr[py, x0:x1, 1] = g
+    arr[py, x0:x1, 2] = b
+    arr[py, x0:x1, 3] = alpha
+    arr[y0:y1, px, 0] = r
+    arr[y0:y1, px, 1] = g
+    arr[y0:y1, px, 2] = b
+    arr[y0:y1, px, 3] = alpha
 
 
 def paint_overview_zoom(zoom: int) -> tuple[int, int, int, dict[str, dict[str, int]]]:
@@ -152,13 +194,10 @@ def paint_overview_zoom(zoom: int) -> tuple[int, int, int, dict[str, dict[str, i
         class_arr = qml_class_tiles[cls_key].setdefault(
             (tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8)
         )
-        qml_r, qml_g, qml_b = qgis_color(point.get("rt", point.get("r")))
-        x0, x1 = max(0, px - radius), min(TILE_SIZE, px + radius + 1)
-        y0, y1 = max(0, py - radius), min(TILE_SIZE, py + radius + 1)
-        class_arr[y0:y1, x0:x1, 0] = qml_r
-        class_arr[y0:y1, x0:x1, 1] = qml_g
-        class_arr[y0:y1, x0:x1, 2] = qml_b
-        class_arr[y0:y1, x0:x1, 3] = 225
+        rank_value = point.get("rt", point.get("r"))
+        qml_color = qgis_color(rank_value)
+        qml_point_alpha = qgis_alpha(rank_value, zoom)
+        paint_marker(class_arr, px, py, qml_color, qml_point_alpha, radius)
         class_counts[cls_key] += 1
 
         if cls_key == "other":
@@ -167,12 +206,9 @@ def paint_overview_zoom(zoom: int) -> tuple[int, int, int, dict[str, dict[str, i
 
         qml_arr = qml_tiles.setdefault((tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8))
         action_arr = action_tiles.setdefault((tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8))
-        action_r, action_g, action_b = ACTION_COLORS[cls_key]
-        qml_arr[y0:y1, x0:x1, :] = class_arr[y0:y1, x0:x1, :]
-        action_arr[y0:y1, x0:x1, 0] = action_r
-        action_arr[y0:y1, x0:x1, 1] = action_g
-        action_arr[y0:y1, x0:x1, 2] = action_b
-        action_arr[y0:y1, x0:x1, 3] = 225
+        paint_marker(qml_arr, px, py, qml_color, qml_point_alpha, radius)
+        action_alpha = round(QML_ALPHA_HIGH * ZOOM_OPACITY_FACTORS[zoom])
+        paint_marker(action_arr, px, py, ACTION_COLORS[cls_key], action_alpha, radius)
         count += 1
 
     for output, tiles in ((OUTPUT_DIR, qml_tiles), (OUTPUT_ACTION_DIR, action_tiles)):
@@ -236,6 +272,12 @@ def main() -> None:
             "qml_min": QGIS_RANKING_MIN,
             "qml_max": QGIS_RANKING_MAX,
             "palette_size": len(QGIS_PALETTE),
+            "rendering": {
+                "marker_radius_by_zoom": {str(zoom): marker_radius(zoom) for zoom in ZOOMS},
+                "marker_shape": "single_pixel_or_5_pixel_cross",
+                "opacity_factor_by_zoom": {str(zoom): ZOOM_OPACITY_FACTORS[zoom] for zoom in ZOOMS},
+                "qml_alpha": {"first_10_colors": QML_ALPHA_HIGH, "remaining_40_colors": QML_ALPHA_LOW},
+            },
             "zooms": class_summary,
         }, f, ensure_ascii=False, indent=2)
 
