@@ -78,9 +78,10 @@ Uma célula possui baixa evidência quando apresenta três modelos baixos ou doi
 
 ## Visualização 2D
 
-- oferecer dois modos exclusivos para os pontos: `Ranking geral (QML antigo)` e `Classe de ação`;
-- no modo QML antigo, usar `ranking_total`, intervalo fixo de 1 a 104.032 e 50 classes da rampa vermelho → amarelo → verde → azul;
-- no QML antigo, rankings menores são vermelhos, rankings maiores são azuis, as primeiras 10 classes têm opacidade 0,88 e as demais 0,15;
+- usar o `Ranking geral` como única visualização dos pontos, sem seletor de modo;
+- no Ranking geral, usar `ranking_total`, intervalo fixo de 1 a 104.032 e 50 classes da rampa vermelho → amarelo → verde → azul;
+- manter `Classe de ação` somente como grupo de filtros da legenda, nunca como modo alternativo de visualização;
+- no Ranking geral, rankings menores são vermelhos, rankings maiores são azuis, as primeiras 10 classes têm opacidade 0,88 e as demais 0,15;
 - atenção prioritária: vermelho `#d7191c`;
 - atenção: laranja `#f28e2b`;
 - demais áreas: transparente;
@@ -89,9 +90,8 @@ Uma célula possui baixa evidência quando apresenta três modelos baixos ou doi
 - FCU Tipo 1: cinza-escuro com preenchimento translúcido e contorno contínuo;
 - FCU Tipo 2: cinza-claro com preenchimento translúcido e contorno tracejado;
 - desenhar as FCUs sem bloquear o clique nos pontos abaixo;
-- legenda separada em “Classe de ação” e “Situação territorial”;
+- legenda organizada somente em “Ranking geral”, “Classe de ação” e “Situação territorial”;
 - filtros independentes para as duas dimensões;
-- mostrar na legenda o percentual FCU, a expansão, a quantidade prioritária e a quantidade em atenção da área selecionada.
 
 ## Painel da célula
 
@@ -122,7 +122,7 @@ Produza:
 - versão offline executada por servidor HTTP local;
 - GPKG com camadas `celulas_acao`, `fcu_tipos`, `resumo_area` e `regra_escada`;
 - QML para as células de ação, mantendo o tamanho visível dos pontos;
-- QML antigo graduado por `ranking_total`, com a rampa contínua original;
+- Ranking geral graduado por `ranking_total`, com a rampa QML contínua original;
 - QML para FCU Tipo 1 e Tipo 2 com transparência;
 - JSON com regras, limites e quantidades por área;
 - validação funcional do mapa 2D, busca, clique, filtros, painéis, links e 3D.

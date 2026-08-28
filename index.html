@@ -2807,7 +2807,6 @@ window.addEventListener('unhandledrejection', function(event) {
   const TILE_Z = 12;
   const TILE_BASE = `data_tiles/${SCENARIO_KEY}/points/${TILE_Z}`;
   const OVERVIEW_QML_BASE = `data_tiles/${SCENARIO_KEY}/overview_qml/{z}/{x}/{y}.png?v=qml_antigo_20260828_v2`;
-  const OVERVIEW_ACTION_BASE = `data_tiles/${SCENARIO_KEY}/overview_action/{z}/{x}/{y}.png?v=acao_escada_20260828_v2`;
   const EMPTY_TILE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
   const LOOKUP_PREFIX_LEN = 8;
   const LOOKUP_BASE = `data_tiles/${SCENARIO_KEY}/id_lookup/${LOOKUP_PREFIX_LEN}`;
@@ -2821,7 +2820,6 @@ window.addEventListener('unhandledrejection', function(event) {
   const QGIS_RANKING_MIN = 1;
   const QGIS_RANKING_MAX = 104032;
   const QGIS_RANKING_PALETTE = [[215,25,28],[223,55,42],[231,86,56],[238,116,70],[246,147,84],[253,175,98],[253,187,112],[254,198,125],[254,210,139],[254,221,152],[254,233,165],[255,245,179],[254,255,191],[248,252,189],[241,249,187],[234,247,184],[228,244,182],[221,241,180],[214,239,178],[208,236,176],[201,233,174],[194,230,172],[188,228,169],[181,225,167],[174,222,165],[168,219,164],[163,215,165],[158,212,166],[153,208,167],[147,204,168],[142,201,169],[137,197,170],[132,193,171],[127,190,172],[121,186,173],[116,182,173],[111,179,174],[106,175,175],[100,171,176],[95,168,177],[90,164,178],[85,160,179],[80,157,180],[74,153,181],[69,149,182],[64,146,182],[59,142,183],[53,138,184],[48,135,185],[43,131,186]];
-  const FINAL_MAP_RENDER_STATE = {pointMode: 'qml'};
   const FEATURE_LABELS_EN = {"Contagem Domicílios": "Household count", "Densidade de endereços": "Address density", "Densidade de domicílios": "Household density", "Sem rede d'água": "No water network", "Sem banheiro (agregado)": "Inadequate bathroom", "1 banheiro exclusivo": "One exclusive bathroom", "Banheiros por morador": "Bathrooms per resident", "Via compartilhada": "Shared street", "Via não pavimentada": "Unpaved street", "Sem bueiro": "No storm drain", "Sem iluminação pública": "No public lighting", "Sem calçada": "No sidewalk", "Calçada com obstáculo": "Sidewalk obstacle", "Calçada inadequada": "Inadequate sidewalk", "Sem arborização": "No street trees", "Esgoto inadequado": "Inadequate sewage", "Coleta de lixo inadequada": "Inadequate waste collection", "Lixo em caçamba": "Waste in dumpster", "Lixo queimado": "Waste burned on property", "% IBGE lixoente": "Waste buried on property", "% IBGE lixoterr": "Waste in vacant/public area", "Renda média domiciliar": "Mean household income", "Total domicílios": "Occupied private households", "Total pessoas": "Total residents", "Domicílios": "Mean households per cell", "População": "Mean population per cell", "População por domicílio": "Residents per household", "Domicílios em casas": "Households in houses", "Moradores em casas": "Residents in houses", "Moradores por casa": "Residents per house", "Domicílios tipo apartamento por célula": "Households in apartments", "Moradores em apartamentos por célula": "Residents in apartments", "Moradores por apartamento": "Residents per apartment", "Forma das quadras": "Block shape index", "Distância até via carroçável": "Distance to drivable road", "Proximidade de vias carroçáveis": "Drivable-road proximity", "Idade média da ocupação urbana": "Mean urban occupation age", "Ocupação urbana mais recente": "Minimum urban occupation age", "Ocupação urbana mais antiga": "Maximum urban occupation age", "Restrição urbana": "Urban restriction", "Declividade crítica acima de 30%": "Slope above 30%", "Declividade média": "Mean slope", "Presença de APP": "Permanent preservation area", "APP area m2": "PPA area", "% APP area": "Cell share in PPA", "BF num edif": "Number of buildings", "BF area constr m2": "Built area", "% BF area constr": "Built-area share", "Densidade de edificações": "Building density", "Média BF area edif": "Mean building size", "Média BF perim edif": "Mean building perimeter", "Média BF reg edif": "Urban fabric regularity", "Média BF quadr edif": "Building squareness factor", "Média BF shapein edif": "Building shape index", "Média BF hull edif": "Mean building hull area", "Média BF distviz edif": "Mean neighbor distance", "Distância média aos 20 vizinhos": "Mean distance to 20 neighbors", "Distância média aos 10 vizinhos": "Mean distance to 10 neighbors", "Parede compartilhada": "Shared wall", "Densidade construída": "Built density", "Vegetação média (NDVI)": "Mean NDVI", "Vegetação visível (VARI)": "Mean VARI", "Razão vermelho-verde (RGRI)": "Mean RGRI", "Índice verde-NIR (VgNIRBI)": "Mean VgNIRBI", "Índice espectral PISI": "Mean PISI", "Banda Sentinel-2 B5": "Mean band 5", "Banda Sentinel-2 B6": "Mean band 6", "Banda Sentinel-2 B7": "Mean band 7", "Banda Sentinel-2 B11": "Mean band 11", "Banda Sentinel-2 B12": "Mean band 12", "Índice espectral CSSI-1": "CSSI-1 (spectral index)", "Índice espectral CSSI-2": "CSSI-2 (spectral index)", "Brancos": "White people (%)", "Pretos": "Black people (%)", "Amarelos": "Asian people (%)", "Pardos": "Mixed-race people (%)", "Índigenas": "Indigenous people (%)", "Homens alfabetizados": "Literate men (%)", "Homens não alfabetizados": "Illiterate men (%)", "Mulheres alfabetizadas": "Literate women (%)", "Mulheres não alfabetizadas": "Illiterate women (%)", "ID": "ID", "Divisão Geográfica": "Divisão Geográfica", "Resolução da célula": "Resolução da célula", "ID coluna": "ID coluna", "ID linha": "ID linha", "ID célula 200m": "ID célula 200m", "ID célula 100m": "ID célula 100m", "ID grid 1km": "ID grid 1km", "ID grid 5km": "ID grid 5km", "ID grid 10km": "ID grid 10km", "ID grid 50km": "ID grid 50km", "ID grid 100km": "ID grid 100km", "ID grid 500km": "ID grid 500km", "ID quadrante": "ID quadrante", "Código Município": "Código Município", "Nome Município": "Nome Município", "Código UF": "Código UF", "Código RGI": "Código RGI", "Nome RGI": "Nome RGI", "Código RGInt": "Código RGInt", "Nome RGInt": "Nome RGInt", "Código setor censitário": "Código setor censitário", "Área ocupada MapBiomas": "Área ocupada MapBiomas", "Área ocupada IBGE 2019": "Área ocupada IBGE 2019", "Área ocupada CNEFE": "Área ocupada CNEFE", "Célula FCU": "Célula FCU", "Célula FCU não setorizada": "Célula FCU não setorizada", "Célula FCU setorizada": "Célula FCU setorizada", "Tipo FCU": "Tipo FCU", "ID FCU": "ID FCU", "Código FCU": "Código FCU", "Nome FCU": "Nome FCU", "Nome UF": "Nome UF", "Sigla UF": "Sigla UF", "FCU tipo": "FCU tipo", "FCU fonte": "FCU fonte", "FCU origem": "FCU origem", "FCU contagem": "FCU contagem", "FCU área (km2)": "FCU área (km2)", "RGInt Redenção": "RGInt Redenção", "Concentração Urbana Curitiba": "Concentração Urbana Curitiba", "Concentração Urbana Fortaleza": "Concentração Urbana Fortaleza", "Concentração Urbana Goiânia": "Concentração Urbana Goiânia", "Concentração Urbana São Paulo": "Concentração Urbana São Paulo", "RGInt Macapá": "RGInt Macapá", "RGInt Belém": "RGInt Belém", "area conc urb rio de janeiro": "area conc urb rio de janeiro", "Geometria": "Geometria", "Responsável 60 anos ou mais": "Responsável 60 anos ou mais", "Responsável 40 a 59 anos": "Responsável 40 a 59 anos", "Responsável 25 a 39 anos": "Responsável 25 a 39 anos", "Responsável 18 a 24 anos": "Responsável 18 a 24 anos", "Responsável 12 a 17 anos": "Responsável 12 a 17 anos", "Responsável mulher": "Responsável mulher", "Responsável homem": "Responsável homem", "Mulher indigena não alfabetizada": "Mulher indigena não alfabetizada", "Mulher indigena alfabetizada": "Mulher indigena alfabetizada", "Mulher parda não alfabetizada": "Mulher parda não alfabetizada", "Mulher parda alfabetizada": "Mulher parda alfabetizada", "Mulher amarela não alfabetizada": "Mulher amarela não alfabetizada", "Mulher amarela alfabetizada": "Mulher amarela alfabetizada", "Mulher preta não alfabetizada": "Mulher preta não alfabetizada", "Mulher preta alfabetizada": "Mulher preta alfabetizada", "Mulher branca não alfabetizada": "Mulher branca não alfabetizada", "Mulher branca alfabetizada": "Mulher branca alfabetizada", "Homem indigena não alfabetizado": "Homem indigena não alfabetizado", "Homem indigena alfabetizado": "Homem indigena alfabetizado", "Homem pardo não alfabetizado": "Homem pardo não alfabetizado", "Homem pardo alfabetizado": "Homem pardo alfabetizado", "Homem amarelo não alfabetizado": "Homem amarelo não alfabetizado", "Homem amarelo alfabetizado": "Homem amarelo alfabetizado", "Homem preto não alfabetizado": "Homem preto não alfabetizado", "Homem preto alfabetizado": "Homem preto alfabetizado", "Homem branco não alfabetizado": "Homem branco não alfabetizado", "Homem branco alfabetizado": "Homem branco alfabetizado", "Número de edificações (GBA)": "Número de edificações (GBA)", "Edifícios por hectare (GBA)": "Edifícios por hectare (GBA)", "Área construída GBA": "Área construída GBA", "Proporção área construída GBA": "Proporção área construída GBA", "Área média dos edifícios (GBA)": "Área média dos edifícios (GBA)", "Mediana área edifícios GBA": "Mediana área edifícios GBA", "P10 área edifícios GBA": "P10 área edifícios GBA", "P90 área edifícios GBA": "P90 área edifícios GBA", "Variação da área dos edifícios (GBA)": "Variação da área dos edifícios (GBA)", "Edifícios pequenos (GBA)": "Edifícios pequenos (GBA)", "Proporção de edifícios pequenos (GBA)": "Proporção de edifícios pequenos (GBA)", "Altura média GBA": "Altura média GBA", "Mediana altura GBA": "Mediana altura GBA", "Altura baixa - percentil 10 (GBA)": "Altura baixa - percentil 10 (GBA)", "P90 altura GBA": "P90 altura GBA", "Altura máxima dos edifícios (GBA)": "Altura máxima dos edifícios (GBA)", "Desvio altura GBA": "Desvio altura GBA", "Variação da altura dos edifícios (GBA)": "Variação da altura dos edifícios (GBA)", "IQR altura GBA": "IQR altura GBA", "Edifícios baixos até 6 m (GBA)": "Edifícios baixos até 6 m (GBA)", "% altura alta GBA": "% altura alta GBA", "Volume construído GBA": "Volume construído GBA", "Volume por hectare GBA": "Volume por hectare GBA", "Volume médio dos edifícios (GBA)": "Volume médio dos edifícios (GBA)", "Área de piso proxy GBA": "Área de piso proxy GBA", "Pavimentos estimados (GBA)": "Pavimentos estimados (GBA)", "Variância média altura GBA": "Variância média altura GBA", "P90 variância altura GBA": "P90 variância altura GBA", "% incerteza alta GBA": "% incerteza alta GBA", "% altura válida GBA": "% altura válida GBA", "Distância ao vizinho mais próximo (GBA)": "Distância ao vizinho mais próximo (GBA)", "P10 distância vizinho GBA": "P10 distância vizinho GBA", "Mediana da distância ao vizinho (GBA)": "Mediana da distância ao vizinho (GBA)", "Compacidade dos edifícios (GBA)": "Compacidade dos edifícios (GBA)", "Alongamento GBA": "Alongamento GBA", "Retangularidade dos edifícios (GBA)": "Retangularidade dos edifícios (GBA)", "Desvio orientação GBA": "Desvio orientação GBA", "Diversidade de orientação dos edifícios (GBA)": "Diversidade de orientação dos edifícios (GBA)", "% fonte Google GBA": "% fonte Google GBA", "% fonte OSM GBA": "% fonte OSM GBA", "% fonte Microsoft GBA": "% fonte Microsoft GBA", "% fonte TUM GBA": "% fonte TUM GBA", "Entropia fonte GBA": "Entropia fonte GBA", "Distância 10 vizinhos GBA": "Distância 10 vizinhos GBA", "Distância aos 20 vizinhos (GBA)": "Distância aos 20 vizinhos (GBA)", "Pretos ou pardos": "Pretos ou pardos", "Pretos, pardos ou indígenas": "Pretos, pardos ou indígenas", "Intensidade ocupação GBA": "Intensidade ocupação GBA", "Ocupação x forma GBA": "Ocupação x forma GBA", "Volume x forma GBA": "Volume x forma GBA"};
     const SCENARIO_I18N = {"pt":{"label":"Resultado final","subtitle":"Mapa de priorização territorial por área de estudo. Ao clicar na célula, o painel mostra a prioridade, a evidência dominante e o nível de evidência por família."},"en":{"label":"Final result","subtitle":"Territorial prioritization map by study area. Click a cell to see priority, dominant evidence, and evidence level by feature family."}};
   const tileCache = new Map();
@@ -4056,7 +4054,7 @@ window.addEventListener('unhandledrejection', function(event) {
 
   function ensureOverviewLayer() {
     if (!App.map || App.overviewLayer) return;
-    App.overviewLayer = L.tileLayer(FINAL_MAP_RENDER_STATE.pointMode === 'qml' ? OVERVIEW_QML_BASE : OVERVIEW_ACTION_BASE, {
+    App.overviewLayer = L.tileLayer(OVERVIEW_QML_BASE, {
       tileSize: 256,
       opacity: 0.95,
       minZoom: 8,
@@ -4074,8 +4072,7 @@ window.addEventListener('unhandledrejection', function(event) {
 
   function refreshOverviewLayer() {
     if (!App.map || !App.overviewLayer) return;
-    const overviewUrl = FINAL_MAP_RENDER_STATE.pointMode === 'qml' ? OVERVIEW_QML_BASE : OVERVIEW_ACTION_BASE;
-    if (App.overviewLayer.setUrl) App.overviewLayer.setUrl(overviewUrl, false);
+    if (App.overviewLayer.setUrl) App.overviewLayer.setUrl(OVERVIEW_QML_BASE, false);
     if (!App.map.hasLayer(App.overviewLayer)) App.overviewLayer.addTo(App.map);
     if (App.overviewLayer.setOpacity) App.overviewLayer.setOpacity(0.95);
   }
@@ -5272,9 +5269,7 @@ window.addEventListener('unhandledrejection', function(event) {
         const points = data.p || [];
         for (const p of points) {
           const areaCol = p.a || fallbackAreaCol;
-          const style = FINAL_MAP_RENDER_STATE.pointMode === 'qml'
-            ? qgisOverlayStyle(p, areaCol)
-            : candidateClass(p, areaCol);
+          const style = qgisOverlayStyle(p, areaCol);
           drawFinalPoint(ctx, p, coords, size, style);
         }
         ctx.globalAlpha = 1;
@@ -5287,12 +5282,7 @@ window.addEventListener('unhandledrejection', function(event) {
   function allPointsLegendHtml(open) {
     const dot = (color, alpha = 1) => `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};opacity:${alpha};margin-right:6px;vertical-align:middle;"></span>`;
     const fill = (color, border = '#636363', alpha = 1) => `<span style="display:inline-block;width:13px;height:10px;border-radius:2px;background:${color};border:2px solid ${border};opacity:${alpha};margin-right:6px;vertical-align:middle;"></span>`;
-    const actionRamp = `<span style="display:inline-flex;width:42px;height:9px;border-radius:5px;overflow:hidden;margin-right:6px;vertical-align:middle;border:1px solid rgba(15,23,42,.18);"><i style="width:50%;background:#d7191c"></i><i style="width:50%;background:#f28e2b"></i></span>`;
-    const qmlRamp = `<span style="display:inline-block;width:42px;height:9px;border-radius:5px;margin-right:6px;vertical-align:middle;border:1px solid rgba(15,23,42,.18);background:linear-gradient(90deg,#d7191c 0%,#fdae61 22%,#ffffbf 42%,#a6dbaa 62%,#2b83ba 100%);"></span>`;
-    const modeRow = (mode, swatch, pt, en) => {
-      const active = FINAL_MAP_RENDER_STATE.pointMode === mode;
-      return `<div class="legend-mode-toggle" data-mode="${mode}" title="${escapeHtml(mapLang() === 'en' ? 'select point visualization' : 'selecionar visualização dos pontos')}" style="cursor:pointer;pointer-events:auto;display:flex;align-items:center;gap:4px;opacity:${active ? 1 : .58};padding:5px 6px;margin:2px 0;border:1px solid ${active ? '#94a3b8' : 'transparent'};border-radius:6px;background:${active ? '#f8fafc' : 'transparent'};font-weight:${active ? 800 : 650};"><span style="font-size:12px;color:#475569;">${active ? '●' : '○'}</span>${swatch}${escapeHtml(mapLang() === 'en' ? en : pt)}</div>`;
-    };
+    const qmlRamp = `<span style="display:block;width:88px;height:9px;border-radius:5px;margin:4px 4px 7px;border:1px solid rgba(15,23,42,.18);background:linear-gradient(90deg,#d7191c 0%,#fdae61 22%,#ffffbf 42%,#a6dbaa 62%,#2b83ba 100%);"></span>`;
     const prioritySwatch = (key, alpha = 1) => dot(finalPointClassColor(key), alpha);
     const groupTitle = (pt, en) => `<div style="font:800 10px Inter,sans-serif;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin:8px 4px 3px 4px;">${escapeHtml(mapLang() === 'en' ? en : pt)}</div>`;
     const rowHtml = rows => rows.map(row => {
@@ -5310,26 +5300,17 @@ window.addEventListener('unhandledrejection', function(event) {
       ['mappedFcu', fill('rgba(55,65,81,.17)', '#1f2937', 1)],
       ['mappedLow', fill('rgba(203,213,225,.20)', '#64748b', 1)]
     ];
-    const rule = areaRankRule(finalCanvasAreaCol());
-    const ruleSummary = rule ? `<div style="margin:8px 4px 2px;padding:7px 8px;border-radius:7px;background:#f8fafc;border:1px solid #e2e8f0;color:#475569;font:600 10px/1.45 Inter,sans-serif;">` +
-      `FCU: <b>${(Number(rule.p_fcu || 0) * 100).toLocaleString('pt-BR', {maximumFractionDigits:1})}%</b> · ` +
-      `expansão: <b>${(Number(rule.expansion_pct || 0) * 100).toLocaleString('pt-BR', {maximumFractionDigits:1})}%</b><br>` +
-      `prioritária: <b>${Number(rule.priority_limit || 0).toLocaleString('pt-BR')}</b> · atenção: <b>${Number(rule.attention_count || 0).toLocaleString('pt-BR')}</b>` +
-      `</div>` : '';
     return (
       `<div style="display:flex;align-items:center;gap:8px;padding:0.45rem 0.6rem 0.25rem 0.6rem;">` +
       `<button type="button" class="legend-toggle" style="border:0;background:transparent;padding:0;font:700 12px Inter,sans-serif;color:#2c3e50;cursor:pointer;text-align:left;flex:1;">${mapText('legend')}</button>` +
       `</div>` +
       `<div class="legend-body" style="display:${open ? 'block' : 'none'};padding:0 0.65rem 0.55rem 0.65rem;line-height:1.35;min-width:225px;">` +
-      groupTitle('Visualização dos pontos', 'Point visualization') +
-      modeRow('qml', qmlRamp, 'Ranking geral (QML antigo)', 'General ranking (legacy QML)') +
-      modeRow('action', actionRamp, 'Classe de ação', 'Action class') +
-      `<div style="margin:3px 6px 5px;color:#64748b;font:600 9px/1.35 Inter,sans-serif;">${mapLang() === 'en' ? 'QML: ranking_total from 1 to 104,032; low ranks are red and high ranks are blue.' : 'QML: ranking_total de 1 a 104.032; rankings menores em vermelho e maiores em azul.'}</div>` +
+      groupTitle('Ranking geral', 'General ranking') +
+      qmlRamp +
       groupTitle('Classe de ação', 'Action class') +
       rowHtml(priorityRows) +
       groupTitle('Situação territorial', 'Territorial status') +
       rowHtml(fcuRows) +
-      ruleSummary +
       `</div>`
     );
   }
@@ -5358,15 +5339,6 @@ window.addEventListener('unhandledrejection', function(event) {
       event.stopPropagation();
       refreshFilteredLayers();
     });
-    div.querySelectorAll('.legend-mode-toggle').forEach(item => item.addEventListener('click', event => {
-      event.preventDefault();
-      event.stopPropagation();
-      const mode = item.dataset.mode;
-      if (mode !== 'qml' && mode !== 'action') return;
-      FINAL_MAP_RENDER_STATE.pointMode = mode;
-      refreshAllPointsLegend();
-      refreshFilteredLayers();
-    }));
     div.querySelectorAll('.legend-filter').forEach(item => {
       item.addEventListener('click', event => {
         event.preventDefault();
@@ -5467,8 +5439,7 @@ window.addEventListener('unhandledrejection', function(event) {
       const tolerance = 18 / Math.max(1, Math.pow(2, App.map.getZoom() - TILE_Z));
       for (const p of (data.p || [])) {
         const areaCol = p.a || fallbackAreaCol;
-        const cls = candidateClass(p, areaCol);
-        const style = FINAL_MAP_RENDER_STATE.pointMode === 'qml' ? qgisOverlayStyle(p, areaCol) : cls;
+        const style = qgisOverlayStyle(p, areaCol);
         const visible = !!(style && finalClassVisible(style.key) && style.alpha && style.alpha > 0);
         if (!visible) continue;
         const pc = tileCoord(Number(p.lat), Number(p.lng), TILE_Z);

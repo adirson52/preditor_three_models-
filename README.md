@@ -5,8 +5,8 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 ## Versão ranking em escadas
 
 - A classe de ação considera todas as células da área no `ranking_total`.
-- A legenda permite alternar entre o modo `Ranking geral (QML antigo)` e o modo `Classe de ação` sem misturar as duas simbologias.
-- O modo QML antigo preserva a rampa contínua vermelho–amarelo–verde–azul no intervalo fixo de 1 a 104.032.
+- O mapa usa sempre o `Ranking geral`, preservando a rampa QML contínua vermelho–amarelo–verde–azul no intervalo fixo de 1 a 104.032.
+- `Classe de ação` aparece somente como grupo de filtros da legenda: atenção prioritária, atenção e demais áreas.
 - Atenção prioritária é vermelha, atenção é laranja e demais áreas ficam transparentes.
 - A situação territorial é independente da classe de ação: fora da FCU, FCU Tipo 1 ou FCU Tipo 2.
 - FCU Tipo 2 ocorre quando pelo menos 50% das células válidas da FCU têm três modelos baixos ou dois baixos e um médio; as demais são FCU Tipo 1.
@@ -21,7 +21,7 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 - `data_tiles/final/ranking_rules_escada.json`: limites e contagens por área.
 - `data_tiles/final/estilos_qgis/`: estilos QML públicos.
 - `data_tiles/final/overview_qml/`: visão geral com a rampa QML antiga.
-- `data_tiles/final/overview_action/`: visão geral categórica vermelha/laranja.
+- `data_tiles/final/overview_action/`: visão geral categórica gerada como ativo técnico, sem uso na visualização principal.
 - `PROMPT_DASHBOARD_FCU_ESCADA.md`: prompt reutilizável da especificação completa.
 - `tools/dashboard_generator_0407.py`: copia do gerador usado neste checkpoint.
 - `tools/consolidate_lookup.py`: utilitario que consolida o lookup de busca para reduzir arquivos no deploy.
