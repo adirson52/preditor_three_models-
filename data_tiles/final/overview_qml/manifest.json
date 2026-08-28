@@ -1,0 +1,47 @@
+{
+  "source": "E:\\Banco de dados Preditor Br\\03_preditor_grade31_teste0407\\03_outputs\\05_dashboard_ebmv2_3d_evidencias_teste_2\\data_tiles\\final\\points\\12",
+  "field": "ranking_total",
+  "classes_rendered": [
+    "priority",
+    "attention",
+    "mappedFcu",
+    "mappedLow"
+  ],
+  "classes_hidden": [
+    "other"
+  ],
+  "qml_min": 1,
+  "qml_max": 104032,
+  "zooms": {
+    "6": {
+      "tiles": 12,
+      "points_rendered": 283283,
+      "points_skipped_other": 3265691
+    },
+    "7": {
+      "tiles": 18,
+      "points_rendered": 283283,
+      "points_skipped_other": 3265691
+    },
+    "8": {
+      "tiles": 32,
+      "points_rendered": 283283,
+      "points_skipped_other": 3265691
+    },
+    "9": {
+      "tiles": 60,
+      "points_rendered": 283283,
+      "points_skipped_other": 3265691
+    },
+    "10": {
+      "tiles": 131,
+      "points_rendered": 283283,
+      "points_skipped_other": 3265691
+    },
+    "11": {
+      "tiles": 264,
+      "points_rendered": 283283,
+      "points_skipped_other": 3265691
+    }
+  }
+}

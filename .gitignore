@@ -6,3 +6,7 @@ downloads/
 *.zip
 http_server_*.log
 analise_modelos.html
+*backup*
+_check_*.png
+predeploy_*.png
+validation_*.png

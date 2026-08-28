@@ -1,0 +1,314 @@
+{
+  "rules": {
+    "area_arranjo_pop_rj": {
+      "total": 101166,
+      "n_fcu": 3675,
+      "p_fcu": 0.036326,
+      "ranked_candidates": 7350,
+      "pct_priority": 0.075,
+      "priority_limit": 552,
+      "attention_limit": 1103,
+      "qml_rank_min": 1,
+      "qml_rank_max": 101166
+    },
+    "area_conc_urb_curitiba": {
+      "total": 363467,
+      "n_fcu": 15579,
+      "p_fcu": 0.042862,
+      "ranked_candidates": 31158,
+      "pct_priority": 0.075,
+      "priority_limit": 2337,
+      "attention_limit": 4674,
+      "qml_rank_min": 1,
+      "qml_rank_max": 363467
+    },
+    "area_conc_urb_fortaleza": {
+      "total": 257306,
+      "n_fcu": 17625,
+      "p_fcu": 0.068498,
+      "ranked_candidates": 35250,
+      "pct_priority": 0.075,
+      "priority_limit": 2644,
+      "attention_limit": 5288,
+      "qml_rank_min": 1,
+      "qml_rank_max": 257306
+    },
+    "area_conc_urb_goiania": {
+      "total": 306292,
+      "n_fcu": 3441,
+      "p_fcu": 0.011234,
+      "ranked_candidates": 6882,
+      "pct_priority": 0.075,
+      "priority_limit": 517,
+      "attention_limit": 1033,
+      "qml_rank_min": 1,
+      "qml_rank_max": 306292
+    },
+    "area_conc_urb_rio_de_janeiro": {
+      "total": 799668,
+      "n_fcu": 44227,
+      "p_fcu": 0.055307,
+      "ranked_candidates": 88454,
+      "pct_priority": 0.075,
+      "priority_limit": 6635,
+      "attention_limit": 13269,
+      "qml_rank_min": 1,
+      "qml_rank_max": 799668
+    },
+    "area_conc_urb_sao_paulo": {
+      "total": 1015035,
+      "n_fcu": 51022,
+      "p_fcu": 0.050266,
+      "ranked_candidates": 102044,
+      "pct_priority": 0.075,
+      "priority_limit": 7654,
+      "attention_limit": 15307,
+      "qml_rank_min": 1,
+      "qml_rank_max": 1015035
+    },
+    "area_medias_conc_urb_rj": {
+      "total": 364678,
+      "n_fcu": 19395,
+      "p_fcu": 0.053184,
+      "ranked_candidates": 38790,
+      "pct_priority": 0.075,
+      "priority_limit": 2910,
+      "attention_limit": 5819,
+      "qml_rank_min": 1,
+      "qml_rank_max": 364678
+    },
+    "area_rgint_belem": {
+      "total": 206709,
+      "n_fcu": 57673,
+      "p_fcu": 0.279006,
+      "ranked_candidates": 115346,
+      "pct_priority": 0.05,
+      "priority_limit": 5768,
+      "attention_limit": 11535,
+      "qml_rank_min": 1,
+      "qml_rank_max": 206709
+    },
+    "area_rgint_macapa": {
+      "total": 60100,
+      "n_fcu": 8468,
+      "p_fcu": 0.140899,
+      "ranked_candidates": 16936,
+      "pct_priority": 0.05,
+      "priority_limit": 847,
+      "attention_limit": 1694,
+      "qml_rank_min": 1,
+      "qml_rank_max": 60100
+    },
+    "area_rgint_redencao": {
+      "total": 74553,
+      "n_fcu": 1889,
+      "p_fcu": 0.025338,
+      "ranked_candidates": 3778,
+      "pct_priority": 0.075,
+      "priority_limit": 284,
+      "attention_limit": 567,
+      "qml_rank_min": 1,
+      "qml_rank_max": 74553
+    },
+    "area_conc_urb_salvador": {
+      "total": 225164,
+      "n_fcu": 33838,
+      "p_fcu": 0.150282,
+      "ranked_candidates": 67676,
+      "pct_priority": 0.05,
+      "priority_limit": 3384,
+      "attention_limit": 6768,
+      "qml_rank_min": 1,
+      "qml_rank_max": 225164
+    }
+  },
+  "thresholds": {
+    "area_arranjo_pop_rj": {
+      "completo": {
+        "high_min": 0.066122,
+        "medium_min": 0.06001,
+        "n": 7350
+      },
+      "morfologico": {
+        "high_min": 0.1554,
+        "medium_min": 0.137487,
+        "n": 7350
+      },
+      "nao_morfologico": {
+        "high_min": 0.104903,
+        "medium_min": 0.100155,
+        "n": 7350
+      }
+    },
+    "area_conc_urb_curitiba": {
+      "completo": {
+        "high_min": 0.122511,
+        "medium_min": 0.104758,
+        "n": 31158
+      },
+      "morfologico": {
+        "high_min": 0.316024,
+        "medium_min": 0.253445,
+        "n": 31158
+      },
+      "nao_morfologico": {
+        "high_min": 0.146755,
+        "medium_min": 0.126029,
+        "n": 31158
+      }
+    },
+    "area_conc_urb_fortaleza": {
+      "completo": {
+        "high_min": 0.419462,
+        "medium_min": 0.308197,
+        "n": 35250
+      },
+      "morfologico": {
+        "high_min": 0.397891,
+        "medium_min": 0.310722,
+        "n": 35250
+      },
+      "nao_morfologico": {
+        "high_min": 0.373097,
+        "medium_min": 0.298759,
+        "n": 35250
+      }
+    },
+    "area_conc_urb_goiania": {
+      "completo": {
+        "high_min": 0.029831,
+        "medium_min": 0.020631,
+        "n": 6882
+      },
+      "morfologico": {
+        "high_min": 0.17614,
+        "medium_min": 0.135221,
+        "n": 6882
+      },
+      "nao_morfologico": {
+        "high_min": 0.01563,
+        "medium_min": 0.012322,
+        "n": 6882
+      }
+    },
+    "area_conc_urb_rio_de_janeiro": {
+      "completo": {
+        "high_min": 0.288138,
+        "medium_min": 0.221767,
+        "n": 88454
+      },
+      "morfologico": {
+        "high_min": 0.320988,
+        "medium_min": 0.246986,
+        "n": 88454
+      },
+      "nao_morfologico": {
+        "high_min": 0.319148,
+        "medium_min": 0.242367,
+        "n": 88454
+      }
+    },
+    "area_conc_urb_sao_paulo": {
+      "completo": {
+        "high_min": 0.330771,
+        "medium_min": 0.228623,
+        "n": 102044
+      },
+      "morfologico": {
+        "high_min": 0.442367,
+        "medium_min": 0.336622,
+        "n": 102044
+      },
+      "nao_morfologico": {
+        "high_min": 0.334511,
+        "medium_min": 0.234566,
+        "n": 102044
+      }
+    },
+    "area_medias_conc_urb_rj": {
+      "completo": {
+        "high_min": 0.113179,
+        "medium_min": 0.09344,
+        "n": 38790
+      },
+      "morfologico": {
+        "high_min": 0.276284,
+        "medium_min": 0.222085,
+        "n": 38790
+      },
+      "nao_morfologico": {
+        "high_min": 0.211149,
+        "medium_min": 0.181304,
+        "n": 38790
+      }
+    },
+    "area_rgint_belem": {
+      "completo": {
+        "high_min": 0.425889,
+        "medium_min": 0.354439,
+        "n": 115346
+      },
+      "morfologico": {
+        "high_min": 0.55146,
+        "medium_min": 0.454112,
+        "n": 115346
+      },
+      "nao_morfologico": {
+        "high_min": 0.405015,
+        "medium_min": 0.340659,
+        "n": 115346
+      }
+    },
+    "area_rgint_macapa": {
+      "completo": {
+        "high_min": 0.21001,
+        "medium_min": 0.181026,
+        "n": 16936
+      },
+      "morfologico": {
+        "high_min": 0.466944,
+        "medium_min": 0.357538,
+        "n": 16936
+      },
+      "nao_morfologico": {
+        "high_min": 0.102508,
+        "medium_min": 0.089143,
+        "n": 16936
+      }
+    },
+    "area_rgint_redencao": {
+      "completo": {
+        "high_min": 0.028234,
+        "medium_min": 0.028234,
+        "n": 3778
+      },
+      "morfologico": {
+        "high_min": 0.072114,
+        "medium_min": 0.061448,
+        "n": 3778
+      },
+      "nao_morfologico": {
+        "high_min": 0.025112,
+        "medium_min": 0.025112,
+        "n": 3778
+      }
+    },
+    "area_conc_urb_salvador": {
+      "completo": {
+        "high_min": 0.193606,
+        "medium_min": 0.168098,
+        "n": 67676
+      },
+      "morfologico": {
+        "high_min": 0.491274,
+        "medium_min": 0.405352,
+        "n": 67676
+      },
+      "nao_morfologico": {
+        "high_min": 0.493764,
+        "medium_min": 0.407531,
+        "n": 67676
+      }
+    }
+  }
+}

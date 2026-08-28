@@ -1281,33 +1281,17 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
                         // No anchors: if value is already 0-1, use it; otherwise clamp
                         return Math.max(0, Math.min(1, v));
                     }""",
-        """                    const compareVals = [rSampleVals[i], rMeanPolo[i], rMeanFcu[i], rMeanNonFcu[i]]
-                        .map(Number).filter(Number.isFinite);
-                    const signedScale = (extraVals = []) => {
-                        const center = Number.isFinite(Number(rMeanPolo[i])) ? Number(rMeanPolo[i]) : 0;
-                        const values = [...compareVals, ...extraVals.map(Number).filter(Number.isFinite), Number(v)]
-                            .filter(Number.isFinite);
-                        const spread = Math.max(...values.map(x => Math.abs(x - center)), 1e-9);
-                        return Math.max(0, Math.min(1, 0.5 + 0.5 * ((Number(v) - center) / spread)));
-                    };
-
-                    if (!anch || !Array.isArray(anch) || anch.length < 2) {
-                        if (compareVals.some(x => x < 0)) return signedScale();
+        """                    if (!anch || !Array.isArray(anch) || anch.length < 2) {
+                        const compareVals = [rSampleVals[i], rMeanPolo[i], rMeanFcu[i], rMeanNonFcu[i]]
+                            .map(Number).filter(Number.isFinite);
+                        if (compareVals.some(x => x < 0)) {
+                            const maxAbs = Math.max(...compareVals.map(x => Math.abs(x)), Math.abs(Number(v) || 0), 1e-9);
+                            const divisor = maxAbs <= 1.5 ? 1 : maxAbs;
+                            return Math.max(0, Math.min(1, 0.5 + 0.5 * ((Number(v) || 0) / divisor)));
+                        }
                         // No anchors: if value is already 0-1, use it; otherwise clamp.
                         return Math.max(0, Math.min(1, v));
                     }""",
-    )
-    html = html.replace(
-        """                    const median = anch[0];
-                    const p99 = anch[1];
-
-                    // AUTO-DETECT: if p99 <= 1.01 the variable is a proportion (0-1 scale)""",
-        """                    const median = anch[0];
-                    const p99 = anch[1];
-                    const anchorVals = anch.map(Number).filter(Number.isFinite);
-                    if ([...compareVals, ...anchorVals].some(x => x < 0)) return signedScale(anchorVals);
-
-                    // AUTO-DETECT: if p99 <= 1.01 the variable is a proportion (0-1 scale)""",
     )
     html = html.replace(
         "                const anch = mMaxes[feat] || mMaxes[String(feat || '').replace(/^p_ibge_|^m_ibge_|^s_cad_|^shape_|^decliv_|^m_cad_/g, '')];",
@@ -1687,17 +1671,17 @@ def inject_final_dashboard_patches(html: str, payload: dict[str, Any]) -> str:
         priority: 'atenÃ§Ã£o prioritÃ¡ria',
         attention: 'atenÃ§Ã£o',
         other: 'demais Ã¡reas',
-        mappedAll: 'FCUs originais completas',
-        mappedFcu: 'FCU original mantida',
-        mappedLow: 'FCU original em revisÃ£o'
+        mappedAll: 'Todas as FCUs',
+        mappedFcu: 'FCU tipo 1',
+        mappedLow: 'FCU tipo 2'
       },
       en: {
         priority: 'priority attention',
         attention: 'attention',
         other: 'other areas',
-        mappedAll: 'all original FCU polygons',
-        mappedFcu: 'original FCU maintained',
-        mappedLow: 'original FCU for review'
+        mappedAll: 'All FCUs',
+        mappedFcu: 'FCU type 1',
+        mappedLow: 'FCU type 2'
       }
     };
     return (dict[mapLang()] && dict[mapLang()][key]) || key;

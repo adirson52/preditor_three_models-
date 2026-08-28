@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mapa 3D - Preditor FCU</title>
+  <link rel="stylesheet" href="vendor/maplibre-gl/maplibre-gl.css">
+  <script src="vendor/maplibre-gl/maplibre-gl.js"></script>
+  <style>
+    :root { color-scheme: light; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    * { box-sizing: border-box; }
+    html, body, #map { width: 100%; height: 100%; margin: 0; }
+    body { overflow: hidden; background: #e9eef2; color: #172033; }
+    #map { position: fixed; inset: 0; }
+    .panel {
+      position: fixed;
+      z-index: 10;
+      border: 1px solid rgba(148, 163, 184, .55);
+      border-radius: 11px;
+      background: rgba(255, 255, 255, .94);
+      box-shadow: 0 5px 20px rgba(15, 23, 42, .18);
+      backdrop-filter: blur(9px);
+    }
+    .topbar {
+      top: max(10px, env(safe-area-inset-top));
+      left: 52px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: min(520px, calc(100vw - 114px));
+      padding: 7px 9px;
+    }
+    .back {
+      flex: 0 0 auto;
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #0f172a;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .subtitle { color: #435268; font-size: 12px; line-height: 1.25; font-weight: 650; }
+    .legend {
+      left: 10px;
+      bottom: max(10px, env(safe-area-inset-bottom));
+      width: min(286px, calc(100vw - 20px));
+      padding: 7px;
+      transition: width .15s ease;
+    }
+    .legend.collapsed { width: auto; }
+    .legend-head {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 4px 6px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: #172033;
+      font: 800 13px/1.2 inherit;
+      cursor: pointer;
+    }
+    .legend-head:hover { background: #f1f5f9; }
+    .legend-arrow { font-size: 12px; transition: transform .15s ease; }
+    .legend.collapsed .legend-arrow { transform: rotate(180deg); }
+    .legend.collapsed #legend-body { display: none; }
+    .legend-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 6px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: #334155;
+      font: 12px/1.2 inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .legend-row:hover { background: #f1f5f9; }
+    .legend-row.off { opacity: .38; text-decoration: line-through; }
+    .swatch { width: 12px; height: 12px; flex: 0 0 12px; border: 1px solid rgba(15, 23, 42, .55); border-radius: 2px; }
+    .legend-note { margin: 5px 6px 2px; padding-top: 7px; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 10px; line-height: 1.35; }
+    .loading {
+      left: 50%;
+      bottom: max(54px, calc(env(safe-area-inset-bottom) + 54px));
+      transform: translateX(-50%);
+      display: none;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 12px;
+      color: #435268;
+      font-size: 11px;
+      pointer-events: none;
+    }
+    .loading.visible { display: flex; }
+    .loading.error { color: #991b1b; background: rgba(254, 242, 242, .97); }
+    .spinner { width: 16px; height: 16px; border: 2px solid #cbd5e1; border-top-color: #0f172a; border-radius: 50%; animation: spin .75s linear infinite; }
+    .loading.error .spinner { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .refresh-control button { font: 800 21px/29px system-ui; }
+    .refresh-control.busy button { opacity: .52; cursor: wait; }
+    .maplibregl-ctrl-bottom-right .orientation-control button {
+      width: 42px;
+      height: 42px;
+    }
+    .maplibregl-ctrl-bottom-right .orientation-control .maplibregl-ctrl-icon {
+      width: 30px;
+      height: 30px;
+      margin: 6px;
+    }
+    .selected-cell-marker {
+      width: 16px;
+      height: 16px;
+      border: 3px solid #111827;
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(255,255,255,.95), 0 2px 8px rgba(15,23,42,.5);
+    }
+    .maplibregl-popup-content { border-radius: 10px; font: 12px/1.45 Inter, sans-serif; }
+    @media (max-width: 640px) {
+      .topbar { max-width: calc(100vw - 104px); }
+      .subtitle { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="map" aria-label="Mapa tridimensional de edificacoes GBA coloridas pelas classes do modelo"></div>
+  <header class="panel topbar">
+    <a class="back" href="index.html" title="Voltar ao mapa 2D" aria-label="Voltar ao mapa 2D">&#8249;</a>
+    <div class="subtitle">Altura GBA LoD1 com teto visual; cor da celula do modelo.</div>
+  </header>
+
+  <aside class="panel legend" id="legend" aria-label="Legenda interativa">
+    <button class="legend-head" id="legend-toggle" type="button" aria-expanded="true">
+      <span>Legenda</span><span class="legend-arrow">&#9660;</span>
+    </button>
+    <div id="legend-body">
+      <div id="legend-rows"></div>
+      <div class="legend-note">Clique em uma classe para ocultar ou exibir.</div>
+    </div>
+  </aside>
+  <div class="panel loading" id="loading"><span class="spinner"></span><span id="loading-text">Carregando este enquadramento...</span></div>
+
+  <script>
+  (async function() {
+    const params = new URLSearchParams(window.location.search);
+    const urlLat = Number(params.get('lat'));
+    const urlLng = Number(params.get('lng'));
+    const urlZoom = Number(params.get('zoom'));
+    const center = [Number.isFinite(urlLng) ? urlLng : -46.61, Number.isFinite(urlLat) ? urlLat : -23.68];
+    const initialZoom = Number.isFinite(urlZoom) ? Math.max(15, Math.min(19, urlZoom)) : 16;
+    const loading = document.getElementById('loading');
+    const loadingText = document.getElementById('loading-text');
+    let selectedCellId = params.get('cell') || '';
+    let selectedLat = Number.isFinite(urlLat) ? urlLat : null;
+    let selectedLng = Number.isFinite(urlLng) ? urlLng : null;
+    let selectedMarker = null;
+    let tileRevision = 'full-v1';
+    let refreshControl = null;
+    let manualRefresh = false;
+    let activeAreaId = params.get('area') || '';
+    let activeAreaRecord = null;
+    const USE_LOCAL_3D_TILES = false;
+    const isLocalRuntime = USE_LOCAL_3D_TILES && ['localhost', '127.0.0.1'].includes(window.location.hostname);
+    const areaTileOrigins = {
+      area_conc_urb_sao_paulo: 'https://preditor-fcu-3d-sp.vercel.app',
+      area_arranjo_pop_rj: 'https://preditor-fcu-3d-rj.vercel.app',
+      area_conc_urb_rio_de_janeiro: 'https://preditor-fcu-3d-rj.vercel.app',
+      area_medias_conc_urb_rj: 'https://preditor-fcu-3d-rj.vercel.app',
+      area_conc_urb_curitiba: 'https://preditor-fcu-3d-centro.vercel.app',
+      area_conc_urb_fortaleza: 'https://preditor-fcu-3d-centro.vercel.app',
+      area_conc_urb_goiania: 'https://preditor-fcu-3d-centro.vercel.app',
+      area_rgint_belem: 'https://preditor-fcu-3d-norte.vercel.app',
+      area_rgint_macapa: 'https://preditor-fcu-3d-norte.vercel.app',
+      area_rgint_redencao: 'https://preditor-fcu-3d-norte.vercel.app'
+    };
+
+    const classMeta = {
+      priority: {label: 'atencao prioritaria', color: '#f03b20'},
+      attention: {label: 'atencao', color: '#feb24c'},
+      other: {label: 'demais areas', color: '#ffeda0'},
+      mappedFcu: {label: 'FCU tipo 1', color: '#4b5563'},
+      mappedLow: {label: 'FCU tipo 2', color: '#bdbdbd'},
+      unmodeled: {label: 'fora da cobertura do modelo', color: '#d7dde3'}
+    };
+    const activeClasses = new Set(Object.keys(classMeta));
+
+    function pointInRing(point, ring) {
+      let inside = false;
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const xi = ring[i][0], yi = ring[i][1];
+        const xj = ring[j][0], yj = ring[j][1];
+        const crosses = ((yi > point[1]) !== (yj > point[1])) &&
+          (point[0] < (xj - xi) * (point[1] - yi) / ((yj - yi) || Number.EPSILON) + xi);
+        if (crosses) inside = !inside;
+      }
+      return inside;
+    }
+
+    function pointInPolygon(point, polygon) {
+      if (!polygon.length || !pointInRing(point, polygon[0])) return false;
+      for (let i = 1; i < polygon.length; i += 1) {
+        if (pointInRing(point, polygon[i])) return false;
+      }
+      return true;
+    }
+
+    function pointInGeometry(point, geometry) {
+      if (!geometry) return false;
+      if (geometry.type === 'Polygon') return pointInPolygon(point, geometry.coordinates);
+      if (geometry.type === 'MultiPolygon') return geometry.coordinates.some(function(polygon) { return pointInPolygon(point, polygon); });
+      return false;
+    }
+
+    async function resolveArea() {
+      try {
+        const response = await fetch('data_3d/areas/index.json', {cache: 'no-store'});
+        if (!response.ok) throw new Error();
+        const payload = await response.json();
+        const areas = payload.areas || [];
+        let area = areas.find(function(row) { return row.id === activeAreaId; });
+        if (area) return area;
+        if (!Number.isFinite(urlLng) || !Number.isFinite(urlLat)) return null;
+        const candidates = areas.filter(function(row) {
+          const b = row.bounds;
+          return b && urlLng >= b[0] && urlLng <= b[2] && urlLat >= b[1] && urlLat <= b[3];
+        });
+        for (const candidate of candidates) {
+          const boundaryResponse = await fetch('data_3d/' + candidate.boundary, {cache: 'force-cache'});
+          if (!boundaryResponse.ok) continue;
+          const boundary = await boundaryResponse.json();
+          const feature = boundary.features && boundary.features[0];
+          if (feature && pointInGeometry([urlLng, urlLat], feature.geometry)) return candidate;
+        }
+        return candidates[0] || null;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    activeAreaRecord = await resolveArea();
+    if (activeAreaRecord) {
+      activeAreaId = activeAreaRecord.id;
+      params.set('area', activeAreaId);
+      history.replaceState(null, '', window.location.pathname + '?' + params.toString());
+    }
+
+    const localStyle = {
+      version: 8,
+      terrain: {source: 'terrain-dem', exaggeration: 1},
+      sources: {
+        'terrain-dem': {
+          type: 'raster-dem',
+          tiles: [activeAreaId && isLocalRuntime
+            ? window.location.origin + '/data_3d/areas/' + encodeURIComponent(activeAreaId) + '/terrain/{z}/{x}/{y}.png'
+            : 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
+          tileSize: 256,
+          maxzoom: 12,
+          encoding: 'terrarium'
+        },
+        osm: {
+          type: 'raster',
+          tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+          tileSize: 256,
+          minzoom: 0,
+          maxzoom: 19,
+          attribution: '&copy; OpenStreetMap contributors'
+        }
+      },
+      layers: [
+        {id: 'background', type: 'background', paint: {'background-color': '#e9eef2'}},
+        {id: 'terrain-shadow', type: 'hillshade', source: 'terrain-dem', paint: {'hillshade-exaggeration': 0.18, 'hillshade-shadow-color': '#536274'}},
+        {id: 'streets', type: 'raster', source: 'osm', paint: {'raster-opacity': 0.84, 'raster-saturation': -0.42}}
+      ]
+    };
+
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: localStyle,
+      center: center,
+      zoom: initialZoom,
+      pitch: 52,
+      bearing: 0,
+      antialias: true,
+      maxPitch: 65,
+      attributionControl: true
+    });
+    map.addControl(new maplibregl.NavigationControl({showCompass: false, showZoom: true}), 'top-right');
+    map.addControl(new maplibregl.FullscreenControl(), 'top-right');
+    map.addControl(new maplibregl.ScaleControl({unit: 'metric'}), 'bottom-right');
+    const orientationControl = new maplibregl.NavigationControl({showZoom: false, showCompass: true, visualizePitch: true});
+    map.addControl(orientationControl, 'bottom-right');
+    if (orientationControl._container) orientationControl._container.classList.add('orientation-control');
+
+    function RefreshControl() {}
+    RefreshControl.prototype.onAdd = function() {
+      this.container = document.createElement('div');
+      this.container.className = 'maplibregl-ctrl maplibregl-ctrl-group refresh-control';
+      this.button = document.createElement('button');
+      this.button.type = 'button';
+      this.button.title = 'Atualizar os edificios 3D deste enquadramento';
+      this.button.setAttribute('aria-label', this.button.title);
+      this.button.innerHTML = '&#8635;';
+      this.button.addEventListener('click', refreshVisible3d);
+      this.container.appendChild(this.button);
+      return this.container;
+    };
+    RefreshControl.prototype.onRemove = function() { this.container.remove(); };
+    refreshControl = new RefreshControl();
+    map.addControl(refreshControl, 'top-right');
+
+    function setBusy(message) {
+      loadingText.textContent = message || 'Carregando este enquadramento...';
+      loading.classList.remove('error');
+      loading.classList.add('visible');
+      if (refreshControl.container) refreshControl.container.classList.add('busy');
+      if (refreshControl.button) refreshControl.button.disabled = true;
+    }
+
+    function clearBusy() {
+      loading.classList.remove('visible', 'error');
+      if (refreshControl.container) refreshControl.container.classList.remove('busy');
+      if (refreshControl.button) refreshControl.button.disabled = false;
+      manualRefresh = false;
+    }
+
+    function setError(message) {
+      loadingText.textContent = message;
+      loading.classList.add('visible', 'error');
+      if (refreshControl.container) refreshControl.container.classList.remove('busy');
+      if (refreshControl.button) refreshControl.button.disabled = false;
+      manualRefresh = false;
+    }
+
+    function localTileUrl() {
+      const areaPath = activeAreaId ? '/data_3d/areas/' + encodeURIComponent(activeAreaId) : '/data_3d';
+      const remoteOrigin = areaTileOrigins[activeAreaId];
+      if (!isLocalRuntime && remoteOrigin) {
+        return remoteOrigin + '/areas/' + encodeURIComponent(activeAreaId) + '/tiles/15/{x}/{y}.pbf.gz?v=' + tileRevision;
+      }
+      return window.location.origin + areaPath + '/tiles/15/{x}/{y}.pbf.gz?v=' + tileRevision;
+    }
+
+    function colorExpression() {
+      return [
+        'match', ['get', 'class'],
+        'priority', classMeta.priority.color,
+        'attention', classMeta.attention.color,
+        'other', classMeta.other.color,
+        'mappedFcu', classMeta.mappedFcu.color,
+        'mappedLow', classMeta.mappedLow.color,
+        classMeta.unmodeled.color
+      ];
+    }
+
+    function rawHeightExpression() {
+      return ['max', 0, ['to-number', ['get', 'height']]];
+    }
+
+    function visualHeightExpression(extra) {
+      const h = rawHeightExpression();
+      return ['+', extra || 0, [
+        'interpolate', ['linear'], h,
+        0, 0,
+        3, 3,
+        12, 10,
+        30, 22,
+        60, 34,
+        120, 46,
+        1000, 48
+      ]];
+    }
+
+    function visualHeightMeters(height) {
+      const h = Math.max(0, Number(height) || 0);
+      if (h <= 3) return h;
+      if (h <= 12) return 3 + ((h - 3) * (7 / 9));
+      if (h <= 30) return 10 + ((h - 12) * (12 / 18));
+      if (h <= 60) return 22 + ((h - 30) * (12 / 30));
+      if (h <= 120) return 34 + ((h - 60) * (12 / 60));
+      return Math.min(48, 46 + ((Math.min(h, 1000) - 120) * (2 / 880)));
+    }
+
+    function classFilter() {
+      return ['match', ['get', 'class'], Array.from(activeClasses), true, false];
+    }
+
+    function selectedFilter() {
+      return ['all', ['==', ['get', 'cell_id'], selectedCellId || '__none__'], classFilter()];
+    }
+
+    function updateFilters() {
+      if (map.getLayer('gba-buildings-3d')) map.setFilter('gba-buildings-3d', classFilter());
+      if (map.getLayer('selected-buildings-3d')) map.setFilter('selected-buildings-3d', selectedFilter());
+      if (map.getLayer('selected-buildings-outline')) map.setFilter('selected-buildings-outline', selectedFilter());
+    }
+
+    function setBuildingOpacity(value) {
+      if (map.getLayer('gba-buildings-3d')) map.setPaintProperty('gba-buildings-3d', 'fill-extrusion-opacity', value ? 0.88 : 0);
+      if (map.getLayer('selected-buildings-3d')) map.setPaintProperty('selected-buildings-3d', 'fill-extrusion-opacity', value ? 1 : 0);
+      if (map.getLayer('selected-buildings-outline')) map.setPaintProperty('selected-buildings-outline', 'line-opacity', value ? 1 : 0);
+    }
+
+    function squareGeoJson(lat, lng) {
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return {type: 'FeatureCollection', features: []};
+      const halfMeters = 25;
+      const dLat = halfMeters / 110540;
+      const dLng = halfMeters / (111320 * Math.max(0.1, Math.cos(lat * Math.PI / 180)));
+      return {type: 'FeatureCollection', features: [{type: 'Feature', properties: {}, geometry: {type: 'Polygon', coordinates: [[
+        [lng - dLng, lat - dLat], [lng + dLng, lat - dLat], [lng + dLng, lat + dLat], [lng - dLng, lat + dLat], [lng - dLng, lat - dLat]
+      ]]}}]};
+    }
+
+    function selectedColor(classKey) {
+      return classMeta[classKey] ? classMeta[classKey].color : classMeta.unmodeled.color;
+    }
+
+    function updateSelectedVisual(classKey) {
+      const color = selectedColor(classKey);
+      if (map.getLayer('selected-cell-fill')) map.setPaintProperty('selected-cell-fill', 'fill-color', color);
+      if (map.getLayer('selected-cell-line')) map.setPaintProperty('selected-cell-line', 'line-color', color);
+      if (selectedMarker) selectedMarker.getElement().style.background = color;
+    }
+
+    function selectCell(cellId, lat, lng, classKey) {
+      selectedCellId = cellId || '';
+      selectedLat = Number.isFinite(lat) ? lat : null;
+      selectedLng = Number.isFinite(lng) ? lng : null;
+      updateFilters();
+      const cellSource = map.getSource('selected-cell');
+      if (cellSource) cellSource.setData(squareGeoJson(selectedLat, selectedLng));
+      if (selectedMarker) selectedMarker.remove();
+      selectedMarker = null;
+      if (selectedCellId && selectedLat !== null && selectedLng !== null) {
+        const markerElement = document.createElement('div');
+        markerElement.className = 'selected-cell-marker';
+        selectedMarker = new maplibregl.Marker({element: markerElement, anchor: 'center'})
+          .setLngLat([selectedLng, selectedLat])
+          .addTo(map);
+        updateSelectedVisual(classKey);
+        params.set('cell', selectedCellId);
+        params.set('lat', selectedLat.toFixed(7));
+        params.set('lng', selectedLng.toFixed(7));
+        history.replaceState(null, '', window.location.pathname + '?' + params.toString());
+      }
+    }
+
+    function refreshSource(message) {
+      const source = map.getSource('gba-buildings');
+      if (!source || typeof source.setTiles !== 'function') return;
+      setBusy(message);
+      tileRevision = Date.now();
+      source.setTiles([localTileUrl()]);
+      map.triggerRepaint();
+    }
+
+    function refreshVisible3d() {
+      if (!map.getSource('gba-buildings')) {
+        map.once('load', refreshVisible3d);
+        return;
+      }
+      if (map.getZoom() < 15) map.easeTo({zoom: 15, duration: 250});
+      manualRefresh = true;
+      if (!isLocalRuntime) {
+        refreshSource('Atualizando os edificios deste enquadramento...');
+        return;
+      }
+      setBusy('Regenerando o enquadramento atual...');
+      const bounds = map.getBounds();
+      const query = new URLSearchParams({
+        west: bounds.getWest(), south: bounds.getSouth(), east: bounds.getEast(), north: bounds.getNorth(), area: activeAreaId
+      });
+      fetch('data_3d/refresh.json?' + query.toString(), {cache: 'no-store'})
+        .then(function(response) { if (!response.ok) throw new Error(); return response.json(); })
+        .then(function() { refreshSource('Regenerando o enquadramento atual...'); })
+        .catch(function() { setError('Nao foi possivel atualizar os edificios deste enquadramento.'); });
+    }
+
+    function buildLegend() {
+      const container = document.getElementById('legend-rows');
+      Object.entries(classMeta).forEach(function(entry) {
+        const key = entry[0];
+        const meta = entry[1];
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'legend-row';
+        button.setAttribute('aria-pressed', 'true');
+        button.innerHTML = '<span class="swatch" style="background:' + meta.color + '"></span><span>' + meta.label + '</span>';
+        button.addEventListener('click', function() {
+          if (activeClasses.has(key)) activeClasses.delete(key); else activeClasses.add(key);
+          const active = activeClasses.has(key);
+          button.classList.toggle('off', !active);
+          button.setAttribute('aria-pressed', String(active));
+          updateFilters();
+        });
+        container.appendChild(button);
+      });
+      const legend = document.getElementById('legend');
+      const toggle = document.getElementById('legend-toggle');
+      toggle.addEventListener('click', function() {
+        const collapsed = legend.classList.toggle('collapsed');
+        toggle.setAttribute('aria-expanded', String(!collapsed));
+      });
+    }
+
+    function classLabel(key) {
+      return classMeta[key] ? classMeta[key].label : classMeta.unmodeled.label;
+    }
+
+    function winningModelLabel(key) {
+      const labels = {
+        complete: 'Modelo completo',
+        morphological: 'Modelo morfológico',
+        non_morphological: 'Modelo não morfológico'
+      };
+      return labels[key] || '';
+    }
+
+    function probabilityLabel(properties) {
+      const probability = Number(properties.probability);
+      if (properties.class === 'unmodeled' || !Number.isFinite(probability)) return '';
+      const percent = (probability * 100).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      const model = winningModelLabel(properties.winning_model);
+      return 'Probabilidade: <b>' + percent + '%' + (model ? ' (' + model + ')' : '') + '</b>';
+    }
+
+    function popupHtml(properties) {
+      const height = Number(properties.height);
+      const visualHeight = visualHeightMeters(height);
+      return '<div style="min-width:210px"><strong>Edificacao GBA LoD1</strong><br>' +
+        'Altura GBA: <b>' + (Number.isFinite(height) ? height.toFixed(1) + ' m' : '-') + '</b><br>' +
+        'Altura visual: <b>' + (Number.isFinite(visualHeight) ? visualHeight.toFixed(1) + ' m' : '-') + '</b><br>' +
+        'Classe do modelo: <b>' + classLabel(properties.class) + '</b><br>' +
+        (properties.cell_id ? 'Celula: <b>' + properties.cell_id + '</b><br>' : '') +
+        probabilityLabel(properties) +
+        '</div>';
+    }
+
+    buildLegend();
+
+    fetch('data_3d/health.json', {cache: 'no-store'})
+      .then(function(response) { if (!response.ok) throw new Error(); return response.json(); })
+      .then(function(data) { if (!data.ok) throw new Error(); })
+      .catch(function() {
+        if (isLocalRuntime) {
+          setError('Servidor 3D local nao detectado. Inicie o atalho local para carregar o GBA.');
+        }
+      });
+
+    map.once('style.load', function() {
+      const boundaryUrl = activeAreaRecord ? 'data_3d/' + activeAreaRecord.boundary : 'data_3d/study_areas.geojson';
+      map.addSource('study-areas', {type: 'geojson', data: boundaryUrl});
+      map.addLayer({
+        id: 'study-areas-outline', type: 'line', source: 'study-areas',
+        paint: {'line-color': '#164e63', 'line-width': 1.5, 'line-opacity': 0.5}
+      });
+
+      map.addSource('selected-cell', {type: 'geojson', data: squareGeoJson(selectedLat, selectedLng)});
+      map.addLayer({
+        id: 'selected-cell-fill', type: 'fill', source: 'selected-cell',
+        paint: {'fill-color': '#f03b20', 'fill-opacity': 0.22}
+      });
+      map.addLayer({
+        id: 'selected-cell-line', type: 'line', source: 'selected-cell',
+        paint: {'line-color': '#f03b20', 'line-width': 5, 'line-opacity': 1}
+      });
+
+      map.addSource('gba-buildings', {
+        type: 'vector', tiles: [localTileUrl()], minzoom: 15, maxzoom: 15,
+        bounds: [-75.5, -34.0, -32.0, 5.5]
+      });
+      map.addLayer({
+        id: 'gba-buildings-3d', type: 'fill-extrusion', source: 'gba-buildings', 'source-layer': 'buildings', minzoom: 15,
+        paint: {
+          'fill-extrusion-color': colorExpression(),
+          'fill-extrusion-height': visualHeightExpression(0),
+          'fill-extrusion-base': 0,
+          'fill-extrusion-opacity': 0.88,
+          'fill-extrusion-vertical-gradient': true
+        }
+      });
+      map.addLayer({
+        id: 'selected-buildings-3d', type: 'fill-extrusion', source: 'gba-buildings', 'source-layer': 'buildings', minzoom: 15,
+        filter: selectedFilter(),
+        paint: {
+          'fill-extrusion-color': colorExpression(),
+          'fill-extrusion-height': visualHeightExpression(1.5),
+          'fill-extrusion-base': 0,
+          'fill-extrusion-opacity': 1,
+          'fill-extrusion-vertical-gradient': false
+        }
+      });
+      map.addLayer({
+        id: 'selected-buildings-outline', type: 'line', source: 'gba-buildings', 'source-layer': 'buildings', minzoom: 15,
+        filter: selectedFilter(),
+        paint: {'line-color': '#111827', 'line-width': 2.8, 'line-opacity': 1}
+      });
+      map.moveLayer('selected-cell-line');
+      updateFilters();
+      if (selectedCellId) selectCell(selectedCellId, selectedLat, selectedLng);
+      setBusy('Carregando este enquadramento...');
+
+      map.on('mouseenter', 'gba-buildings-3d', function() { map.getCanvas().style.cursor = 'pointer'; });
+      map.on('mouseleave', 'gba-buildings-3d', function() { map.getCanvas().style.cursor = ''; });
+      map.on('click', 'gba-buildings-3d', function(event) {
+        const feature = event.features && event.features[0];
+        if (!feature) return;
+        const properties = feature.properties || {};
+        const cellLat = Number(properties.cell_lat);
+        const cellLng = Number(properties.cell_lng);
+        if (properties.cell_id && Number.isFinite(cellLat) && Number.isFinite(cellLng) && cellLat && cellLng) {
+          selectCell(properties.cell_id, cellLat, cellLng, properties.class);
+        }
+        new maplibregl.Popup({maxWidth: '320px'}).setLngLat(event.lngLat).setHTML(popupHtml(properties)).addTo(map);
+      });
+
+      map.on('sourcedata', function(event) {
+        if (event.sourceId !== 'gba-buildings' || !event.isSourceLoaded || map.isMoving()) return;
+        setBuildingOpacity(true);
+        clearBusy();
+        if (selectedCellId) {
+          const features = map.querySourceFeatures('gba-buildings', {sourceLayer: 'buildings'});
+          const selected = features.find(function(feature) { return feature.properties && feature.properties.cell_id === selectedCellId; });
+          if (selected) updateSelectedVisual(selected.properties.class);
+        }
+      });
+
+      map.on('movestart', function() {
+        if (manualRefresh || map.getZoom() < 15) return;
+        setBusy('Carregando somente as novas bordas...');
+      });
+      map.on('moveend', function() {
+        if (map.getZoom() < 15) {
+          setBuildingOpacity(false);
+          setBusy('Aproxime ate o zoom 15 para ver os edificios 3D.');
+          return;
+        }
+        if (map.isSourceLoaded('gba-buildings')) {
+          setBuildingOpacity(true);
+          clearBusy();
+        }
+      });
+    });
+
+    map.on('error', function(event) {
+      const message = String(event && event.error && event.error.message || '');
+      if (message.includes('tile.openstreetmap.org') || message.includes('demotiles.maplibre.org')) return;
+      if (message.includes('/data_3d/tiles/')) setError('Falha ao gerar um bloco GBA local deste enquadramento.');
+    });
+  })();
+  </script>
+</body>
+</html>

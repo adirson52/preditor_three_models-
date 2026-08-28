@@ -3,13 +3,13 @@
   "source": "Z:\\Banco de dados Preditor Br\\03_preditor_grade31_teste0407\\03_outputs\\04_produtos\\consolidado_3_modelos\\0407_predicoes_3_modelos.geoparquet",
   "source_mtime": 1783380710.5042827,
   "tile_zoom": 12,
-  "tile_count": 796,
-  "point_count": 3548974,
+  "tile_count": 841,
+  "point_count": 3774138,
   "format": "json.gz",
   "bounds": [
     -52.54282109566724,
     -25.917974587294573,
-    -38.22554408714933,
+    -37.90081819731118,
     0.8802992338215802
   ],
   "topn": 7,
@@ -23,7 +23,8 @@
     "area_medias_conc_urb_rj": 19395,
     "area_rgint_belem": 57673,
     "area_rgint_macapa": 8468,
-    "area_rgint_redencao": 1889
+    "area_rgint_redencao": 1889,
+    "area_conc_urb_salvador": 33838
   },
-  "created_at": "2026-07-07T22:32:57"
+  "created_at": "2026-08-27T21:46:19"
 }

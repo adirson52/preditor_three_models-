@@ -5,13 +5,13 @@
       "source": "Z:\\Banco de dados Preditor Br\\03_preditor_grade31_teste0407\\03_outputs\\04_produtos\\consolidado_3_modelos\\0407_predicoes_3_modelos.geoparquet",
       "source_mtime": 1783380710.5042827,
       "tile_zoom": 12,
-      "tile_count": 796,
-      "point_count": 3548974,
+      "tile_count": 841,
+      "point_count": 3774138,
       "format": "json.gz",
       "bounds": [
         -52.54282109566724,
         -25.917974587294573,
-        -38.22554408714933,
+        -37.90081819731118,
         0.8802992338215802
       ],
       "topn": 7,
@@ -25,9 +25,10 @@
         "area_medias_conc_urb_rj": 19395,
         "area_rgint_belem": 57673,
         "area_rgint_macapa": 8468,
-        "area_rgint_redencao": 1889
+        "area_rgint_redencao": 1889,
+        "area_conc_urb_salvador": 33838
       },
-      "created_at": "2026-07-07T22:32:57"
+      "created_at": "2026-08-27T21:46:19"
     },
     "id_lookup": {
       "scenario": "final",
@@ -45,10 +46,10 @@
         "lat",
         "lng"
       ],
-      "shard_count": 108,
-      "point_count": 3548974,
-      "tile_count": 796,
-      "created_at": "2026-07-07T22:33:56"
+      "shard_count": 110,
+      "point_count": 3774138,
+      "tile_count": 841,
+      "created_at": "2026-08-27T21:46:19"
     },
     "overview": {
       "scenario": "final",
@@ -60,21 +61,21 @@
         10,
         11
       ],
-      "tile_count": 613,
-      "drawn_points": 3325980,
+      "tile_count": 646,
+      "drawn_points": 3517306,
       "class_counts": {
-        "other": 2879992,
-        "attention": 334487,
-        "priority": 111501
+        "other": 3003642,
+        "attention": 385244,
+        "priority": 128420
       },
       "format": "png",
-      "created_at": "2026-07-07T22:57:51"
+      "created_at": "2026-08-27T21:46:19"
     },
-    "fcu_adherence": "Z:\\Banco de dados Preditor Br\\03_preditor_grade31_teste0407\\03_outputs\\05_dashboard_b\\data_tiles\\fcu_aderencia.geojson",
+    "fcu_adherence": "E:\\Banco de dados Preditor Br\\03_preditor_grade31_teste0407\\03_outputs\\05_dashboard_ebmv2_3d_evidencias_teste_2\\data_tiles\\fcu_aderencia.geojson",
     "bounds": [
       -52.54282109566724,
       -25.917974587294573,
-      -38.22554408714933,
+      -37.90081819731118,
       0.8802992338215802
     ],
     "fcu_counts": {
