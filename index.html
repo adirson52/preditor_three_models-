@@ -2806,16 +2806,16 @@ window.addEventListener('unhandledrejection', function(event) {
   const SCENARIO_KEY = "final";
   const TILE_Z = 12;
   const TILE_BASE = `data_tiles/${SCENARIO_KEY}/points/${TILE_Z}`;
-  const OVERVIEW_BASE = `data_tiles/${SCENARIO_KEY}/overview_qml/{z}/{x}/{y}.png?v=qml260827_alpha85_v1`;
+  const OVERVIEW_BASE = `data_tiles/${SCENARIO_KEY}/overview_qml/{z}/{x}/{y}.png?v=escada_20260828_v1`;
   const EMPTY_TILE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
   const LOOKUP_PREFIX_LEN = 8;
   const LOOKUP_BASE = `data_tiles/${SCENARIO_KEY}/id_lookup/${LOOKUP_PREFIX_LEN}`;
-  const SEARCH_INDEX_URL = `data_tiles/${SCENARIO_KEY}/search_index.json.gz?v=busca_fcu_2608_v1`;
+  const SEARCH_INDEX_URL = `data_tiles/${SCENARIO_KEY}/search_index.json.gz?v=escada_20260828_v1`;
   const SEARCH_GEOMETRIES_URL = `data_tiles/${SCENARIO_KEY}/search_geometries.geojson.gz?v=base0407_search_geom_v1`;
-  const FCU_URL = 'data_tiles/fcu_aderencia.geojson?v=fcu_regra_2608_v1';
+  const FCU_URL = 'data_tiles/fcu_aderencia.geojson?v=escada_20260828_v1';
   const FCU_COUNTS = {"area_arranjo_pop_rj":3675,"area_conc_urb_curitiba":15579,"area_conc_urb_fortaleza":17625,"area_conc_urb_goiania":3441,"area_conc_urb_rio_de_janeiro":44227,"area_conc_urb_sao_paulo":51022,"area_medias_conc_urb_rj":19395,"area_rgint_belem":57673,"area_rgint_macapa":8468,"area_rgint_redencao":1889,"area_conc_urb_salvador":33838};
-  const AREA_RANK_RULES = {"area_arranjo_pop_rj":{"total":101166,"n_fcu":3675,"p_fcu":0.036326,"ranked_candidates":7350,"pct_priority":0.075,"priority_limit":552,"attention_limit":1103},"area_conc_urb_curitiba":{"total":363467,"n_fcu":15579,"p_fcu":0.042862,"ranked_candidates":31158,"pct_priority":0.075,"priority_limit":2337,"attention_limit":4674},"area_conc_urb_fortaleza":{"total":257306,"n_fcu":17625,"p_fcu":0.068498,"ranked_candidates":35250,"pct_priority":0.075,"priority_limit":2644,"attention_limit":5288},"area_conc_urb_goiania":{"total":306292,"n_fcu":3441,"p_fcu":0.011234,"ranked_candidates":6882,"pct_priority":0.075,"priority_limit":517,"attention_limit":1033},"area_conc_urb_rio_de_janeiro":{"total":799668,"n_fcu":44227,"p_fcu":0.055307,"ranked_candidates":88454,"pct_priority":0.075,"priority_limit":6635,"attention_limit":13269},"area_conc_urb_sao_paulo":{"total":1015035,"n_fcu":51022,"p_fcu":0.050266,"ranked_candidates":102044,"pct_priority":0.075,"priority_limit":7654,"attention_limit":15307},"area_medias_conc_urb_rj":{"total":364678,"n_fcu":19395,"p_fcu":0.053184,"ranked_candidates":38790,"pct_priority":0.075,"priority_limit":2910,"attention_limit":5819},"area_rgint_belem":{"total":206709,"n_fcu":57673,"p_fcu":0.279006,"ranked_candidates":115346,"pct_priority":0.05,"priority_limit":5768,"attention_limit":11535},"area_rgint_macapa":{"total":60100,"n_fcu":8468,"p_fcu":0.140899,"ranked_candidates":16936,"pct_priority":0.05,"priority_limit":847,"attention_limit":1694},"area_rgint_redencao":{"total":74553,"n_fcu":1889,"p_fcu":0.025338,"ranked_candidates":3778,"pct_priority":0.075,"priority_limit":284,"attention_limit":567},"area_conc_urb_salvador":{"total":225164,"n_fcu":33838,"p_fcu":0.150282,"ranked_candidates":67676,"pct_priority":0.05,"priority_limit":3384,"attention_limit":6768}};
-  const MODEL_EVIDENCE_THRESHOLDS = {"area_arranjo_pop_rj":{"completo":{"high_min":0.066122,"medium_min":0.06001},"morfologico":{"high_min":0.1554,"medium_min":0.137487},"nao_morfologico":{"high_min":0.104903,"medium_min":0.100155}},"area_conc_urb_curitiba":{"completo":{"high_min":0.122511,"medium_min":0.104758},"morfologico":{"high_min":0.316024,"medium_min":0.253445},"nao_morfologico":{"high_min":0.146755,"medium_min":0.126029}},"area_conc_urb_fortaleza":{"completo":{"high_min":0.419462,"medium_min":0.308197},"morfologico":{"high_min":0.397891,"medium_min":0.310722},"nao_morfologico":{"high_min":0.373097,"medium_min":0.298759}},"area_conc_urb_goiania":{"completo":{"high_min":0.029831,"medium_min":0.020631},"morfologico":{"high_min":0.17614,"medium_min":0.135221},"nao_morfologico":{"high_min":0.01563,"medium_min":0.012322}},"area_conc_urb_rio_de_janeiro":{"completo":{"high_min":0.288138,"medium_min":0.221767},"morfologico":{"high_min":0.320988,"medium_min":0.246986},"nao_morfologico":{"high_min":0.319148,"medium_min":0.242367}},"area_conc_urb_sao_paulo":{"completo":{"high_min":0.330771,"medium_min":0.228623},"morfologico":{"high_min":0.442367,"medium_min":0.336622},"nao_morfologico":{"high_min":0.334511,"medium_min":0.234566}},"area_medias_conc_urb_rj":{"completo":{"high_min":0.113179,"medium_min":0.09344},"morfologico":{"high_min":0.276284,"medium_min":0.222085},"nao_morfologico":{"high_min":0.211149,"medium_min":0.181304}},"area_rgint_belem":{"completo":{"high_min":0.425889,"medium_min":0.354439},"morfologico":{"high_min":0.55146,"medium_min":0.454112},"nao_morfologico":{"high_min":0.405015,"medium_min":0.340659}},"area_rgint_macapa":{"completo":{"high_min":0.21001,"medium_min":0.181026},"morfologico":{"high_min":0.466944,"medium_min":0.357538},"nao_morfologico":{"high_min":0.102508,"medium_min":0.089143}},"area_rgint_redencao":{"completo":{"high_min":0.028234,"medium_min":0.028234},"morfologico":{"high_min":0.072114,"medium_min":0.061448},"nao_morfologico":{"high_min":0.025112,"medium_min":0.025112}},"area_conc_urb_salvador":{"completo":{"high_min":0.193606,"medium_min":0.168098},"morfologico":{"high_min":0.491274,"medium_min":0.405352},"nao_morfologico":{"high_min":0.493764,"medium_min":0.407531}}};
+  const AREA_RANK_RULES = {"area_arranjo_pop_rj":{"total":101166,"n_fcu":3675,"p_fcu":0.036326,"expansion_pct":0.036326,"expansion_count":3675,"priority_extra":1838,"priority_limit":5513,"attention_count":1837,"attention_limit":7350,"other_count":93816},"area_conc_urb_curitiba":{"total":363467,"n_fcu":15579,"p_fcu":0.042862,"expansion_pct":0.042862,"expansion_count":15579,"priority_extra":7790,"priority_limit":23369,"attention_count":7789,"attention_limit":31158,"other_count":332309},"area_conc_urb_fortaleza":{"total":257306,"n_fcu":17625,"p_fcu":0.068498,"expansion_pct":0.068498,"expansion_count":17625,"priority_extra":8813,"priority_limit":26438,"attention_count":8812,"attention_limit":35250,"other_count":222056},"area_conc_urb_goiania":{"total":306292,"n_fcu":3441,"p_fcu":0.011234,"expansion_pct":0.011234,"expansion_count":3441,"priority_extra":1721,"priority_limit":5162,"attention_count":1720,"attention_limit":6882,"other_count":299410},"area_conc_urb_rio_de_janeiro":{"total":799668,"n_fcu":44227,"p_fcu":0.055307,"expansion_pct":0.055307,"expansion_count":44227,"priority_extra":22114,"priority_limit":66341,"attention_count":22113,"attention_limit":88454,"other_count":711214},"area_conc_urb_salvador":{"total":225164,"n_fcu":33838,"p_fcu":0.150282,"expansion_pct":0.12,"expansion_count":27020,"priority_extra":13510,"priority_limit":47348,"attention_count":13510,"attention_limit":60858,"other_count":164306},"area_conc_urb_sao_paulo":{"total":1015035,"n_fcu":51022,"p_fcu":0.050266,"expansion_pct":0.050266,"expansion_count":51022,"priority_extra":25511,"priority_limit":76533,"attention_count":25511,"attention_limit":102044,"other_count":912991},"area_medias_conc_urb_rj":{"total":364678,"n_fcu":19395,"p_fcu":0.053184,"expansion_pct":0.053184,"expansion_count":19395,"priority_extra":9698,"priority_limit":29093,"attention_count":9697,"attention_limit":38790,"other_count":325888},"area_rgint_belem":{"total":206709,"n_fcu":57673,"p_fcu":0.279006,"expansion_pct":0.15,"expansion_count":31006,"priority_extra":15503,"priority_limit":73176,"attention_count":15503,"attention_limit":88679,"other_count":118030},"area_rgint_macapa":{"total":60100,"n_fcu":8468,"p_fcu":0.140899,"expansion_pct":0.11,"expansion_count":6611,"priority_extra":3306,"priority_limit":11774,"attention_count":3305,"attention_limit":15079,"other_count":45021},"area_rgint_redencao":{"total":74553,"n_fcu":1889,"p_fcu":0.025338,"expansion_pct":0.025338,"expansion_count":1889,"priority_extra":945,"priority_limit":2834,"attention_count":944,"attention_limit":3778,"other_count":70775}};
+  const MODEL_EVIDENCE_THRESHOLDS = {"area_arranjo_pop_rj":{"completo":{"high_min":0.060463,"high_last_id":"200ME60532N88262_B_C","medium_min":0.054383,"medium_last_id":"200ME61982N87610_C_A","high_count":5513,"medium_count":1837,"low_count":93816},"morfologico":{"high_min":0.097622,"high_last_id":"200ME61702N88730_D_C","medium_min":0.088054,"medium_last_id":"200ME62086N87746_B_C","high_count":5513,"medium_count":1837,"low_count":93816},"nao_morfologico":{"high_min":0.096522,"high_last_id":"200ME61984N87618_B_A","medium_min":0.089272,"medium_last_id":"200ME62758N89508_D_D","high_count":5513,"medium_count":1837,"low_count":93816}},"area_conc_urb_curitiba":{"completo":{"high_min":0.098519,"high_last_id":"200ME54916N85056_C_B","medium_min":0.08406,"medium_last_id":"200ME54918N84910_A_C","high_count":23369,"medium_count":7789,"low_count":332309},"morfologico":{"high_min":0.154213,"high_last_id":"200ME54826N84814_B_B","medium_min":0.127273,"medium_last_id":"200ME54700N85070_D_A","high_count":23369,"medium_count":7789,"low_count":332309},"nao_morfologico":{"high_min":0.110549,"high_last_id":"200ME54866N85128_D_A","medium_min":0.090902,"medium_last_id":"200ME54914N84858_D_B","high_count":23369,"medium_count":7789,"low_count":332309}},"area_conc_urb_fortaleza":{"completo":{"high_min":0.219678,"high_last_id":"200ME66984N108770_D_A","medium_min":0.147266,"medium_last_id":"200ME66976N108580_B_A","high_count":26438,"medium_count":8812,"low_count":222056},"morfologico":{"high_min":0.183478,"high_last_id":"200ME66984N108746_B_C","medium_min":0.146592,"medium_last_id":"200ME67010N108712_D_D","high_count":26438,"medium_count":8812,"low_count":222056},"nao_morfologico":{"high_min":0.21811,"high_last_id":"200ME66922N108624_C_C","medium_min":0.154065,"medium_last_id":"200ME66920N108602_D_C","high_count":26438,"medium_count":8812,"low_count":222056}},"area_conc_urb_goiania":{"completo":{"high_min":0.039226,"high_last_id":"200ME54882N94530_A_C","medium_min":0.034517,"medium_last_id":"200ME54852N94632_D_A","high_count":5162,"medium_count":1720,"low_count":299410},"morfologico":{"high_min":0.077447,"high_last_id":"200ME54996N94476_D_B","medium_min":0.064628,"medium_last_id":"200ME55042N95032_C_D","high_count":5162,"medium_count":1720,"low_count":299410},"nao_morfologico":{"high_min":0.023701,"high_last_id":"200ME54952N94800_B_C","medium_min":0.021147,"medium_last_id":"200ME54962N94832_D_B","high_count":5162,"medium_count":1720,"low_count":299410}},"area_conc_urb_rio_de_janeiro":{"completo":{"high_min":0.161202,"high_last_id":"200ME60598N87582_C_D","medium_min":0.121854,"medium_last_id":"200ME60836N87842_C_A","high_count":66341,"medium_count":22113,"low_count":711214},"morfologico":{"high_min":0.139489,"high_last_id":"200ME61264N87682_D_B","medium_min":0.1137,"medium_last_id":"200ME61438N87764_A_B","high_count":66341,"medium_count":22113,"low_count":711214},"nao_morfologico":{"high_min":0.167731,"high_last_id":"200ME61278N87882_D_B","medium_min":0.125746,"medium_last_id":"200ME60760N87832_A_C","high_count":66341,"medium_count":22113,"low_count":711214}},"area_conc_urb_salvador":{"completo":{"high_min":0.13584,"high_last_id":"200ME66582N98552_A_A","medium_min":0.094208,"medium_last_id":"200ME67152N98962_D_D","high_count":47348,"medium_count":13510,"low_count":164306},"morfologico":{"high_min":0.229591,"high_last_id":"200ME66788N98732_B_C","medium_min":0.177557,"medium_last_id":"200ME66670N98522_D_A","high_count":47348,"medium_count":13510,"low_count":164306},"nao_morfologico":{"high_min":0.314989,"high_last_id":"200ME66654N98528_C_C","medium_min":0.22774,"medium_last_id":"200ME66452N98720_D_C","high_count":47348,"medium_count":13510,"low_count":164306}},"area_conc_urb_sao_paulo":{"completo":{"high_min":0.145397,"high_last_id":"200ME57698N86978_B_B","medium_min":0.084073,"medium_last_id":"200ME57280N87020_B_C","high_count":76533,"medium_count":25511,"low_count":912991},"morfologico":{"high_min":0.185326,"high_last_id":"200ME57914N87040_B_B","medium_min":0.136363,"medium_last_id":"200ME58080N87072_D_D","high_count":76533,"medium_count":25511,"low_count":912991},"nao_morfologico":{"high_min":0.144108,"high_last_id":"200ME57810N86998_D_D","medium_min":0.084702,"medium_last_id":"200ME57294N87078_C_A","high_count":76533,"medium_count":25511,"low_count":912991}},"area_medias_conc_urb_rj":{"completo":{"high_min":0.093144,"high_last_id":"200ME62370N87954_A_D","medium_min":0.077157,"medium_last_id":"200ME60152N88048_D_B","high_count":29093,"medium_count":9697,"low_count":325888},"morfologico":{"high_min":0.133967,"high_last_id":"200ME63206N88702_C_C","medium_min":0.113909,"medium_last_id":"200ME63144N88750_D_A","high_count":29093,"medium_count":9697,"low_count":325888},"nao_morfologico":{"high_min":0.150589,"high_last_id":"200ME62528N88468_D_D","medium_min":0.126284,"medium_last_id":"200ME59856N88152_A_D","high_count":29093,"medium_count":9697,"low_count":325888}},"area_rgint_belem":{"completo":{"high_min":0.310873,"high_last_id":"200ME56152N111696_A_C","medium_min":0.240199,"medium_last_id":"200ME56540N112034_C_B","high_count":73176,"medium_count":15503,"low_count":118030},"morfologico":{"high_min":0.305859,"high_last_id":"200ME56150N111794_C_A","medium_min":0.259345,"medium_last_id":"200ME56402N111812_C_C","high_count":73176,"medium_count":15503,"low_count":118030},"nao_morfologico":{"high_min":0.294104,"high_last_id":"200ME54044N113180_B_A","medium_min":0.239338,"medium_last_id":"200ME56150N111886_A_C","high_count":73176,"medium_count":15503,"low_count":118030}},"area_rgint_macapa":{"completo":{"high_min":0.156957,"high_last_id":"200ME53156N113334_A_D","medium_min":0.13672,"medium_last_id":"200ME53250N113342_C_B","high_count":11774,"medium_count":3305,"low_count":45021},"morfologico":{"high_min":0.201304,"high_last_id":"200ME53226N113370_B_D","medium_min":0.158788,"medium_last_id":"200ME53288N113410_C_A","high_count":11774,"medium_count":3305,"low_count":45021},"nao_morfologico":{"high_min":0.06982,"high_last_id":"200ME53274N113386_D_A","medium_min":0.04808,"medium_last_id":"200ME53286N113422_D_D","high_count":11774,"medium_count":3305,"low_count":45021}},"area_rgint_redencao":{"completo":{"high_min":0.028234,"high_last_id":"200ME52202N106014_C_A","medium_min":0.028234,"medium_last_id":"200ME52212N106000_C_D","high_count":2834,"medium_count":944,"low_count":70775},"morfologico":{"high_min":0.046635,"high_last_id":"200ME54438N105454_B_B","medium_min":0.04421,"medium_last_id":"200ME53214N105826_B_C","high_count":2834,"medium_count":944,"low_count":70775},"nao_morfologico":{"high_min":0.025112,"high_last_id":"200ME52200N106000_A_A","medium_min":0.025112,"medium_last_id":"200ME52210N105998_D_C","high_count":2834,"medium_count":944,"low_count":70775}}};
   const QGIS_RANKING_FIELD = 'ranking_total';
   const QGIS_RANKING_MIN = 1;
   const QGIS_RANKING_MAX = 104032;
@@ -2842,11 +2842,11 @@ window.addEventListener('unhandledrejection', function(event) {
     const key = fcuFeatureClass(feature);
     if (phase === 'base') {
       if (!finalClassVisible(key)) return null;
-      return {stroke: 'rgba(2,6,23,0.18)', fill: 'rgba(17,24,39,0)', width: 0.8};
+      return {stroke: 'rgba(15,23,42,0.18)', fill: 'rgba(255,255,255,0)', width: 0.7};
     }
     if (!finalClassVisible(key)) return null;
-    if (key === 'mappedLow') return {stroke: 'rgba(107,114,128,0.90)', fill: 'rgba(209,213,219,0.15)', width: 2.15};
-    return {stroke: 'rgba(17,24,39,0.94)', fill: 'rgba(55,65,81,0.15)', width: 2.35};
+    if (key === 'mappedLow') return {stroke: 'rgba(100,116,139,0.94)', fill: 'rgba(203,213,225,0.20)', width: 2.15, dash: [7, 4]};
+    return {stroke: 'rgba(31,41,55,0.96)', fill: 'rgba(55,65,81,0.17)', width: 2.35, dash: []};
   }
 
   function finalProjectRing(ring, coords) {
@@ -2890,8 +2890,10 @@ window.addEventListener('unhandledrejection', function(event) {
       ctx.fillStyle = style.fill;
       ctx.strokeStyle = style.stroke;
       ctx.lineWidth = style.width;
+      ctx.setLineDash(Array.isArray(style.dash) ? style.dash : []);
       ctx.fill('evenodd');
       ctx.stroke();
+      ctx.setLineDash([]);
     }
   }
 
@@ -3533,18 +3535,18 @@ window.addEventListener('unhandledrejection', function(event) {
 
   function actionRankingValue(p) {
     if (!p) return null;
-    const rank = Number(p.r ?? p.ranking_candidato);
-    if (Number.isFinite(rank) && rank > 0) return rank;
     const totalRank = Number(p.rt ?? p.ranking_total);
-    return Number.isFinite(totalRank) && totalRank > 0 ? totalRank : null;
+    if (Number.isFinite(totalRank) && totalRank > 0) return totalRank;
+    const rank = Number(p.r ?? p.ranking_candidato);
+    return Number.isFinite(rank) && rank > 0 ? rank : null;
   }
 
   function finalPointClassColor(key) {
     if (key === 'priority') return '#d7191c';
-    if (key === 'attention') return '#fee08b';
-    if (key === 'mappedFcu') return '#4b5563';
-    if (key === 'mappedLow') return '#bdbdbd';
-    return '#9ca3af';
+    if (key === 'attention') return '#f28e2b';
+    if (key === 'mappedFcu') return '#374151';
+    if (key === 'mappedLow') return '#cbd5e1';
+    return 'rgba(0,0,0,0)';
   }
 
   function qgisOverlayStyle(p, areaCol) {
@@ -3557,9 +3559,9 @@ window.addEventListener('unhandledrejection', function(event) {
 
   function candidateVisualStyle(key, p) {
     const classColor = finalPointClassColor(key);
-    if (key === 'priority') return {color: classColor, radius: FINAL_POINT_RADIUS, alpha: 0.9, key};
-    if (key === 'attention') return {color: classColor, radius: FINAL_POINT_RADIUS, alpha: 0.78, key};
-    return {color: classColor, radius: FINAL_POINT_RADIUS, alpha: 0.055, key: 'other'};
+    if (key === 'priority') return {color: classColor, radius: FINAL_POINT_RADIUS, alpha: 0.92, key};
+    if (key === 'attention') return {color: classColor, radius: FINAL_POINT_RADIUS, alpha: 0.88, key};
+    return {color: classColor, radius: FINAL_POINT_RADIUS, alpha: 0, key: 'other'};
   }
 
   function candidateClass(p, areaCol) {
@@ -3697,10 +3699,15 @@ window.addEventListener('unhandledrejection', function(event) {
     const nCells = Number(props.n_celulas ?? item.n ?? item.n_fcu);
     const meanModel = Number(props.prob_media_max_modelos ?? props.prob_media_winner);
     const maxModel = Number(props.prob_max_max_modelos ?? props.prob_max_winner ?? item.max_prob);
+    const nValid = Number(props.n_celulas_evidencia_valida);
+    const nLow = Number(props.n_celulas_baixa_evidencia);
+    const pctLow = Number(props.pct_celulas_baixa_evidencia);
     const rows = [];
     if (idFcu) rows.push([mapOverlayText('fcuId'), idFcu]);
     if (codeFcu && String(codeFcu) !== String(idFcu)) rows.push([mapOverlayText('fcuCode'), codeFcu]);
     rows.push([mapOverlayText('modelResult'), modelResult]);
+    if (Number.isFinite(pctLow)) rows.push([mapLang() === 'en' ? 'Low-evidence cells' : 'Células com baixa evidência', percentLabel(pctLow)]);
+    if (Number.isFinite(nLow) && Number.isFinite(nValid)) rows.push([mapLang() === 'en' ? 'Low / valid cells' : 'Baixas / válidas', `${nLow.toLocaleString(mapLang() === 'en' ? 'en-US' : 'pt-BR')} / ${nValid.toLocaleString(mapLang() === 'en' ? 'en-US' : 'pt-BR')}`]);
     if (Number.isFinite(meanModel)) rows.push([mapOverlayText('meanModel'), percentLabel(meanModel)]);
     if (Number.isFinite(maxModel)) rows.push([mapOverlayText('maxModel'), percentLabel(maxModel)]);
     if (areaLabel) rows.push([mapOverlayText('areaEstudo'), areaLabel]);
@@ -3739,7 +3746,7 @@ window.addEventListener('unhandledrejection', function(event) {
       color: low ? '#6b7280' : '#111827',
       weight: low ? 2.15 : 2.35,
       fillColor: low ? '#d1d5db' : '#374151',
-      fillOpacity: 0.15,
+      fillOpacity: low ? 0.20 : 0.18,
       opacity: low ? 0.90 : 0.94,
       dashArray: low ? '6 4' : null
     };
@@ -3784,9 +3791,9 @@ window.addEventListener('unhandledrejection', function(event) {
     const probMorfologico = finalNumericValue(sample.prob_morfologico);
     const probNaoMorfologico = finalNumericValue(sample.prob_nao_morfologico);
     const probCompleto = finalNumericValue(sample.prob_completo);
+    if (probCompleto !== null) rows.push(['completo', finalScenarioLabel('completo'), probCompleto]);
     if (probMorfologico !== null) rows.push(['morfologico', finalScenarioLabel('morfologico'), probMorfologico]);
     if (probNaoMorfologico !== null) rows.push(['nao_morfologico', finalScenarioLabel('nao_morfologico'), probNaoMorfologico]);
-    if (probCompleto !== null) rows.push(['completo', finalScenarioLabel('completo'), probCompleto]);
     if (!rows.length) {
       const fallbackScenario = String(sample.local_scenario || sample.winner_scenario || sample.scenario || (App && App.currentPolo ? App.currentPolo.winner_scenario_key : '') || 'completo').trim() || 'completo';
       const fallbackProb = finalNumericValue(sample.proba);
@@ -3805,8 +3812,13 @@ window.addEventListener('unhandledrejection', function(event) {
     if (thresholds) {
       const highMin = Number(thresholds.high_min);
       const mediumMin = Number(thresholds.medium_min);
-      if (Number.isFinite(highMin) && p >= highMin) return {key: 'high', label: mapLang() === 'en' ? 'high' : 'alto'};
-      if (Number.isFinite(mediumMin) && p >= mediumMin) return {key: 'medium', label: mapLang() === 'en' ? 'medium' : 'médio'};
+      const cellId = String(sample && sample.id || '');
+      const highLastId = String(thresholds.high_last_id || '');
+      const mediumLastId = String(thresholds.medium_last_id || '');
+      const within = (score, limit, lastId) => Number.isFinite(limit) &&
+        (score > limit || (Math.abs(score - limit) <= 5e-7 && (!lastId || cellId <= lastId)));
+      if (within(p, highMin, highLastId)) return {key: 'high', label: mapLang() === 'en' ? 'high' : 'alto'};
+      if (within(p, mediumMin, mediumLastId)) return {key: 'medium', label: mapLang() === 'en' ? 'medium' : 'médio'};
       return {key: 'low', label: mapLang() === 'en' ? 'low' : 'baixo'};
     }
     if (p >= 0.70) return {key: 'high', label: mapLang() === 'en' ? 'high' : 'alto'};
@@ -3816,7 +3828,7 @@ window.addEventListener('unhandledrejection', function(event) {
 
   function samplePriorityKey(sample) {
     const areaCol = sample && sample.scope ? sample.scope : (App && App.currentPolo ? App.currentPolo.area_col : null);
-    const rank = Number(sample && sample.ranking_candidato);
+    const rank = actionRankingValue(sample);
     return candidateClassKeyFromRank(rank, areaCol);
   }
 
@@ -3850,9 +3862,15 @@ window.addEventListener('unhandledrejection', function(event) {
 
   function compactEvidenceHtml(sample) {
     const priorityKey = samplePriorityKey(sample);
-    const priorityBadge = priorityKey === 'priority'
-      ? `<span class="rf-priority-badge">${escapeHtml(finalClassLabel(priorityKey))}</span>`
+    const priorityBadge = `<span class="rf-priority-badge ${priorityKey}">${escapeHtml(finalClassLabel(priorityKey))}</span>`;
+    const rank = actionRankingValue(sample);
+    const rankLine = Number.isFinite(Number(rank))
+      ? `<div class="rf-selection-municipio"><span>${mapLang() === 'en' ? 'General ranking position' : 'Posição no ranking geral'}:</span><b>${Number(rank).toLocaleString(mapLang() === 'en' ? 'en-US' : 'pt-BR')}</b></div>`
       : '';
+    const territorialStatus = sample.territorial_status || (Number(sample.target) === 1
+      ? (mapLang() === 'en' ? 'original FCU' : 'FCU original')
+      : (mapLang() === 'en' ? 'outside original FCU' : 'fora da FCU original'));
+    const territorialLine = `<div class="rf-selection-municipio"><span>${mapLang() === 'en' ? 'Territorial status' : 'Situação territorial'}:</span><b>${escapeHtml(territorialStatus)}</b></div>`;
     const municipality = sample && sample.municipio
       ? `<div class="rf-selection-municipio"><span>${mapText('municipality')}:</span><b>${escapeHtml(sample.municipio)}</b></div>`
       : '';
@@ -3862,8 +3880,63 @@ window.addEventListener('unhandledrejection', function(event) {
         ${priorityBadge}
       </div>
       ${modelEvidenceTableHtml(sample)}
+      ${rankLine}
+      ${territorialLine}
       ${municipality}
     </div>`;
+  }
+
+  function finalPointInRing(lng, lat, ring) {
+    let inside = false;
+    if (!Array.isArray(ring) || ring.length < 3) return false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const xi = Number(ring[i][0]); const yi = Number(ring[i][1]);
+      const xj = Number(ring[j][0]); const yj = Number(ring[j][1]);
+      const intersects = ((yi > lat) !== (yj > lat)) &&
+        (lng < (xj - xi) * (lat - yi) / ((yj - yi) || Number.EPSILON) + xi);
+      if (intersects) inside = !inside;
+    }
+    return inside;
+  }
+
+  function finalPointInPolygonCoordinates(lng, lat, coordinates) {
+    if (!Array.isArray(coordinates) || !coordinates.length || !finalPointInRing(lng, lat, coordinates[0])) return false;
+    for (let i = 1; i < coordinates.length; i += 1) {
+      if (finalPointInRing(lng, lat, coordinates[i])) return false;
+    }
+    return true;
+  }
+
+  function finalPointInFcuFeature(lng, lat, feature) {
+    const geometry = feature && feature.geometry;
+    if (!geometry) return false;
+    if (geometry.type === 'Polygon') return finalPointInPolygonCoordinates(lng, lat, geometry.coordinates);
+    if (geometry.type === 'MultiPolygon') return geometry.coordinates.some(poly => finalPointInPolygonCoordinates(lng, lat, poly));
+    return false;
+  }
+
+  function finalEnrichTerritorialStatus(sample) {
+    if (!sample) return;
+    if (Number(sample.target) !== 1) {
+      sample.territorial_status = mapLang() === 'en' ? 'outside original FCU' : 'fora da FCU original';
+      return;
+    }
+    const lng = Number(sample.lng); const lat = Number(sample.lat);
+    if (!Number.isFinite(lng) || !Number.isFinite(lat)) return;
+    if (!fcuDataPromise) fcuDataPromise = fetch(FCU_URL).then(r => r.ok ? r.json() : {type:'FeatureCollection', features:[]});
+    fcuDataPromise.then(data => {
+      const areaCol = sample.scope || (App && App.currentPolo ? App.currentPolo.area_col : '');
+      const feature = (data.features || []).find(item => {
+        const props = item.properties || {};
+        return (!areaCol || props.area_col === areaCol) && finalPointInFcuFeature(lng, lat, item);
+      });
+      sample.territorial_status = feature
+        ? fcuModelResultLabel(feature.properties && feature.properties.aderencia_modelo)
+        : (mapLang() === 'en' ? 'original FCU' : 'FCU original');
+      if (feature && feature.properties) sample.fcu_id = feature.properties.id_fcu || feature.properties.cd_fcu || '';
+      const current = (typeof App !== 'undefined' && App.selectedSample) ? String(App.selectedSample.id || '') : '';
+      if (current === String(sample.id || '')) finalRenderSelectionDetails(sample);
+    }).catch(() => {});
   }
 
   function finalMergeSampleWithLocalExplanation(lightSample, point) {
@@ -3945,13 +4018,14 @@ window.addEventListener('unhandledrejection', function(event) {
     const lat = Number(sample.lat);
     const lng = Number(sample.lng);
     const priorityKey = samplePriorityKey(sample);
-    const priorityBadge = priorityKey === 'priority'
-      ? `<span class="rf-priority-badge">${escapeHtml(finalClassLabel(priorityKey))}</span>`
-      : '';
+    const priorityBadge = `<span class="rf-priority-badge ${priorityKey}">${escapeHtml(finalClassLabel(priorityKey))}</span>`;
+    const territorialStatus = sample.territorial_status || (Number(sample.target) === 1 ? (mapLang() === 'en' ? 'original FCU' : 'FCU original') : (mapLang() === 'en' ? 'outside original FCU' : 'fora da FCU original'));
+    const territorialLine = `<div class="rf-popup-municipio"><span>${mapLang() === 'en' ? 'Territorial status' : 'Situação territorial'}:</span><b>${escapeHtml(territorialStatus)}</b></div>`;
     const municipalityLine = sample.municipio ? `<div class="rf-popup-municipio"><span>${mapText('municipality')}:</span><b>${escapeHtml(sample.municipio)}</b></div>` : '';
     const html = `<div class="rf-map-popup">` +
       `<div class="rf-popup-head"><b>${escapeHtml(sample.id)}</b>${priorityBadge}</div>` +
       `${modelProbabilitiesHtml(sample, true)}` +
+      territorialLine +
       municipalityLine +
       externalLinksHtml(sample) +
       `</div>`;
@@ -5200,11 +5274,6 @@ window.addEventListener('unhandledrejection', function(event) {
         for (const p of points) {
           drawFinalPoint(ctx, p, coords, size, candidateClass(p, p.a || fallbackAreaCol));
         }
-        if (FINAL_MAP_RENDER_STATE.qmlRanking) {
-          for (const p of points) {
-            drawFinalPoint(ctx, p, coords, size, qgisOverlayStyle(p, p.a || fallbackAreaCol), false);
-          }
-        }
         ctx.globalAlpha = 1;
         done(null, tile);
       });
@@ -5215,7 +5284,7 @@ window.addEventListener('unhandledrejection', function(event) {
   function allPointsLegendHtml(open) {
     const dot = (color, alpha = 1) => `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};opacity:${alpha};margin-right:6px;vertical-align:middle;"></span>`;
     const fill = (color, border = '#636363', alpha = 1) => `<span style="display:inline-block;width:13px;height:10px;border-radius:2px;background:${color};border:2px solid ${border};opacity:${alpha};margin-right:6px;vertical-align:middle;"></span>`;
-    const gradient = `<span style="display:inline-block;width:34px;height:8px;border-radius:5px;background:linear-gradient(90deg,#d7191c,#fdae61,#ffffbf,#abdda4,#2b83ba);margin-right:6px;vertical-align:middle;border:1px solid rgba(15,23,42,.18);"></span>`;
+    const actionRamp = `<span style="display:inline-flex;width:34px;height:8px;border-radius:5px;overflow:hidden;margin-right:6px;vertical-align:middle;border:1px solid rgba(15,23,42,.18);"><i style="width:50%;background:#d7191c"></i><i style="width:50%;background:#f28e2b"></i></span>`;
     const prioritySwatch = (key, alpha = 1) => dot(finalPointClassColor(key), alpha);
     const groupTitle = (pt, en) => `<div style="font:800 10px Inter,sans-serif;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin:8px 4px 3px 4px;">${escapeHtml(mapLang() === 'en' ? en : pt)}</div>`;
     const rowHtml = rows => rows.map(row => {
@@ -5230,20 +5299,27 @@ window.addEventListener('unhandledrejection', function(event) {
       ['other', prioritySwatch('other', .65)]
     ];
     const fcuRows = [
-      ['mappedFcu', fill('#4b5563', '#1f2937', .98)],
-      ['mappedLow', fill('#bdbdbd', '#4b5563', 1)]
+      ['mappedFcu', fill('rgba(55,65,81,.17)', '#1f2937', 1)],
+      ['mappedLow', fill('rgba(203,213,225,.20)', '#64748b', 1)]
     ];
+    const rule = areaRankRule(finalCanvasAreaCol());
+    const ruleSummary = rule ? `<div style="margin:8px 4px 2px;padding:7px 8px;border-radius:7px;background:#f8fafc;border:1px solid #e2e8f0;color:#475569;font:600 10px/1.45 Inter,sans-serif;">` +
+      `FCU: <b>${(Number(rule.p_fcu || 0) * 100).toLocaleString('pt-BR', {maximumFractionDigits:1})}%</b> · ` +
+      `expansão: <b>${(Number(rule.expansion_pct || 0) * 100).toLocaleString('pt-BR', {maximumFractionDigits:1})}%</b><br>` +
+      `prioritária: <b>${Number(rule.priority_limit || 0).toLocaleString('pt-BR')}</b> · atenção: <b>${Number(rule.attention_count || 0).toLocaleString('pt-BR')}</b>` +
+      `</div>` : '';
     return (
       `<div style="display:flex;align-items:center;gap:8px;padding:0.45rem 0.6rem 0.25rem 0.6rem;">` +
       `<button type="button" class="legend-toggle" style="border:0;background:transparent;padding:0;font:700 12px Inter,sans-serif;color:#2c3e50;cursor:pointer;text-align:left;flex:1;">${mapText('legend')}</button>` +
       `</div>` +
       `<div class="legend-body" style="display:${open ? 'block' : 'none'};padding:0 0.65rem 0.55rem 0.65rem;line-height:1.35;min-width:225px;">` +
-      groupTitle('Estilo QML', 'QML style') +
-      `<div class="legend-qml-toggle" title="${escapeHtml(mapText('qmlLayer'))}" style="cursor:pointer;pointer-events:auto;opacity:${FINAL_MAP_RENDER_STATE.qmlRanking ? 1 : .48};padding:3px 4px 6px 4px;margin-bottom:3px;border-bottom:1px solid #e5edf5;font-weight:700;text-decoration:${FINAL_MAP_RENDER_STATE.qmlRanking ? 'none' : 'line-through'};">${gradient}${mapText('qmlLayer')}</div>` +
-      groupTitle('Prioridade do modelo', 'Model priority') +
+      groupTitle('Ranking geral', 'General ranking') +
+      `<div class="legend-qml-toggle" title="camada de pontos e visão geral" style="cursor:pointer;pointer-events:auto;opacity:${FINAL_MAP_RENDER_STATE.qmlRanking ? 1 : .48};padding:3px 4px 6px 4px;margin-bottom:3px;border-bottom:1px solid #e5edf5;font-weight:700;text-decoration:${FINAL_MAP_RENDER_STATE.qmlRanking ? 'none' : 'line-through'};">${actionRamp}pontos do ranking geral (QML)</div>` +
+      groupTitle('Classe de ação', 'Action class') +
       rowHtml(priorityRows) +
-      groupTitle('FCU', 'FCU') +
+      groupTitle('Situação territorial', 'Territorial status') +
       rowHtml(fcuRows) +
+      ruleSummary +
       `</div>`
     );
   }
@@ -5477,6 +5553,7 @@ window.addEventListener('unhandledrejection', function(event) {
         previousSelectSample(sample);
         finalRenderSelectionDetails(sample);
         finalEnrichModelProbabilities(sample);
+        finalEnrichTerritorialStatus(sample);
         if (App.selectionMarker && App.map && App.map.hasLayer(App.selectionMarker)) {
           App.map.removeLayer(App.selectionMarker);
         }
@@ -5764,6 +5841,16 @@ window.addEventListener('unhandledrejection', function(event) {
     font-weight: 850;
     line-height: 1.1;
     text-transform: uppercase;
+  }
+  .rf-priority-badge.attention {
+    border-color: rgba(242, 142, 43, 0.62);
+    background: rgba(242, 142, 43, 0.15);
+    color: #8a4a05;
+  }
+  .rf-priority-badge.other {
+    border-color: #cbd5e1;
+    background: rgba(241, 245, 249, 0.72);
+    color: #64748b;
   }
   .rf-model-evidence {
     display: grid;

@@ -1,11 +1,9 @@
 {
-  "source": "E:\\Banco de dados Preditor Br\\03_preditor_grade31_teste0407\\03_outputs\\05_dashboard_ebmv2_3d_evidencias_teste_2\\data_tiles\\final\\points\\12",
+  "source": "E:\\Banco de dados Preditor Br\\03_preditor_grade31_teste0407\\03_outputs\\05_dashboard_b_salvador_fcu_tipos_online\\data_tiles\\final\\points\\12",
   "field": "ranking_total",
   "classes_rendered": [
     "priority",
-    "attention",
-    "mappedFcu",
-    "mappedLow"
+    "attention"
   ],
   "classes_hidden": [
     "other"
@@ -14,34 +12,34 @@
   "qml_max": 104032,
   "zooms": {
     "6": {
-      "tiles": 12,
-      "points_rendered": 283283,
-      "points_skipped_other": 3265691
+      "tiles": 13,
+      "points_rendered": 478322,
+      "points_skipped_other": 3295816
     },
     "7": {
-      "tiles": 18,
-      "points_rendered": 283283,
-      "points_skipped_other": 3265691
+      "tiles": 20,
+      "points_rendered": 478322,
+      "points_skipped_other": 3295816
     },
     "8": {
-      "tiles": 32,
-      "points_rendered": 283283,
-      "points_skipped_other": 3265691
+      "tiles": 36,
+      "points_rendered": 478322,
+      "points_skipped_other": 3295816
     },
     "9": {
-      "tiles": 60,
-      "points_rendered": 283283,
-      "points_skipped_other": 3265691
+      "tiles": 64,
+      "points_rendered": 478322,
+      "points_skipped_other": 3295816
     },
     "10": {
-      "tiles": 131,
-      "points_rendered": 283283,
-      "points_skipped_other": 3265691
+      "tiles": 140,
+      "points_rendered": 478322,
+      "points_skipped_other": 3295816
     },
     "11": {
-      "tiles": 264,
-      "points_rendered": 283283,
-      "points_skipped_other": 3265691
+      "tiles": 277,
+      "points_rendered": 478322,
+      "points_skipped_other": 3295816
     }
   }
 }

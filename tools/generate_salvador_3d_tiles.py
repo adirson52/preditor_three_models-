@@ -24,8 +24,11 @@ ZOOM = 15
 EXTENT = 4096
 CLASS_MAP = {
     "prioridade": "priority",
+    "atencao_prioritaria": "priority",
     "atencao": "attention",
     "outros": "other",
+    "demais_areas": "other",
+    "sem_resultado": "unmodeled",
     "fcu_mapeada": "mappedFcu",
     "fcu_revisao": "mappedLow",
 }
@@ -61,9 +64,13 @@ def load_cells(gpkg: Path) -> tuple[dict[int, dict[str, object]], set[int]]:
         "id_row",
         "winner_scenario",
         "prob_fcu_winner",
-        "classe_candidato_winner",
+        "classe_acao",
     ]
-    cells = gpd.read_file(gpkg, layer="predicoes_base0407", columns=columns)
+    try:
+        cells = gpd.read_file(gpkg, layer="celulas_acao", columns=columns)
+    except Exception:
+        columns[-1] = "classe_candidato_winner"
+        cells = gpd.read_file(gpkg, layer="predicoes_base0407", columns=columns)
     centroids = cells.geometry.centroid
     lookup: dict[int, dict[str, object]] = {}
     keys: set[int] = set()
@@ -74,7 +81,7 @@ def load_cells(gpkg: Path) -> tuple[dict[int, dict[str, object]], set[int]]:
             "cell_id": str(row.ID),
             "cell_lat": round(float(lat), 7),
             "cell_lng": round(float(lon), 7),
-            "class": CLASS_MAP.get(str(row.classe_candidato_winner), "unmodeled"),
+            "class": CLASS_MAP.get(str(getattr(row, "classe_acao", getattr(row, "classe_candidato_winner", ""))), "unmodeled"),
             "probability": round(float(row.prob_fcu_winner), 6),
             "winning_model": MODEL_MAP.get(str(row.winner_scenario), str(row.winner_scenario)),
         }

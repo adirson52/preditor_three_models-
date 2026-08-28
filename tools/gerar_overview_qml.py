@@ -18,19 +18,10 @@ ZOOMS = range(6, 12)
 TILE_SIZE = 256
 QGIS_RANKING_MIN = 1
 QGIS_RANKING_MAX = 104032
-FCU_REVIEW_PROB_CUTOFF = 0.70
-QGIS_PALETTE = [
-    (215, 25, 28), (223, 55, 42), (231, 86, 56), (238, 116, 70), (246, 147, 84),
-    (253, 175, 98), (253, 187, 112), (254, 198, 125), (254, 210, 139), (254, 221, 152),
-    (254, 233, 165), (255, 245, 179), (254, 255, 191), (248, 252, 189), (241, 249, 187),
-    (234, 247, 184), (228, 244, 182), (221, 241, 180), (214, 239, 178), (208, 236, 176),
-    (201, 233, 174), (194, 230, 172), (188, 228, 169), (181, 225, 167), (174, 222, 165),
-    (168, 219, 164), (163, 215, 165), (158, 212, 166), (153, 208, 167), (147, 204, 168),
-    (142, 201, 169), (137, 197, 170), (132, 193, 171), (127, 190, 172), (121, 186, 173),
-    (116, 182, 173), (111, 179, 174), (106, 175, 175), (100, 171, 176), (95, 168, 177),
-    (90, 164, 178), (85, 160, 179), (80, 157, 180), (74, 153, 181), (69, 149, 182),
-    (64, 146, 182), (59, 142, 183), (53, 138, 184), (48, 135, 185), (43, 131, 186),
-]
+ACTION_COLORS = {
+    "priority": (215, 25, 28),
+    "attention": (242, 142, 43),
+}
 
 
 def load_ranking_rules() -> dict:
@@ -44,17 +35,6 @@ def load_ranking_rules() -> dict:
 RANKING_RULES = load_ranking_rules()
 
 
-def qgis_color(value: object) -> tuple[int, int, int]:
-    try:
-        rank = float(value)
-    except (TypeError, ValueError):
-        return 255, 237, 160
-    span = max(1.0, QGIS_RANKING_MAX - QGIS_RANKING_MIN)
-    t = min(1.0, max(0.0, (rank - QGIS_RANKING_MIN) / span))
-    idx = min(len(QGIS_PALETTE) - 1, max(0, int(math.floor(t * len(QGIS_PALETTE)))))
-    return QGIS_PALETTE[idx]
-
-
 def numeric(value: object) -> float | None:
     try:
         number = float(value)
@@ -63,27 +43,10 @@ def numeric(value: object) -> float | None:
     return number if math.isfinite(number) else None
 
 
-def max_model_prob(point: dict) -> float:
-    vals = [
-        numeric(point.get("pc")),
-        numeric(point.get("pm")),
-        numeric(point.get("pn")),
-        numeric(point.get("ps")),
-        numeric(point.get("pi")),
-        numeric(point.get("p")),
-    ]
-    vals = [value for value in vals if value is not None]
-    return max(vals) if vals else 0.0
-
-
 def candidate_class_key(point: dict) -> str:
-    target = int(numeric(point.get("t")) or 0)
-    if target:
-        return "mappedLow" if max_model_prob(point) < FCU_REVIEW_PROB_CUTOFF else "mappedFcu"
-
     area = str(point.get("a") or "")
     rule = RANKING_RULES.get(area)
-    rank = numeric(point.get("r"))
+    rank = numeric(point.get("rt"))
     if not rule or rank is None or rank <= 0:
         return "other"
 
@@ -157,7 +120,7 @@ def paint_overview_zoom(zoom: int) -> tuple[int, int]:
             continue
         tx, ty, px, py = tile
         arr = tiles.setdefault((tx, ty), np.zeros((TILE_SIZE, TILE_SIZE, 4), dtype=np.uint8))
-        r, g, b = qgis_color(point.get("rt", point.get("r")))
+        r, g, b = ACTION_COLORS[cls_key]
         x0, x1 = max(0, px - radius), min(TILE_SIZE, px + radius + 1)
         y0, y1 = max(0, py - radius), min(TILE_SIZE, py + radius + 1)
         arr[y0:y1, x0:x1, 0] = r
@@ -189,7 +152,7 @@ def main() -> None:
             {
                 "source": str(POINTS_DIR),
                 "field": "ranking_total",
-                "classes_rendered": ["priority", "attention", "mappedFcu", "mappedLow"],
+                "classes_rendered": ["priority", "attention"],
                 "classes_hidden": ["other"],
                 "qml_min": QGIS_RANKING_MIN,
                 "qml_max": QGIS_RANKING_MAX,

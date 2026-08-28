@@ -7,11 +7,14 @@ downloads/
 http_server_*.log
 analise_modelos.html
 *backup*
+*_antes_escada*
 _check_*.png
 predeploy_*.png
 validation_*.png
 before_*.png
 after_*.png
 
+.vercel
+.env*
 .vercel
 .env*

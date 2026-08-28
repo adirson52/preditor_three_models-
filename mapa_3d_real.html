@@ -184,13 +184,16 @@
 
     const classMeta = {
       priority: {label: 'atencao prioritaria', color: '#f03b20'},
-      attention: {label: 'atencao', color: '#feb24c'},
-      other: {label: 'demais areas', color: '#ffeda0'},
-      mappedFcu: {label: 'FCU tipo 1', color: '#4b5563'},
-      mappedLow: {label: 'FCU tipo 2', color: '#bdbdbd'},
-      unmodeled: {label: 'fora da cobertura do modelo', color: '#d7dde3'}
+      attention: {label: 'atencao', color: '#f28e2b'},
+      other: {label: 'demais areas', color: 'rgba(0,0,0,0)'},
+      unmodeled: {label: 'sem resultado', color: 'rgba(0,0,0,0)'}
     };
     const activeClasses = new Set(Object.keys(classMeta));
+    const fcuMeta = {
+      fcu_mantida: {label: 'FCU tipo 1', color: 'rgba(55,65,81,.18)', border: '#1f2937'},
+      fcu_revisao: {label: 'FCU tipo 2', color: 'rgba(203,213,225,.22)', border: '#64748b'}
+    };
+    const activeFcuClasses = new Set(Object.keys(fcuMeta));
 
     function pointInRing(point, ring) {
       let inside = false;
@@ -354,10 +357,12 @@
         'priority', classMeta.priority.color,
         'attention', classMeta.attention.color,
         'other', classMeta.other.color,
-        'mappedFcu', classMeta.mappedFcu.color,
-        'mappedLow', classMeta.mappedLow.color,
         classMeta.unmodeled.color
       ];
+    }
+
+    function opacityExpression() {
+      return ['match', ['get', 'class'], 'priority', 0.9, 'attention', 0.84, 0];
     }
 
     function rawHeightExpression() {
@@ -400,6 +405,9 @@
       if (map.getLayer('gba-buildings-3d')) map.setFilter('gba-buildings-3d', classFilter());
       if (map.getLayer('selected-buildings-3d')) map.setFilter('selected-buildings-3d', selectedFilter());
       if (map.getLayer('selected-buildings-outline')) map.setFilter('selected-buildings-outline', selectedFilter());
+      const fcuFilter = ['all', ['==', ['get', 'area_col'], activeAreaId], ['match', ['get', 'aderencia_modelo'], Array.from(activeFcuClasses), true, false]];
+      if (map.getLayer('fcu-fill')) map.setFilter('fcu-fill', fcuFilter);
+      if (map.getLayer('fcu-line')) map.setFilter('fcu-line', fcuFilter);
     }
 
     function setBuildingOpacity(value) {
@@ -485,6 +493,7 @@
 
     function buildLegend() {
       const container = document.getElementById('legend-rows');
+      container.insertAdjacentHTML('beforeend', '<div style="padding:5px 6px 2px;color:#64748b;font:800 10px/1.2 Inter,sans-serif;text-transform:uppercase;letter-spacing:.04em">Classe de acao</div>');
       Object.entries(classMeta).forEach(function(entry) {
         const key = entry[0];
         const meta = entry[1];
@@ -496,6 +505,24 @@
         button.addEventListener('click', function() {
           if (activeClasses.has(key)) activeClasses.delete(key); else activeClasses.add(key);
           const active = activeClasses.has(key);
+          button.classList.toggle('off', !active);
+          button.setAttribute('aria-pressed', String(active));
+          updateFilters();
+        });
+        container.appendChild(button);
+      });
+      container.insertAdjacentHTML('beforeend', '<div style="padding:9px 6px 2px;color:#64748b;font:800 10px/1.2 Inter,sans-serif;text-transform:uppercase;letter-spacing:.04em">Situacao territorial</div>');
+      Object.entries(fcuMeta).forEach(function(entry) {
+        const key = entry[0];
+        const meta = entry[1];
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'legend-row';
+        button.setAttribute('aria-pressed', 'true');
+        button.innerHTML = '<span class="swatch" style="background:' + meta.color + ';border-color:' + meta.border + '"></span><span>' + meta.label + '</span>';
+        button.addEventListener('click', function() {
+          if (activeFcuClasses.has(key)) activeFcuClasses.delete(key); else activeFcuClasses.add(key);
+          const active = activeFcuClasses.has(key);
           button.classList.toggle('off', !active);
           button.setAttribute('aria-pressed', String(active));
           updateFilters();
@@ -562,6 +589,25 @@
         paint: {'line-color': '#164e63', 'line-width': 1.5, 'line-opacity': 0.5}
       });
 
+      map.addSource('fcu-original', {type: 'geojson', data: 'data_tiles/fcu_aderencia.geojson'});
+      map.addLayer({
+        id: 'fcu-fill', type: 'fill', source: 'fcu-original',
+        filter: ['all', ['==', ['get', 'area_col'], activeAreaId], ['match', ['get', 'aderencia_modelo'], Array.from(activeFcuClasses), true, false]],
+        paint: {
+          'fill-color': ['match', ['get', 'aderencia_modelo'], 'fcu_revisao', 'rgba(203,213,225,.22)', 'rgba(55,65,81,.18)'],
+          'fill-opacity': 1
+        }
+      });
+      map.addLayer({
+        id: 'fcu-line', type: 'line', source: 'fcu-original',
+        filter: ['all', ['==', ['get', 'area_col'], activeAreaId], ['match', ['get', 'aderencia_modelo'], Array.from(activeFcuClasses), true, false]],
+        paint: {
+          'line-color': ['match', ['get', 'aderencia_modelo'], 'fcu_revisao', '#64748b', '#1f2937'],
+          'line-width': ['match', ['get', 'aderencia_modelo'], 'fcu_revisao', 1.8, 2.2],
+          'line-opacity': .94
+        }
+      });
+
       map.addSource('selected-cell', {type: 'geojson', data: squareGeoJson(selectedLat, selectedLng)});
       map.addLayer({
         id: 'selected-cell-fill', type: 'fill', source: 'selected-cell',
@@ -582,7 +628,7 @@
           'fill-extrusion-color': colorExpression(),
           'fill-extrusion-height': visualHeightExpression(0),
           'fill-extrusion-base': 0,
-          'fill-extrusion-opacity': 0.88,
+          'fill-extrusion-opacity': opacityExpression(),
           'fill-extrusion-vertical-gradient': true
         }
       });
