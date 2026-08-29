@@ -2844,6 +2844,11 @@ window.addEventListener('unhandledrejection', function(event) {
   .rf-minimap-control.is-collapsed .rf-minimap-toggle { inset: 2px; width: 30px; height: 30px; }
   .rf-minimap-map .leaflet-control-attribution,
   .rf-minimap-map .leaflet-control-container { display: none; }
+  /* Os canvases já chegam renderizados; não aplicar o fade padrão do Leaflet. */
+  .leaflet-tile.rf-final-points-tile {
+    opacity: 1 !important;
+    transition: none !important;
+  }
   @media (max-width: 720px) {
     .rf-minimap-control { width: 148px; height: 100px; }
     .rf-minimap-control.is-collapsed { width: 38px; height: 38px; }
@@ -4246,12 +4251,34 @@ window.addEventListener('unhandledrejection', function(event) {
     if (!App.map || !App.minimapMap || !App.minimapBoundsLayer || App.minimapSyncing) return;
     const container = App.minimapControl && App.minimapControl.getContainer ? App.minimapControl.getContainer() : null;
     if (!container || container.classList.contains('is-collapsed')) return;
-    App.minimapSyncing = true;
+    const mainCenter = App.map.getCenter();
     const miniZoom = Math.max(2, App.map.getZoom() - MINIMAP_ZOOM_OFFSET);
-    App.minimapMap.setView(App.map.getCenter(), miniZoom, {animate: false, reset: true});
     App.minimapBoundsLayer.setBounds(App.map.getBounds());
     refreshMinimapBasemap();
-    App.minimapSyncing = false;
+
+    const miniLoaded = !!App.minimapMap._loaded;
+    const currentMiniCenter = miniLoaded ? App.minimapMap.getCenter() : null;
+    const currentMiniZoom = miniLoaded ? App.minimapMap.getZoom() : null;
+    const centerChanged = !currentMiniCenter || currentMiniCenter.distanceTo(mainCenter) > 1;
+    const zoomChanged = !Number.isFinite(Number(currentMiniZoom)) || Number(currentMiniZoom) !== Number(miniZoom);
+    if (!centerChanged && !zoomChanged) return;
+
+    // Mantém o bloqueio até o fim real do movimento do minimapa. Liberá-lo logo
+    // após setView criava um ciclo minimapa -> mapa principal -> minimapa, que
+    // disparava redraws contínuos e fazia os pontos piscarem.
+    App.minimapSyncing = true;
+    let released = false;
+    let releaseTimer = null;
+    const releaseSync = () => {
+      if (released) return;
+      released = true;
+      if (releaseTimer) window.clearTimeout(releaseTimer);
+      App.minimapMap.off('moveend', releaseSync);
+      App.minimapSyncing = false;
+    };
+    App.minimapMap.once('moveend', releaseSync);
+    App.minimapMap.setView(mainCenter, miniZoom, {animate: false, reset: true});
+    if (!released) releaseTimer = window.setTimeout(releaseSync, 120);
   }
 
   function setMinimapCollapsed(collapsed) {
@@ -4310,10 +4337,13 @@ window.addEventListener('unhandledrejection', function(event) {
     }).addTo(App.minimapMap);
     App.minimapMap.on('moveend', () => {
       if (App.minimapSyncing || container.classList.contains('is-collapsed')) return;
-      App.map.panTo(App.minimapMap.getCenter(), {animate: false});
+      const targetCenter = App.minimapMap.getCenter();
+      if (App.map.getCenter().distanceTo(targetCenter) > 1) {
+        App.map.panTo(targetCenter, {animate: false});
+      }
     });
     App.minimapMap.on('click', event => App.map.panTo(event.latlng));
-    App.map.on('move zoom resize', updateMinimapFromMain);
+    App.map.on('moveend zoomend resize', updateMinimapFromMain);
     App.map.on('baselayerchange', () => {
       refreshMinimapBasemap();
       updateMinimapFromMain();
@@ -5580,7 +5610,7 @@ window.addEventListener('unhandledrejection', function(event) {
 
   const AllPointsLayer = L.GridLayer.extend({
     createTile: function(coords, done) {
-      const tile = L.DomUtil.create('canvas', 'leaflet-tile');
+      const tile = L.DomUtil.create('canvas', 'leaflet-tile rf-final-points-tile');
       const size = this.getTileSize();
       tile.width = size.x;
       tile.height = size.y;
@@ -5871,7 +5901,15 @@ window.addEventListener('unhandledrejection', function(event) {
       refreshFcuCanvasLayer();
       refreshTouchInteractionGates();
       if (!App.qmlPointsLayer) {
-        App.qmlPointsLayer = new AllPointsLayer({tileSize: 256, opacity: 0.92, zIndex: 460, renderMode: 'qml'});
+        App.qmlPointsLayer = new AllPointsLayer({
+          tileSize: 256,
+          opacity: 0.92,
+          zIndex: 460,
+          renderMode: 'qml',
+          updateWhenIdle: true,
+          updateWhenZooming: false,
+          keepBuffer: 2
+        });
         App.qmlPointsLayer.addTo(App.map);
         App.allPointsLayer = App.qmlPointsLayer;
         App.priorityPointsLayers = {};
@@ -5881,7 +5919,10 @@ window.addEventListener('unhandledrejection', function(event) {
             opacity: 0.94,
             zIndex: 470 + index,
             renderMode: 'priority',
-            classKey: key
+            classKey: key,
+            updateWhenIdle: true,
+            updateWhenZooming: false,
+            keepBuffer: 2
           });
           App.priorityPointsLayers[key] = layer;
           layer.addTo(App.map);
@@ -5901,11 +5942,9 @@ window.addEventListener('unhandledrejection', function(event) {
           }, 260);
         });
         App.map.on('dblclick', clearFinalSingleClick);
-        App.map.on('zoomend', () => {
-          redrawFinalPointLayers();
-          refreshFcuPolygonsStyle();
-        });
-        App.map.on('moveend', redrawFinalPointLayers);
+        // O GridLayer troca os tiles automaticamente durante pan/zoom. Forçar
+        // redraw nesses eventos apagava os canvases prontos antes da recarga.
+        App.map.on('zoomend', refreshFcuPolygonsStyle);
         addAllPointsControl();
       }
       loadFcusForCurrentArea();
