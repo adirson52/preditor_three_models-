@@ -443,6 +443,10 @@
     .context-layout { align-items: stretch; }
     .context-copy { display: grid; align-content: center; gap: .7rem; padding: 1.25rem; }
     .context-copy p { margin: 0; color: var(--muted); font-size: .86rem; }
+    .model-limit-list { display: grid; gap: .55rem; }
+    .model-limit { padding: .72rem .82rem; border-left: 3px solid var(--teal); border-radius: 0 10px 10px 0; background: var(--teal-pale); }
+    .model-limit strong { display: block; margin-bottom: .16rem; color: var(--teal-dark); font-size: .78rem; }
+    .model-limit p { color: var(--ink-soft); font-size: .8rem; line-height: 1.45; }
     .checklist { display: grid; gap: .5rem; margin-top: .25rem; }
     .check { display: grid; grid-template-columns: 23px 1fr; gap: .55rem; align-items: start; color: var(--ink-soft); font-size: .82rem; }
     .check::before { content: "✓"; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 7px; color: #fff; background: var(--teal); font-size: .7rem; font-weight: 900; }
@@ -831,22 +835,20 @@
     <section class="section" id="contexto">
       <div class="section-heading">
         <div class="kicker">07 · Imagens e 3D</div>
-        <h2>Use o contexto visual como complemento</h2>
-        <p>Observe forma, continuidade, acessos e entorno.</p>
+        <h2>O contexto visual não transforma a indicação em verdade</h2>
+        <p>O mapa representa um resultado produzido com os dados e as observações disponíveis em determinado momento.</p>
       </div>
       <div class="context-layout context-wide">
         <figure class="shot">
           <img src="assets/guia/mapa-3d.png" alt="Visualização 3D completa de uma célula selecionada em Salvador, com mapa, grade, legenda e controles" data-zoom>
-          <figcaption>Visualização 3D completa, com a célula selecionada, construções, grade, legenda e entorno. O volume construído acrescenta contexto, mas não confirma a classe.</figcaption>
+          <figcaption>Visualização 3D completa, com a célula selecionada, construções, grade, legenda e entorno. Ela acrescenta contexto, mas não confirma a classificação e também representa um recorte no tempo.</figcaption>
         </figure>
         <article class="card context-copy">
-          <div><h3>Uma sequência útil de observação</h3><p>Use as imagens para responder perguntas específicas — não para validar a cor.</p></div>
-          <div class="checklist">
-            <div class="check">A ocupação parece contínua ou fragmentada?</div>
-            <div class="check">A forma construída acompanha a indicação morfológica?</div>
-            <div class="check">Existem barreiras, áreas vazias ou mudanças recentes?</div>
-            <div class="check">O limite da FCU representa bem o conjunto observado?</div>
-            <div class="check">Há elementos que expliquem a divergência entre modelos?</div>
+          <div><h3>O que o resultado realmente indica</h3><p>Áreas cujas características se aproximam das encontradas nas FCUs da base de referência. Isso não equivale a uma confirmação definitiva sobre o território.</p></div>
+          <div class="model-limit-list">
+            <div class="model-limit"><strong>O modelo não é estático</strong><p>Novas variáveis, bases atualizadas e novas observações podem modificar o ranking e as classes do mapa.</p></div>
+            <div class="model-limit"><strong>O território também é dinâmico</strong><p>Adensamentos, obras, remoções, novas ocupações e outras transformações podem alterar as características observadas.</p></div>
+            <div class="model-limit"><strong>O resultado é uma indicação</strong><p>A plataforma organiza sinais e prioridades; ela não produz uma verdade definitiva nem substitui a atualização das informações territoriais.</p></div>
           </div>
         </article>
       </div>
@@ -875,7 +877,7 @@
     </section>
 
     <section class="closing" aria-labelledby="conclusao-title">
-      <div><h2 id="conclusao-title">Conclusão: indicar, explicar e apoiar decisões</h2><p>A plataforma não emite veredictos sobre o território. Sua missão é organizar evidências, indicar onde há sinais que merecem atenção e mostrar por que cada célula foi destacada. O resultado deve ser entendido como uma hipótese de trabalho — útil para orientar análises e atualizações, mas sempre aberta ao confronto com imagens recentes, dados complementares e conhecimento territorial.</p><div class="closing-points"><span>Indica sinais</span><span>Organiza prioridades</span><span>Explicita evidências</span><span>Não substitui a análise territorial</span></div></div>
+      <div><h2 id="conclusao-title">Conclusão: indicar, explicar e apoiar decisões</h2><p>A plataforma não emite veredictos sobre o território. Sua missão é organizar evidências, indicar áreas com características semelhantes às FCUs de referência e mostrar por que cada célula foi destacada. O resultado é uma hipótese de trabalho: novas variáveis e observações podem modificar o mapa, assim como as transformações contínuas do próprio território exigem atualizações ao longo do tempo.</p><div class="closing-points"><span>Indica sinais</span><span>Organiza prioridades</span><span>Explicita evidências</span><span>Não substitui a análise territorial</span></div></div>
       <a class="button" href="index.html">Voltar ao mapa</a>
     </section>
   </main>
