@@ -1294,7 +1294,7 @@ window.addEventListener('unhandledrejection', function(event) {
                         Framework de IA Explicável para Mapeamento de Favelas.<br><span style="font-size:0.92rem;color:var(--text-muted);">Cenario: Modelo completo. Modelo completo com variáveis candidatas selecionadas por área de estudo.</span>
                     </p>
                 </header>
-<nav class="site-nav-links" aria-label="Navegacao principal"><a class="active" href="index.html">Início</a><a href="guia.html">Guia de uso</a><a href="https://cefavela.ufabc.edu.br/revelando-favelas-arcabouco-metodologico-para-identificacao-e-caracterizacao-de-favelas/" target="_blank" rel="noopener noreferrer">Saiba mais</a></nav>
+<nav class="site-nav-links" aria-label="Navegacao principal"><a class="active" href="./">Início</a><a href="guia.html">Guia de uso</a><a href="https://cefavela.ufabc.edu.br/revelando-favelas-arcabouco-metodologico-para-identificacao-e-caracterizacao-de-favelas/" target="_blank" rel="noopener noreferrer">Saiba mais</a></nav>
 
                 <div class="tab-nav">
                     <button class="tab-btn active" onclick="switchTab(1)"> Insights Analysis</button>
@@ -3665,7 +3665,7 @@ window.addEventListener('unhandledrejection', function(event) {
     const sampleArea = sample.a || sample.scope ||
       (typeof finalCanvasAreaCol === 'function' ? finalCanvasAreaCol() : '') || '';
     const areaId = encodeURIComponent(String(sampleArea));
-    const view3d = `mapa_3d_real.html?lat=${latText}&lng=${lngText}&zoom=17&cell=${cellId}&area=${areaId}`;
+    const view3d = `3d.html?lat=${latText}&lng=${lngText}&zoom=17&cell=${cellId}&area=${areaId}`;
     const view3dLabel = mapLang() === 'en' ? 'View in 3D' : 'Ver em 3D';
     return `<div class="map-open-links" style="margin-top:6px;font-size:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">` +
       `<a href="${google}" target="_blank" rel="noopener">${mapText('google')}</a>` +
@@ -6109,7 +6109,7 @@ window.addEventListener('unhandledrejection', function(event) {
     const nav = document.querySelector('.site-nav-links');
     if (nav) {
       nav.innerHTML =
-        '<a class="active" href="index.html">Início</a>' +
+        '<a class="active" href="./">Início</a>' +
         '<a href="guia.html">Guia de uso</a>' +
         '<a href="https://cefavela.ufabc.edu.br/revelando-favelas-arcabouco-metodologico-para-identificacao-e-caracterizacao-de-favelas/" target="_blank" rel="noopener noreferrer">Saiba mais</a>';
     }
@@ -6139,7 +6139,7 @@ window.addEventListener('unhandledrejection', function(event) {
     const nav = document.querySelector('.site-nav-links');
     if (nav) {
       nav.innerHTML =
-        `<a class="active" href="index.html">${labels[0]}</a>` +
+        `<a class="active" href="./">${labels[0]}</a>` +
         `<a href="guia.html">${labels[5]}</a>` +
         `<a href="https://cefavela.ufabc.edu.br/revelando-favelas-arcabouco-metodologico-para-identificacao-e-caracterizacao-de-favelas/" target="_blank" rel="noopener noreferrer">${labels[3]}</a>`;
     }
@@ -6226,7 +6226,7 @@ window.addEventListener('unhandledrejection', function(event) {
     App.real3dControl.onAdd = function() {
       const wrap = L.DomUtil.create('div', 'real-3d-map-control leaflet-control');
       const link = L.DomUtil.create('a', '', wrap);
-      link.href = 'mapa_3d_real.html';
+      link.href = '3d.html';
       link.title = 'Abrir edificacoes em 3D sem probabilidades';
       link.setAttribute('aria-label', link.title);
       link.textContent = '3D real';
@@ -6240,7 +6240,7 @@ window.addEventListener('unhandledrejection', function(event) {
         const lat = Number.isFinite(selectedLat) ? selectedLat : center.lat;
         const lng = Number.isFinite(selectedLng) ? selectedLng : center.lng;
         const zoom = Math.max(15.5, Number(App.map.getZoom()) || 15.5);
-        const url = new URL('mapa_3d_real.html', window.location.href);
+        const url = new URL('3d.html', window.location.href);
         url.searchParams.set('lat', lat.toFixed(7));
         url.searchParams.set('lng', lng.toFixed(7));
         url.searchParams.set('zoom', zoom.toFixed(1));

@@ -1,4 +1,19 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/index",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/mapa_3d_real",
+      "destination": "/3d",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/data_tiles/(.*).json.gz",
