@@ -321,6 +321,14 @@
     .formula-label { color: var(--muted); font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; }
     .formula-value { margin: .22rem 0; color: var(--teal-dark); font-size: 1.35rem; font-weight: 880; }
     .formula p { margin: 0; color: var(--muted); font-size: .78rem; }
+    .stair-summary { margin-bottom: 1rem; padding: 1.15rem; border-left: 5px solid var(--teal); }
+    .stair-summary h3 { margin: 0 0 .45rem; font-size: 1.12rem; }
+    .stair-summary > p { max-width: 980px; margin: 0; color: var(--ink-soft); font-size: .9rem; line-height: 1.65; }
+    .stair-flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; margin-top: .9rem; }
+    .stair-step { padding: .8rem; border-radius: 12px; background: var(--canvas); }
+    .stair-step span { display: inline-grid; place-items: center; width: 26px; height: 26px; margin-bottom: .4rem; border-radius: 8px; color: #fff; background: var(--teal-dark); font-size: .72rem; font-weight: 900; }
+    .stair-step strong { display: block; font-size: .84rem; }
+    .stair-step p { margin: .22rem 0 0; color: var(--muted); font-size: .76rem; }
     .stairs-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr); gap: 1rem; align-items: start; }
     .table-card { overflow: hidden; }
     .table-scroll { overflow-x: auto; }
@@ -486,7 +494,7 @@
       .hero { margin-top: 1rem; padding: 1.15rem; border-radius: 18px; }
       .hero-visual img { aspect-ratio: 1.3; }
       .hero-caption { position: static; max-width: none; margin-top: .5rem; color: var(--ink-soft); background: transparent; box-shadow: none; border-color: var(--line); }
-      .flow, .models, .examples, .formula-strip, .decision-grid, .explain-gallery, .read-keys, .interpret-limit, .cell-dimensions { grid-template-columns: 1fr; }
+      .flow, .models, .examples, .formula-strip, .stair-flow, .decision-grid, .explain-gallery, .read-keys, .interpret-limit, .cell-dimensions { grid-template-columns: 1fr; }
       .explain-panel.wide { grid-column: auto; }
       .flow-step { min-height: 0; display: grid; grid-template-columns: 33px 1fr; column-gap: .7rem; }
       .flow-number { grid-row: span 2; margin: 0; }
@@ -617,12 +625,21 @@
       <div class="section-heading">
         <div class="kicker">03 · Regra da escada</div>
         <h2>Como o tamanho das faixas é definido</h2>
-        <p>F dimensiona o volume; o ranking escolhe as células.</p>
+        <p>Partimos das células cobertas pelas FCUs originais de 2022. Elas dimensionam as faixas; o ranking geral decide quais células entram.</p>
       </div>
+      <article class="card stair-summary">
+        <h3>A regra em linguagem direta</h3>
+        <p>Em cada área de estudo, primeiro contamos quantas células estavam dentro das <strong>FCUs originais de 2022</strong>. A proporção encontrada é chamada de <strong>F</strong>. Se 8% das células da área estavam em FCU, então F = 8%. A escada usa esse valor apenas para calcular <strong>quantas células</strong> serão destacadas. Depois, o ranking geral ordena todas as células da área — dentro e fora das FCUs — e escolhe as primeiras para atenção prioritária e as seguintes para atenção.</p>
+        <div class="stair-flow" aria-label="Resumo da regra da escada em três etapas">
+          <div class="stair-step"><span>1</span><strong>Contar a referência de 2022</strong><p>Calcular a parcela de células cobertas pelas FCUs originais. Essa parcela é F.</p></div>
+          <div class="stair-step"><span>2</span><strong>Definir o volume</strong><p>A escada acrescenta E e determina o tamanho das faixas prioritária e de atenção.</p></div>
+          <div class="stair-step"><span>3</span><strong>Escolher pelo ranking</strong><p>O ranking geral seleciona as células mais bem colocadas, independentemente de estarem ou não em FCU.</p></div>
+        </div>
+      </article>
       <div class="formula-strip">
-        <article class="card formula"><span class="formula-label">F</span><div class="formula-value">FCU original</div><p>Percentual de células da área pertencente à FCU original.</p></article>
-        <article class="card formula"><span class="formula-label">E</span><div class="formula-value">Expansão</div><p>Percentual adicional escolhido pela escada conforme o valor de F.</p></article>
-        <article class="card formula"><span class="formula-label">Limites</span><div class="formula-value">F + E/2 → F + E</div><p>A primeira expressão fecha a faixa prioritária; a segunda fecha o total destacado.</p></article>
+        <article class="card formula"><span class="formula-label">F</span><div class="formula-value">FCU original de 2022</div><p>Percentual de células da área cobertas pelas FCUs usadas como referência.</p></article>
+        <article class="card formula"><span class="formula-label">E</span><div class="formula-value">Expansão</div><p>Percentual adicional permitido pela escada. Metade vai para cada faixa.</p></article>
+        <article class="card formula"><span class="formula-label">Resultado</span><div class="formula-value">F + E/2 → F + E</div><p>Prioritária vai até F + E/2; atenção ocupa os E/2 seguintes.</p></article>
       </div>
       <div class="stairs-layout">
         <div>
@@ -669,7 +686,7 @@
       </div>
       <div class="principle">
         <span class="principle-mark" aria-hidden="true">≠</span>
-        <p><strong>F define quantidades, não pertencimento.</strong> Uma célula da FCU original não entra automaticamente em atenção. Todas as células — dentro e fora da FCU — são ordenadas pelo ranking geral da própria área.</p>
+        <p><strong>F define quantidades, não pertencimento.</strong> Uma célula da FCU original de 2022 não entra automaticamente em atenção. Todas as células — dentro e fora da FCU — são ordenadas pelo ranking geral da própria área.</p>
       </div>
     </section>
 

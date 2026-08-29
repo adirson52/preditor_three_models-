@@ -15,6 +15,7 @@ Data: 28/08/2026
 - fluxo em 6 etapas, da área de estudo à decisão;
 - 6 itens da legenda explicados separadamente;
 - tabela com os 9 exemplos completos da escada;
+- abertura da regra da escada em linguagem direta, partindo das células cobertas pelas FCUs originais de 2022 e separando volume calculado de células escolhidas pelo ranking;
 - intervalos completos de F e E descritos abaixo da tabela;
 - simulador interativo da regra;
 - explicação dos três modelos: Modelo completo, Morfologia e IBGE — sem componente espectral no modelo IBGE;
