@@ -147,6 +147,7 @@ Ao clicar em uma célula, mostre:
 - persistir localmente a última combinação de camadas escolhida pelo usuário;
 - nos zooms afastados, usar amostragem progressiva estável, ponto de 1 pixel e transparência reduzida para preservar a leitura do mapa-base;
 - revelar progressivamente mais células ao aproximar e mostrar todas a partir do zoom 11, preservando o tamanho próximo original no zoom 12 ou superior.
+- incluir um minimapa recolhível no canto inferior direito, com retângulo do enquadramento principal, sincronização de movimento/zoom/mapa-base e persistência do estado aberto ou recolhido.
 
 ## Arquivos de entrega
 

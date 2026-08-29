@@ -17,6 +17,7 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 - A visualização 3D de Salvador usa as mesmas classes e as geometrias contínuas das FCUs.
 - Nos zooms 6–10 o mapa usa pontos de 1 pixel com amostragem progressiva e transparência suave; no zoom 11 usa marcador compacto; a partir do zoom 12 todas as células aparecem no tamanho próximo original.
 - Na primeira abertura, somente o Ranking QML fica ativo. Depois disso, o navegador preserva a última combinação escolhida entre Ranking QML, prioridades e FCUs.
+- O mapa possui um minimapa de localização recolhível no canto inferior direito, sincronizado com o enquadramento, o zoom e o mapa-base; a última condição aberta ou recolhida fica salva no navegador.
 - As FCUs usam uma única camada vetorial interativa, com contorno e transparência suavizados nos zooms afastados.
 
 ## Conteudo publicado

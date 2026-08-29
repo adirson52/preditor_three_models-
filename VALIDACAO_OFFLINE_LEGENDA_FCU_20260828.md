@@ -102,6 +102,9 @@ O validador de dados percorreu as 3.774.138 células e confirmou, área por áre
 - a legenda mantém a ordem Ranking QML → Prioridade do modelo → FCU;
 - após qualquer alteração, a combinação escolhida é salva no navegador e restaurada ao recarregar a página;
 - persistência testada com Ranking QML + atenção prioritária + FCU Tipo 1, mantendo exatamente o mesmo estado após recarga;
+- minimapa de localização aberto por padrão no canto inferior direito, com retângulo do enquadramento principal;
+- minimapa sincronizado com movimento, zoom e alternância entre ruas e satélite;
+- botão de recolher/abrir funcional e condição persistida após recarregar;
 - console sem erros de página durante a validação funcional;
 - a célula `200ME66568N98484_A_D`, em Salvador, abriu com Modelo completo, Morfologia e IBGE simultaneamente;
 - `mapa_3d_real.html` foi aberto com uma célula real de cada uma das 11 áreas; em todas houve resposta válida, um canvas MapLibre, término do carregamento, ausência de sobreposição de erro e zero erros de página.

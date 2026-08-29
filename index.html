@@ -2803,6 +2803,50 @@ window.addEventListener('unhandledrejection', function(event) {
         })();
     </script>
 
+<style id="rf-minimap-style">
+  .rf-minimap-control {
+    position: relative;
+    width: 190px;
+    height: 126px;
+    overflow: hidden;
+    border: 2px solid rgba(255,255,255,.98);
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 2px 9px rgba(15,23,42,.28);
+    transition: width .18s ease, height .18s ease;
+  }
+  .rf-minimap-control.is-collapsed { width: 36px; height: 36px; }
+  .rf-minimap-map { width: 100%; height: 100%; background: #dbe8ed; }
+  .rf-minimap-control.is-collapsed .rf-minimap-map { display: none; }
+  .rf-minimap-toggle {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    color: #0f172a;
+    background: rgba(255,255,255,.96);
+    box-shadow: 0 1px 4px rgba(15,23,42,.20);
+    cursor: pointer;
+    font: 900 18px/1 Arial, sans-serif;
+  }
+  .rf-minimap-toggle:hover,
+  .rf-minimap-toggle:focus-visible { background: #f0f8fa; outline: 2px solid rgba(8,125,150,.28); }
+  .rf-minimap-control.is-collapsed .rf-minimap-toggle { inset: 2px; width: 30px; height: 30px; }
+  .rf-minimap-map .leaflet-control-attribution,
+  .rf-minimap-map .leaflet-control-container { display: none; }
+  @media (max-width: 720px) {
+    .rf-minimap-control { width: 148px; height: 100px; }
+    .rf-minimap-control.is-collapsed { width: 38px; height: 38px; }
+  }
+</style>
+
 
 <script>
 (function() {
@@ -4129,6 +4173,143 @@ window.addEventListener('unhandledrejection', function(event) {
     App.satelliteLayer = satelliteLayer;
     App.basemapControl = L.control.layers(baseLayers, {}, {position: 'topright', collapsed: true});
     App.basemapControl.addTo(App.map);
+  }
+
+  const MINIMAP_COLLAPSE_KEY = 'revelando-minimap-collapsed-v1';
+  const MINIMAP_ZOOM_OFFSET = 4;
+
+  function minimapToggleLabel(collapsed) {
+    if (mapLang() === 'en') return collapsed ? 'Open overview map' : 'Collapse overview map';
+    return collapsed ? 'Abrir minimapa' : 'Recolher minimapa';
+  }
+
+  function refreshMinimapToggleLabel() {
+    const button = App.minimapControl && App.minimapControl.getContainer
+      ? App.minimapControl.getContainer().querySelector('.rf-minimap-toggle')
+      : null;
+    if (!button) return;
+    const collapsed = App.minimapControl.getContainer().classList.contains('is-collapsed');
+    const label = minimapToggleLabel(collapsed);
+    button.setAttribute('aria-label', label);
+    button.setAttribute('title', label);
+    button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    button.textContent = collapsed ? '↖' : '↘';
+  }
+
+  function minimapBasemapKind() {
+    return App.satelliteLayer && App.map && App.map.hasLayer(App.satelliteLayer) ? 'satellite' : 'street';
+  }
+
+  function refreshMinimapBasemap() {
+    if (!App.minimapMap) return;
+    const kind = minimapBasemapKind();
+    if (App.minimapBaseKind === kind && App.minimapBaseLayer) return;
+    if (App.minimapBaseLayer && App.minimapMap.hasLayer(App.minimapBaseLayer)) {
+      App.minimapMap.removeLayer(App.minimapBaseLayer);
+    }
+    const url = kind === 'satellite'
+      ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    App.minimapBaseLayer = L.tileLayer(url, {minZoom: 0, maxZoom: 19, attribution: ''}).addTo(App.minimapMap);
+    App.minimapBaseKind = kind;
+    if (App.minimapBaseLayer.bringToBack) App.minimapBaseLayer.bringToBack();
+  }
+
+  function updateMinimapFromMain() {
+    if (!App.map || !App.minimapMap || !App.minimapBoundsLayer || App.minimapSyncing) return;
+    const container = App.minimapControl && App.minimapControl.getContainer ? App.minimapControl.getContainer() : null;
+    if (!container || container.classList.contains('is-collapsed')) return;
+    App.minimapSyncing = true;
+    const miniZoom = Math.max(2, App.map.getZoom() - MINIMAP_ZOOM_OFFSET);
+    App.minimapMap.setView(App.map.getCenter(), miniZoom, {animate: false, reset: true});
+    App.minimapBoundsLayer.setBounds(App.map.getBounds());
+    refreshMinimapBasemap();
+    App.minimapSyncing = false;
+  }
+
+  function setMinimapCollapsed(collapsed) {
+    if (!App.minimapControl || !App.minimapControl.getContainer) return;
+    const container = App.minimapControl.getContainer();
+    container.classList.toggle('is-collapsed', !!collapsed);
+    window.rfSafeStorage.setItem(MINIMAP_COLLAPSE_KEY, collapsed ? '1' : '0');
+    refreshMinimapToggleLabel();
+    if (!collapsed && App.minimapMap) {
+      setTimeout(() => {
+        App.minimapMap.invalidateSize({pan: false});
+        updateMinimapFromMain();
+      }, 190);
+    }
+  }
+
+  function ensureMinimapControl() {
+    if (!App.map || App.minimapControl) return;
+    App.minimapControl = L.control({position: 'bottomright'});
+    App.minimapControl.onAdd = function() {
+      const container = L.DomUtil.create('div', 'rf-minimap-control leaflet-control');
+      const mapElement = L.DomUtil.create('div', 'rf-minimap-map', container);
+      mapElement.setAttribute('aria-label', mapLang() === 'en' ? 'Overview map' : 'Minimapa de localização');
+      const button = L.DomUtil.create('button', 'rf-minimap-toggle', container);
+      button.type = 'button';
+      L.DomEvent.disableClickPropagation(container);
+      L.DomEvent.disableScrollPropagation(container);
+      L.DomEvent.on(button, 'click', event => {
+        L.DomEvent.stop(event);
+        setMinimapCollapsed(!container.classList.contains('is-collapsed'));
+      });
+      return container;
+    };
+    App.minimapControl.addTo(App.map);
+
+    const container = App.minimapControl.getContainer();
+    const mapElement = container.querySelector('.rf-minimap-map');
+    App.minimapMap = L.map(mapElement, {
+      attributionControl: false,
+      zoomControl: false,
+      boxZoom: false,
+      doubleClickZoom: false,
+      scrollWheelZoom: false,
+      keyboard: false,
+      tap: false,
+      zoomAnimation: false
+    });
+    refreshMinimapBasemap();
+    App.minimapBoundsLayer = L.rectangle(App.map.getBounds(), {
+      color: '#111827',
+      weight: 1.5,
+      opacity: 0.9,
+      fillColor: '#ffffff',
+      fillOpacity: 0.04,
+      interactive: false
+    }).addTo(App.minimapMap);
+    App.minimapMap.on('moveend', () => {
+      if (App.minimapSyncing || container.classList.contains('is-collapsed')) return;
+      App.map.panTo(App.minimapMap.getCenter(), {animate: false});
+    });
+    App.minimapMap.on('click', event => App.map.panTo(event.latlng));
+    App.map.on('move zoom resize', updateMinimapFromMain);
+    App.map.on('baselayerchange', () => {
+      refreshMinimapBasemap();
+      updateMinimapFromMain();
+    });
+
+    const collapsed = window.rfSafeStorage.getItem(MINIMAP_COLLAPSE_KEY) === '1';
+    container.classList.toggle('is-collapsed', collapsed);
+    refreshMinimapToggleLabel();
+    if (!collapsed) setTimeout(updateMinimapFromMain, 0);
+    window.__RF_MINIMAP_DEBUG__ = {
+      getState: () => ({
+        collapsed: container.classList.contains('is-collapsed'),
+        mainZoom: App.map.getZoom(),
+        miniZoom: App.minimapMap._loaded ? App.minimapMap.getZoom() : null,
+        mainCenter: App.map.getCenter(),
+        miniCenter: App.minimapMap._loaded ? App.minimapMap.getCenter() : null,
+        base: App.minimapBaseKind
+      }),
+      setCollapsed: value => {
+        setMinimapCollapsed(!!value);
+        return window.__RF_MINIMAP_DEBUG__.getState();
+      }
+    };
   }
 
   function ensureOverviewLayer() {
@@ -5641,6 +5822,7 @@ window.addEventListener('unhandledrejection', function(event) {
           refreshMapSizeButton();
           refreshLocalPanelButton();
           refreshLocationButton();
+          refreshMinimapToggleLabel();
           initMapOverlaySearch();
         }, 300);
       };
@@ -5650,6 +5832,7 @@ window.addEventListener('unhandledrejection', function(event) {
     initMap = function() {
       previousInitMap();
       ensureBasemapControl();
+      ensureMinimapControl();
       ensureMapSizeControl();
       ensureLocalPanelControl();
       ensureLocationControl();
