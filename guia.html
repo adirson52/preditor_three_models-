@@ -162,7 +162,7 @@
     .hero-visual { position: relative; }
     .hero-visual img {
       width: 100%;
-      aspect-ratio: 1.36;
+      aspect-ratio: 1.59;
       object-fit: cover;
       border: 1px solid #bdd2db;
       border-radius: 17px;
@@ -283,6 +283,24 @@
     }
     .principle-mark { font-size: 1.25rem; font-weight: 900; }
     .principle p { margin: 0; }
+
+    .ranking-brief { margin-top: 1rem; padding: 1.2rem; }
+    .ranking-brief-header { display: grid; grid-template-columns: minmax(220px, .62fr) minmax(0, 1.38fr); gap: 1rem; align-items: start; }
+    .ranking-brief h3 { margin: 0; font-size: 1.18rem; }
+    .ranking-brief-header p { margin: 0; color: var(--ink-soft); font-size: .86rem; }
+    .ranking-process { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .65rem; margin-top: 1rem; }
+    .ranking-step { position: relative; min-height: 145px; padding: .9rem; border-radius: 13px; background: var(--canvas); }
+    .ranking-step:not(:last-child)::after { content: "→"; position: absolute; top: 48%; right: -.66rem; z-index: 2; width: 1.3rem; color: var(--teal); background: #fff; font-weight: 900; text-align: center; }
+    .ranking-step-label { display: block; margin-bottom: .45rem; color: var(--teal-dark); font-size: .67rem; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; }
+    .ranking-step strong { display: block; font-size: .86rem; }
+    .ranking-step p { margin: .28rem 0 0; color: var(--muted); font-size: .74rem; }
+    .model-chips, .ranking-outputs { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .65rem; }
+    .model-chips span, .ranking-outputs span { padding: .25rem .4rem; border: 1px solid var(--line-strong); border-radius: 7px; color: var(--ink-soft); background: #fff; font-size: .66rem; font-weight: 800; }
+    .rank-order { display: flex; align-items: center; justify-content: space-between; gap: .3rem; margin-top: .6rem; color: var(--ink-soft); font-size: .76rem; font-weight: 850; }
+    .rank-order b { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 8px; color: #fff; background: var(--red); }
+    .rank-order i { font-style: normal; color: var(--muted); }
+    .rank-scale { height: 7px; margin-top: .4rem; border-radius: 99px; background: linear-gradient(90deg, #d7191c, #fdae61, #ffffbf, #a6dbaa, #2b83ba); }
+    .ranking-note { margin: .8rem 0 0; padding-top: .75rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .76rem; }
 
     .legend-layout, .cell-layout, .context-layout {
       display: grid;
@@ -428,6 +446,10 @@
     .checklist { display: grid; gap: .5rem; margin-top: .25rem; }
     .check { display: grid; grid-template-columns: 23px 1fr; gap: .55rem; align-items: start; color: var(--ink-soft); font-size: .82rem; }
     .check::before { content: "✓"; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 7px; color: #fff; background: var(--teal); font-size: .7rem; font-weight: 900; }
+    .context-layout.context-wide { grid-template-columns: 1fr; }
+    .context-wide .shot img { display: block; width: 100%; aspect-ratio: 8 / 5; object-fit: cover; }
+    .context-wide .context-copy { grid-template-columns: minmax(220px, .65fr) minmax(0, 1.35fr); align-items: start; }
+    .context-wide .checklist { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 0; }
 
     .faq-tools { display: flex; gap: .7rem; margin-bottom: .8rem; }
     .faq-search { width: min(100%, 520px); padding: .72rem .85rem; border: 1px solid var(--line-strong); border-radius: 10px; color: var(--ink); background: #fff; outline: none; }
@@ -456,8 +478,10 @@
       box-shadow: var(--shadow);
     }
     .closing h2 { margin-bottom: .45rem; }
-    .closing p { max-width: 70ch; margin: 0; color: rgba(255,255,255,.78); }
+    .closing p { max-width: 92ch; margin: 0; color: rgba(255,255,255,.82); }
     .closing .button { color: var(--ink); background: #fff; border-color: #fff; }
+    .closing-points { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .9rem; }
+    .closing-points span { padding: .3rem .52rem; border: 1px solid rgba(255,255,255,.24); border-radius: 999px; color: #fff; background: rgba(255,255,255,.09); font-size: .7rem; font-weight: 800; }
     footer { padding: 1.3rem 0 2rem; color: var(--muted); font-size: .78rem; text-align: center; }
 
     .lightbox {
@@ -477,9 +501,11 @@
     @media (max-width: 980px) {
       .hero, .legend-layout, .cell-layout, .context-layout, .stairs-layout { grid-template-columns: 1fr; }
       .hero-visual { order: -1; }
-      .hero-visual img { aspect-ratio: 1.7; }
+      .hero-visual img { aspect-ratio: 1.59; }
       .flow { grid-template-columns: repeat(3, 1fr); }
       .flow-step:nth-child(3)::after { display: none; }
+      .ranking-process { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .ranking-step:nth-child(2)::after { display: none; }
       .explain-rail { grid-template-columns: repeat(2, 1fr); }
       .explain-step:nth-child(2)::after { display: none; }
       .read-keys { grid-template-columns: repeat(2, 1fr); }
@@ -492,13 +518,14 @@
       .brand span:last-child { display: none; }
       .section-nav-wrap { top: 59px; }
       .hero { margin-top: 1rem; padding: 1.15rem; border-radius: 18px; }
-      .hero-visual img { aspect-ratio: 1.3; }
+      .hero-visual img { aspect-ratio: 1.59; }
       .hero-caption { position: static; max-width: none; margin-top: .5rem; color: var(--ink-soft); background: transparent; box-shadow: none; border-color: var(--line); }
-      .flow, .models, .examples, .formula-strip, .stair-flow, .decision-grid, .explain-gallery, .read-keys, .interpret-limit, .cell-dimensions { grid-template-columns: 1fr; }
+      .flow, .models, .examples, .formula-strip, .stair-flow, .ranking-brief-header, .ranking-process, .decision-grid, .explain-gallery, .read-keys, .interpret-limit, .cell-dimensions, .context-wide .context-copy, .context-wide .checklist { grid-template-columns: 1fr; }
       .explain-panel.wide { grid-column: auto; }
       .flow-step { min-height: 0; display: grid; grid-template-columns: 33px 1fr; column-gap: .7rem; }
       .flow-number { grid-row: span 2; margin: 0; }
       .flow-step::after { display: none !important; }
+      .ranking-step::after { display: none !important; }
       .explain-rail { grid-template-columns: 1fr; }
       .explain-step::after { display: none !important; }
       .closing { grid-template-columns: 1fr; }
@@ -546,7 +573,7 @@
       </div>
     </div>
     <figure class="hero-visual">
-      <img src="assets/guia/mapa-legenda.png" alt="Mapa de Salvador com ranking QML, classes de ação e polígonos FCU" data-zoom>
+      <img src="assets/guia/mapa-legenda.png" alt="Mapa atualizado de Salvador com ranking QML, legenda e minimapa" data-zoom>
       <figcaption class="hero-caption">As camadas respondem a perguntas diferentes. Leia-as em conjunto, sem transformar uma cor isolada em confirmação.</figcaption>
     </figure>
   </section>
@@ -582,6 +609,19 @@
         <span class="principle-mark" aria-hidden="true">i</span>
         <p><strong>Princípio central:</strong> nenhuma camada deve ser lida sozinha. O valor do painel está na combinação entre posição no ranking, modelos, situação territorial e evidências de contexto.</p>
       </div>
+      <article class="card ranking-brief">
+        <div class="ranking-brief-header">
+          <h3>Como o ranking geral é formado</h3>
+          <p>Cada célula recebe uma pontuação dos três modelos. Em cada área de estudo, o modelo com melhor desempenho na validação fornece a pontuação usada no ranking geral. Todas as células são ordenadas da maior para a menor pontuação: a posição 1 é o sinal mais forte daquela área.</p>
+        </div>
+        <div class="ranking-process" aria-label="Formação do ranking geral em quatro etapas">
+          <div class="ranking-step"><span class="ranking-step-label">1 · Pontuar</span><strong>Três leituras da célula</strong><div class="model-chips"><span>Completo</span><span>Morfologia</span><span>IBGE</span></div><p>Cada modelo produz sua própria pontuação.</p></div>
+          <div class="ranking-step"><span class="ranking-step-label">2 · Definir a base</span><strong>Melhor desempenho da área</strong><p>O modelo mais consistente na validação daquela área fornece a ordem geral.</p></div>
+          <div class="ranking-step"><span class="ranking-step-label">3 · Ordenar</span><strong>Maior sinal → menor sinal</strong><div class="rank-order"><b>1</b><span>2</span><span>3</span><i>… N</i></div><div class="rank-scale" aria-hidden="true"></div><p>Quanto menor a posição, mais alta a prioridade relativa.</p></div>
+          <div class="ranking-step"><span class="ranking-step-label">4 · Mostrar no mapa</span><strong>Uma ordem, duas leituras</strong><div class="ranking-outputs"><span>QML · 50 cores</span><span>Escada · 3 classes</span></div><p>A rampa mostra continuidade; a escada cria as faixas de ação.</p></div>
+        </div>
+        <p class="ranking-note"><strong>Importante:</strong> o ranking é calculado separadamente em cada área de estudo. As posições brutas de áreas diferentes não devem ser comparadas diretamente.</p>
+      </article>
     </section>
 
     <section class="section" id="legenda">
@@ -592,8 +632,8 @@
       </div>
       <div class="legend-layout">
         <figure class="shot">
-          <img src="assets/guia/mapa-legenda.png" alt="Recorte real do mapa com a legenda aberta" data-zoom>
-          <figcaption>Recorte real do dashboard. Clique na imagem para ampliar.</figcaption>
+          <img src="assets/guia/mapa-legenda.png" alt="Mapa atualizado de Salvador com a legenda completa e o minimapa de localização" data-zoom>
+          <figcaption>Visualização atual do dashboard: Ranking QML ativo, legenda completa e minimapa. Clique para ampliar.</figcaption>
         </figure>
         <div>
           <div class="legend-list">
@@ -794,14 +834,13 @@
         <h2>Use o contexto visual como complemento</h2>
         <p>Observe forma, continuidade, acessos e entorno.</p>
       </div>
-      <div class="context-layout">
+      <div class="context-layout context-wide">
         <figure class="shot">
-          <img src="assets/guia/mapa-3d.png" alt="Visualização 3D real de uma célula selecionada em Salvador" data-zoom>
-          <figcaption>Visualização 3D da célula selecionada. O volume construído acrescenta contexto, mas não confirma a classe.</figcaption>
+          <img src="assets/guia/mapa-3d.png" alt="Visualização 3D completa de uma célula selecionada em Salvador, com mapa, grade, legenda e controles" data-zoom>
+          <figcaption>Visualização 3D completa, com a célula selecionada, construções, grade, legenda e entorno. O volume construído acrescenta contexto, mas não confirma a classe.</figcaption>
         </figure>
         <article class="card context-copy">
-          <h3>Uma sequência útil de observação</h3>
-          <p>Use as imagens para responder perguntas específicas — não para validar a cor.</p>
+          <div><h3>Uma sequência útil de observação</h3><p>Use as imagens para responder perguntas específicas — não para validar a cor.</p></div>
           <div class="checklist">
             <div class="check">A ocupação parece contínua ou fragmentada?</div>
             <div class="check">A forma construída acompanha a indicação morfológica?</div>
@@ -835,8 +874,8 @@
       <div class="card faq-empty" id="faq-empty">Nenhuma pergunta corresponde à pesquisa.</div>
     </section>
 
-    <section class="closing">
-      <div><h2>Pronto para aplicar o roteiro?</h2><p>Escolha uma área, observe as camadas separadamente e termine pela leitura combinada da célula e de seu contexto.</p></div>
+    <section class="closing" aria-labelledby="conclusao-title">
+      <div><h2 id="conclusao-title">Conclusão: indicar, explicar e apoiar decisões</h2><p>A plataforma não emite veredictos sobre o território. Sua missão é organizar evidências, indicar onde há sinais que merecem atenção e mostrar por que cada célula foi destacada. O resultado deve ser entendido como uma hipótese de trabalho — útil para orientar análises e atualizações, mas sempre aberta ao confronto com imagens recentes, dados complementares e conhecimento territorial.</p><div class="closing-points"><span>Indica sinais</span><span>Organiza prioridades</span><span>Explicita evidências</span><span>Não substitui a análise territorial</span></div></div>
       <a class="button" href="index.html">Voltar ao mapa</a>
     </section>
   </main>

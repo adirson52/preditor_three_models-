@@ -13,6 +13,7 @@ Data: 28/08/2026
 
 - 8 seções principais: roteiro, legenda, regra da escada, leitura da célula, explicabilidade, decisão, imagens/3D e FAQ;
 - fluxo em 6 etapas, da área de estudo à decisão;
+- explicação visual do ranking geral em quatro etapas: pontuação dos três modelos, escolha do modelo-base da área, ordenação local e tradução em QML/escada;
 - 6 itens da legenda explicados separadamente;
 - tabela com os 9 exemplos completos da escada;
 - abertura da regra da escada em linguagem direta, partindo das células cobertas pelas FCUs originais de 2022 e separando volume calculado de células escolhidas pelo ranking;
@@ -24,7 +25,8 @@ Data: 28/08/2026
 - explicabilidade organizada da visão global à leitura local, distinguindo importância global, decomposição, radar comparativo e curvas das variáveis;
 - nota técnica recolhível para explicar impacto em log-odds sem confundi-lo com percentual ou probabilidade;
 - 10 perguntas frequentes pesquisáveis;
-- 6 recortes reais: mapa e legenda, painel de uma célula, três gráficos de explicabilidade e visualização 3D.
+- 6 recortes reais: mapa atualizado com minimapa, painel de uma célula, três gráficos de explicabilidade e visualização 3D completa;
+- conclusão explícita sobre a missão indicativa e explicativa da plataforma, sem tratar o resultado como veredicto territorial.
 
 ## Testes funcionais
 
