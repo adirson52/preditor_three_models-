@@ -21,8 +21,8 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 ## Conteudo publicado
 
 - `index.html`: dashboard final.
-- `guia.html`: guia visual de leitura e priorização, com roteiro, legenda, regra da escada, simulador, leitura da célula, orientação analítica e FAQ.
-- `assets/guia/`: recortes reais do mapa 2D, painel da célula e visualização 3D usados no guia.
+- `guia.html`: guia visual de leitura e priorização, com roteiro, legenda, regra da escada, simulador, leitura da célula, explicabilidade, orientação analítica e FAQ.
+- `assets/guia/`: recortes reais do mapa 2D, painel da célula, explicabilidade e visualização 3D usados no guia.
 - `data_tiles/`: tiles estaticos do mapa, pontos, lookup de busca e FCUs originais.
 - `vercel.json`: headers de cache e gzip para os tiles.
 - `data_tiles/final/ranking_rules_escada.json`: limites e contagens por área.

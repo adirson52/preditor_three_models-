@@ -128,13 +128,15 @@ Ao clicar em uma célula, mostre:
 
 - criar uma página `guia.html`, ligada ao dashboard pela aba `Guia de uso`;
 - usar linguagem institucional e natural, orientada à análise territorial, sem apresentar a página como manual exclusivo de uma instituição ou equipe específica;
-- organizar o conteúdo em: roteiro rápido, interpretação da legenda, regra da escada, leitura da célula, orientação para decisão, imagens/3D e FAQ;
+- organizar o conteúdo em: roteiro rápido, interpretação da legenda, regra da escada, leitura da célula, explicabilidade, orientação para decisão, imagens/3D e FAQ;
 - apresentar o fluxo `área de estudo → classe de ação → concordância dos três modelos → situação FCU → imagens/3D → decisão`;
 - incluir a tabela integral da escada e um simulador de F, E, limite prioritário e atenção seguinte;
 - explicar que cada área possui ranking próprio e que posições brutas de áreas diferentes não são diretamente comparáveis;
 - explicar que vermelho indica prioridade relativa, não confirmação;
 - explicar a independência entre classe de ação e situação territorial;
-- usar recortes reais do dashboard para ilustrar legenda, painel da célula e 3D;
+- usar recortes reais do dashboard para ilustrar legenda, painel da célula, explicabilidade e 3D;
+- explicar os gráficos na sequência `importância global → decomposição da célula → comparação local → curvas das variáveis`, com frases curtas e apoio visual;
+- distinguir explicitamente influência global de contribuição local e deixar visível que impacto não implica causa nem confirmação territorial;
 - permitir ampliar os recortes, pesquisar o FAQ e navegar de volta ao mapa;
 - garantir layout limpo, responsivo, acessível por teclado e sem rolagem horizontal indevida em telas estreitas.
 
