@@ -2809,10 +2809,10 @@ window.addEventListener('unhandledrejection', function(event) {
   const SCENARIO_KEY = "final";
   const TILE_Z = 12;
   const TILE_BASE = `data_tiles/${SCENARIO_KEY}/points/${TILE_Z}`;
-  const OVERVIEW_QML_BASE = `data_tiles/${SCENARIO_KEY}/overview_qml/{z}/{x}/{y}.png?v=ranking_qml_qgis_20260828_v3`;
+  const OVERVIEW_QML_BASE = `data_tiles/${SCENARIO_KEY}/overview_qml/{z}/{x}/{y}.png?v=ranking_qml_qgis_20260828_v4`;
   const OVERVIEW_PRIORITY_BASES = {
-    priority: `data_tiles/${SCENARIO_KEY}/overview_action_classes/priority/{z}/{x}/{y}.png?v=prioridade_subcamadas_20260828_v1`,
-    attention: `data_tiles/${SCENARIO_KEY}/overview_action_classes/attention/{z}/{x}/{y}.png?v=prioridade_subcamadas_20260828_v1`
+    priority: `data_tiles/${SCENARIO_KEY}/overview_action_classes/priority/{z}/{x}/{y}.png?v=prioridade_subcamadas_20260828_v2`,
+    attention: `data_tiles/${SCENARIO_KEY}/overview_action_classes/attention/{z}/{x}/{y}.png?v=prioridade_subcamadas_20260828_v2`
   };
   const EMPTY_TILE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
   const LOOKUP_PREFIX_LEN = 8;
@@ -3619,9 +3619,31 @@ window.addEventListener('unhandledrejection', function(event) {
     if (wrap.firstElementChild) details.appendChild(wrap.firstElementChild);
   }
 
+  const FINAL_LAYER_STORAGE_KEY = 'revelando-map-layer-state-v1';
   const FINAL_RANKING_STATE = {visible: true};
   const FINAL_LOCKED_HIDDEN_CLASSES = {};
-  const FINAL_VISIBLE_CLASSES = {priority: true, attention: true, other: false, mappedFcu: true, mappedLow: true};
+  const FINAL_VISIBLE_CLASSES = {priority: false, attention: false, other: false, mappedFcu: false, mappedLow: false};
+
+  function restoreFinalLayerState() {
+    const raw = window.rfSafeStorage.getItem(FINAL_LAYER_STORAGE_KEY);
+    if (!raw) return;
+    try {
+      const saved = JSON.parse(raw);
+      if (typeof saved.ranking === 'boolean') FINAL_RANKING_STATE.visible = saved.ranking;
+      Object.keys(FINAL_VISIBLE_CLASSES).forEach(key => {
+        if (typeof saved[key] === 'boolean') FINAL_VISIBLE_CLASSES[key] = saved[key];
+      });
+    } catch (_) {}
+  }
+
+  function saveFinalLayerState() {
+    window.rfSafeStorage.setItem(FINAL_LAYER_STORAGE_KEY, JSON.stringify({
+      ranking: FINAL_RANKING_STATE.visible,
+      ...FINAL_VISIBLE_CLASSES
+    }));
+  }
+
+  restoreFinalLayerState();
 
   function finalScenarioLabel(value) {
     const labels = {
@@ -5466,6 +5488,7 @@ window.addEventListener('unhandledrejection', function(event) {
       } else if (key && !FINAL_LOCKED_HIDDEN_CLASSES[key]) {
         FINAL_VISIBLE_CLASSES[key] = FINAL_VISIBLE_CLASSES[key] === false;
       }
+      saveFinalLayerState();
       refreshAllPointsLegend();
       refreshFilteredLayers();
     });
@@ -5484,6 +5507,7 @@ window.addEventListener('unhandledrejection', function(event) {
     setState: (key, visible) => {
       if (key === 'ranking') FINAL_RANKING_STATE.visible = !!visible;
       else if (Object.prototype.hasOwnProperty.call(FINAL_VISIBLE_CLASSES, key)) FINAL_VISIBLE_CLASSES[key] = !!visible;
+      saveFinalLayerState();
       refreshAllPointsLegend();
       refreshOverviewLayer();
       refreshFcuCanvasLayer();

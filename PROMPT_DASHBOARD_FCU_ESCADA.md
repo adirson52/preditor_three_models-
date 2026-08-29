@@ -140,6 +140,14 @@ Ao clicar em uma célula, mostre:
 - permitir ampliar os recortes, pesquisar o FAQ e navegar de volta ao mapa;
 - garantir layout limpo, responsivo, acessível por teclado e sem rolagem horizontal indevida em telas estreitas.
 
+## Estado e qualidade das camadas do mapa
+
+- manter a ordem da legenda: Ranking QML, Prioridade do modelo e FCU;
+- na primeira abertura, ativar somente o Ranking QML;
+- persistir localmente a última combinação de camadas escolhida pelo usuário;
+- nos zooms afastados, usar amostragem progressiva estável, ponto de 1 pixel e transparência reduzida para preservar a leitura do mapa-base;
+- revelar progressivamente mais células ao aproximar e mostrar todas a partir do zoom 11, preservando o tamanho próximo original no zoom 12 ou superior.
+
 ## Arquivos de entrega
 
 Produza:

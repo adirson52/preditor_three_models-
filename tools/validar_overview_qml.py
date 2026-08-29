@@ -124,8 +124,16 @@ def main() -> None:
             f"z{zoom}: files={sum(class_files.values())} classes={class_files} "
             f"points={point_count} colors={len(colors)} alphas={sorted(alphas)} pixels={occupied}"
         )
-        if point_count != 3_774_138:
+        total_points = 3_774_138
+        sample_divisor = manifest["rendering"]["sample_divisor_by_zoom"][str(zoom)]
+        if sample_divisor == 1 and point_count != total_points:
             raise AssertionError(f"Contagem de pontos divergente no zoom {zoom}: {point_count}")
+        if sample_divisor > 1:
+            expected_sample = total_points / sample_divisor
+            if not math.isclose(point_count, expected_sample, rel_tol=0.015):
+                raise AssertionError(
+                    f"Amostra divergente no zoom {zoom}: {point_count} vs aproximadamente {expected_sample:.0f}"
+                )
         if len(colors) != 50:
             raise AssertionError(f"Paleta incompleta no zoom {zoom}: {len(colors)} cores")
         expected_qml_alpha = round(
@@ -140,8 +148,8 @@ def main() -> None:
         unified_paths = list((UNIFIED_QML_ROOT / str(zoom)).rglob("*.png"))
         if len(unified_paths) != qml_manifest["zooms"][str(zoom)]["tiles"]:
             raise AssertionError(f"Quantidade divergente de tiles QML unificados no zoom {zoom}")
-        if qml_manifest["zooms"][str(zoom)]["points_rendered"] != 3_774_138:
-            raise AssertionError(f"QML não contém todas as células no zoom {zoom}")
+        if qml_manifest["zooms"][str(zoom)]["points_rendered"] != point_count:
+            raise AssertionError(f"QML unificado diverge da amostra do zoom {zoom}")
         unified_colors: set[int] = set()
         unified_alphas: set[int] = set()
         for path in unified_paths:

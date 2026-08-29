@@ -69,27 +69,27 @@
   "zooms": {
     "6": {
       "tiles": 13,
-      "points_rendered": 3774138,
+      "points_rendered": 118585,
       "points_hidden": 0
     },
     "7": {
       "tiles": 20,
-      "points_rendered": 3774138,
+      "points_rendered": 236932,
       "points_hidden": 0
     },
     "8": {
       "tiles": 38,
-      "points_rendered": 3774138,
+      "points_rendered": 472038,
       "points_hidden": 0
     },
     "9": {
-      "tiles": 73,
-      "points_rendered": 3774138,
+      "tiles": 72,
+      "points_rendered": 943167,
       "points_hidden": 0
     },
     "10": {
       "tiles": 160,
-      "points_rendered": 3774138,
+      "points_rendered": 1886635,
       "points_hidden": 0
     },
     "11": {

@@ -15,7 +15,8 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 - FCU Tipo 2 ocorre quando pelo menos 50% das células válidas da FCU têm três modelos baixos ou dois baixos e um médio; as demais são FCU Tipo 1.
 - O painel de cada célula mostra Completo, Morfológico e IBGE/Espectral como alto, médio ou baixo.
 - A visualização 3D de Salvador usa as mesmas classes e as geometrias contínuas das FCUs.
-- Nos zooms 6–9 os pontos usam 1 pixel; nos zooms 10–11 usam marcador compacto; a partir do zoom 12 o tamanho próximo original é preservado.
+- Nos zooms 6–10 o mapa usa pontos de 1 pixel com amostragem progressiva e transparência suave; no zoom 11 usa marcador compacto; a partir do zoom 12 todas as células aparecem no tamanho próximo original.
+- Na primeira abertura, somente o Ranking QML fica ativo. Depois disso, o navegador preserva a última combinação escolhida entre Ranking QML, prioridades e FCUs.
 - As FCUs usam uma única camada vetorial interativa, com contorno e transparência suavizados nos zooms afastados.
 
 ## Conteudo publicado

@@ -4,6 +4,7 @@ import gzip
 import json
 import math
 import shutil
+import zlib
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -29,13 +30,14 @@ QGIS_RANKING_MAX = 104032
 QML_ALPHA = 255
 ACTION_ALPHA = 225
 ZOOM_OPACITY_FACTORS = {
-    6: 0.50,
-    7: 0.58,
-    8: 0.66,
-    9: 0.75,
-    10: 0.86,
-    11: 1.00,
+    6: 0.42,
+    7: 0.48,
+    8: 0.56,
+    9: 0.65,
+    10: 0.78,
+    11: 0.92,
 }
+ZOOM_SAMPLE_DIVISORS = {6: 32, 7: 16, 8: 8, 9: 4, 10: 2, 11: 1}
 ACTION_COLORS = {
     "priority": (215, 25, 28),
     "attention": (242, 142, 43),
@@ -176,9 +178,22 @@ def iter_points():
 
 
 def marker_radius(zoom: int) -> int:
-    if zoom <= 9:
+    if zoom <= 10:
         return 0
     return 1
+
+
+def point_visible_at_zoom(point: dict, zoom: int) -> bool:
+    """Mantém uma amostra estável de longe e revela todas as células ao aproximar."""
+    divisor = ZOOM_SAMPLE_DIVISORS[zoom]
+    if divisor <= 1:
+        return True
+    identity = str(
+        point.get("id")
+        or point.get("i")
+        or f'{point.get("lat", "")}:{point.get("lng", "")}'
+    )
+    return zlib.crc32(identity.encode("utf-8")) % divisor == 0
 
 
 def paint_marker(
@@ -227,6 +242,8 @@ def paint_overview_zoom(
     transparent_other = 0
     class_counts = {"priority": 0, "attention": 0, "other": 0}
     for point in iter_points():
+        if not point_visible_at_zoom(point, zoom):
+            continue
         cls_key = candidate_class_key(point)
         area = str(point.get("a") or "")
         try:
@@ -381,6 +398,7 @@ def main() -> None:
                 "marker_radius_by_zoom": {str(zoom): marker_radius(zoom) for zoom in ZOOMS},
                 "marker_shape": "single_pixel_or_5_pixel_cross",
                 "opacity_factor_by_zoom": {str(zoom): ZOOM_OPACITY_FACTORS[zoom] for zoom in ZOOMS},
+                "sample_divisor_by_zoom": {str(zoom): ZOOM_SAMPLE_DIVISORS[zoom] for zoom in ZOOMS},
                 "qml_alpha": {"all_50_colors": QML_ALPHA},
                 "action_alpha": ACTION_ALPHA,
             },

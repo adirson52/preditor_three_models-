@@ -24,20 +24,21 @@ Data: 28/08/2026
 
 ## QML e filtros
 
-- 3.774.138 células processadas em cada zoom de 6 a 11;
+- 3.774.138 células preservadas na base e reveladas integralmente no zoom 11;
 - 367.581 células de atenção prioritária;
 - 110.741 células de atenção;
 - 3.295.816 células em demais áreas;
 - 50 cores QML distintas confirmadas em todos os zooms de 6 a 11;
 - cada área usa seu próprio `ranking_total`, de 1 até o total de células local, dividido nas 50 classes do QML;
-- camada QML unificada, com todas as 3.774.138 células nas 50 cores locais, gerada em `overview_qml`;
+- camada QML unificada gerada em `overview_qml`, com amostragem visual estável nos zooms afastados e todas as células no zoom 11;
 - prioridade categórica separada em `overview_action_classes/priority` e `overview_action_classes/attention`;
 - demais áreas permanece como subcamada lógica transparente;
-- zooms 6–9: ponto de 1 pixel;
-- zooms 10–11: marcador compacto em cruz de 5 pixels;
+- zooms 6–10: ponto de 1 pixel;
+- zoom 11: marcador compacto em cruz;
 - zoom 12 ou superior: raio próximo original preservado;
-- fatores de opacidade da visão geral: 0,50; 0,58; 0,66; 0,75; 0,86; 1,00 nos zooms 6 a 11;
-- os 50 tons do `estilo_revelando2608.qml` usam a mesma opacidade dentro de cada zoom; no zoom 11 e nos níveis próximos, a opacidade é integral como no QGIS;
+- divisores de amostragem nos zooms 6 a 11: 32, 16, 8, 4, 2 e 1;
+- fatores de opacidade da visão geral: 0,42; 0,48; 0,56; 0,65; 0,78 e 0,92 nos zooms 6 a 11;
+- os 50 tons do `estilo_revelando2608.qml` usam a mesma opacidade dentro de cada zoom; no zoom 12 ou superior, a opacidade próxima original é preservada;
 - em Salvador, no zoom 11, QML, prioridade e atenção carregaram 6 tiles cada, sem falhas.
 
 ## Validação das 11 áreas de estudo
@@ -96,13 +97,11 @@ O validador de dados percorreu as 3.774.138 células e confirmou, área por áre
 
 ## Estado entregue
 
-- Salvador restaurado;
-- ranking QML ligado;
-- atenção prioritária ligada;
-- atenção ligada;
-- demais áreas desligada;
-- FCU Tipo 1 ligada;
-- FCU Tipo 2 ligada;
+- na primeira abertura, somente o ranking QML fica ligado;
+- atenção prioritária, atenção, demais áreas, FCU Tipo 1 e FCU Tipo 2 começam desligadas;
+- a legenda mantém a ordem Ranking QML → Prioridade do modelo → FCU;
+- após qualquer alteração, a combinação escolhida é salva no navegador e restaurada ao recarregar a página;
+- persistência testada com Ranking QML + atenção prioritária + FCU Tipo 1, mantendo exatamente o mesmo estado após recarga;
 - console sem erros de página durante a validação funcional;
 - a célula `200ME66568N98484_A_D`, em Salvador, abriu com Modelo completo, Morfologia e IBGE simultaneamente;
 - `mapa_3d_real.html` foi aberto com uma célula real de cada uma das 11 áreas; em todas houve resposta válida, um canvas MapLibre, término do carregamento, ausência de sobreposição de erro e zero erros de página.

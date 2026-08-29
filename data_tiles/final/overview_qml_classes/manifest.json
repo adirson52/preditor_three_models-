@@ -72,17 +72,25 @@
       "7": 0,
       "8": 0,
       "9": 0,
-      "10": 1,
+      "10": 0,
       "11": 1
     },
     "marker_shape": "single_pixel_or_5_pixel_cross",
     "opacity_factor_by_zoom": {
-      "6": 0.5,
-      "7": 0.58,
-      "8": 0.66,
-      "9": 0.75,
-      "10": 0.86,
-      "11": 1.0
+      "6": 0.42,
+      "7": 0.48,
+      "8": 0.56,
+      "9": 0.65,
+      "10": 0.78,
+      "11": 0.92
+    },
+    "sample_divisor_by_zoom": {
+      "6": 32,
+      "7": 16,
+      "8": 8,
+      "9": 4,
+      "10": 2,
+      "11": 1
     },
     "qml_alpha": {
       "all_50_colors": 255
@@ -93,71 +101,71 @@
     "6": {
       "priority": {
         "tiles": 13,
-        "points": 367581
+        "points": 11598
       },
       "attention": {
         "tiles": 12,
-        "points": 110741
+        "points": 3517
       },
       "other": {
         "tiles": 13,
-        "points": 3295816
+        "points": 103470
       }
     },
     "7": {
       "priority": {
-        "tiles": 20,
-        "points": 367581
+        "tiles": 19,
+        "points": 23126
       },
       "attention": {
-        "tiles": 19,
-        "points": 110741
+        "tiles": 17,
+        "points": 7005
       },
       "other": {
         "tiles": 20,
-        "points": 3295816
+        "points": 206801
       }
     },
     "8": {
       "priority": {
-        "tiles": 35,
-        "points": 367581
+        "tiles": 32,
+        "points": 45918
       },
       "attention": {
-        "tiles": 35,
-        "points": 110741
+        "tiles": 32,
+        "points": 13837
       },
       "other": {
         "tiles": 38,
-        "points": 3295816
+        "points": 412283
       }
     },
     "9": {
       "priority": {
-        "tiles": 63,
-        "points": 367581
+        "tiles": 61,
+        "points": 92010
       },
       "attention": {
-        "tiles": 60,
-        "points": 110741
+        "tiles": 58,
+        "points": 27672
       },
       "other": {
-        "tiles": 73,
-        "points": 3295816
+        "tiles": 72,
+        "points": 823485
       }
     },
     "10": {
       "priority": {
-        "tiles": 133,
-        "points": 367581
+        "tiles": 132,
+        "points": 183854
       },
       "attention": {
-        "tiles": 129,
-        "points": 110741
+        "tiles": 127,
+        "points": 55569
       },
       "other": {
         "tiles": 160,
-        "points": 3295816
+        "points": 1647212
       }
     },
     "11": {
