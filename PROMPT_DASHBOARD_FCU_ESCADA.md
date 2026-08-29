@@ -144,6 +144,7 @@ Ao clicar em uma célula, mostre:
 - manter a ordem da legenda: Ranking QML, Prioridade do modelo e FCU;
 - na primeira abertura, ativar somente o Ranking QML;
 - persistir localmente a última combinação de camadas escolhida pelo usuário;
+- permitir recolher e expandir a coluna de áreas de estudo por um controle discreto na borda, salvar o último estado no desktop e usar painel lateral com botão de menu em telas estreitas;
 - nos zooms afastados, usar amostragem progressiva estável, ponto de 1 pixel e transparência reduzida para preservar a leitura do mapa-base;
 - revelar progressivamente mais células ao aproximar, mostrar todas a partir do zoom 11 e aumentar o tamanho dos pontos de forma contínua entre os zooms 12 e 15.
 - incluir um minimapa recolhível no canto inferior direito, com retângulo do enquadramento principal, sincronização de movimento/zoom/mapa-base e persistência do estado aberto ou recolhido.

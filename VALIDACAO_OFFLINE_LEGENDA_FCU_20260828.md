@@ -76,6 +76,14 @@ O validador de dados percorreu as 3.774.138 células e confirmou, área por áre
 - ao desligar somente atenção prioritária, permaneceram 6 tiles QML e 6 tiles de atenção.
 - o seletor de mapa-base exibe ícone local, rótulo acessível `Escolher mapa-base` e abre as opções `Ruas` e `Satelite` sem depender da imagem ausente do Leaflet.
 
+## Coluna de áreas de estudo
+
+- em 1.366 px, a coluna alternou entre 260 px e 0 px e o mapa passou de 739 px para 911 px após o redimensionamento;
+- o botão permanece visível no canto esquerdo quando a coluna está recolhida e informa o estado por `aria-expanded`;
+- o estado recolhido/expandido é restaurado na próxima abertura em desktop;
+- em 390 px, o botão móvel alternou corretamente entre `☰` e `×`, junto com o painel e o fundo de proteção;
+- nenhum erro de execução foi registrado nos testes de abertura e fechamento.
+
 ## FCUs
 
 - Salvador carregou 400 polígonos, todos classificados como FCU Tipo 1 na base atual;
