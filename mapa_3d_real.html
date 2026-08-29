@@ -295,6 +295,7 @@
       maxPitch: 65,
       attributionControl: true
     });
+    window.__RF_3D_MAP__ = map;
     map.addControl(new maplibregl.NavigationControl({showCompass: false, showZoom: true}), 'top-right');
     map.addControl(new maplibregl.FullscreenControl(), 'top-right');
     map.addControl(new maplibregl.ScaleControl({unit: 'metric'}), 'bottom-right');
@@ -394,7 +395,10 @@
     }
 
     function classFilter() {
-      return ['match', ['get', 'class'], Array.from(activeClasses), true, false];
+      const visibleExtrusionClasses = Array.from(activeClasses).filter(function(key) {
+        return key === 'priority' || key === 'attention';
+      });
+      return ['match', ['get', 'class'], visibleExtrusionClasses, true, false];
     }
 
     function selectedFilter() {
@@ -581,7 +585,10 @@
         }
       });
 
-    map.once('style.load', function() {
+    let layersInitialized = false;
+    function initialize3dLayers() {
+      if (layersInitialized) return;
+      layersInitialized = true;
       const boundaryUrl = activeAreaRecord ? 'data_3d/' + activeAreaRecord.boundary : 'data_3d/study_areas.geojson';
       map.addSource('study-areas', {type: 'geojson', data: boundaryUrl});
       map.addLayer({
@@ -628,7 +635,7 @@
           'fill-extrusion-color': colorExpression(),
           'fill-extrusion-height': visualHeightExpression(0),
           'fill-extrusion-base': 0,
-          'fill-extrusion-opacity': opacityExpression(),
+          'fill-extrusion-opacity': 0.88,
           'fill-extrusion-vertical-gradient': true
         }
       });
@@ -693,7 +700,16 @@
           clearBusy();
         }
       });
-    });
+    }
+
+    // Em estilos locais leves, o evento style.load pode ocorrer antes de este
+    // trecho ser registrado. Inicializa imediatamente quando o estilo já está
+    // pronto e mantém os eventos como garantia para conexões mais lentas.
+    if (map.isStyleLoaded()) initialize3dLayers();
+    else {
+      map.once('style.load', initialize3dLayers);
+      map.once('load', initialize3dLayers);
+    }
 
     map.on('error', function(event) {
       const message = String(event && event.error && event.error.message || '');
