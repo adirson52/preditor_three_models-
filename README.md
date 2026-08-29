@@ -13,7 +13,7 @@ Dashboard público e offline com três modelos EBM para predição espacial de F
 - O grupo `FCU` permite ligar e desligar FCU Tipo 1 e FCU Tipo 2; uma FCU visível recebe o clique antes da célula e abre seu popup territorial.
 - A situação territorial é independente da classe de ação: fora da FCU, FCU Tipo 1 ou FCU Tipo 2.
 - FCU Tipo 2 ocorre quando pelo menos 50% das células válidas da FCU têm três modelos baixos ou dois baixos e um médio; as demais são FCU Tipo 1.
-- O painel de cada célula mostra Completo, Morfológico e IBGE/Espectral como alto, médio ou baixo.
+- O painel de cada célula mostra Completo, Morfológico e IBGE como alto, médio ou baixo.
 - A visualização 3D de Salvador usa as mesmas classes e as geometrias contínuas das FCUs.
 - Nos zooms 6–10 o mapa usa pontos de 1 pixel com amostragem progressiva e transparência suave; no zoom 11 usa marcador compacto; a partir do zoom 12 todas as células aparecem no tamanho próximo original.
 - Na primeira abertura, somente o Ranking QML fica ativo. Depois disso, o navegador preserva a última combinação escolhida entre Ranking QML, prioridades e FCUs.

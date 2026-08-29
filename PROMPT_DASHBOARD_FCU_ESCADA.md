@@ -56,7 +56,7 @@ Mostre por célula os três resultados:
 
 - Modelo Completo;
 - Modelo Morfológico;
-- Modelo IBGE/Espectral, correspondente ao modelo não morfológico.
+- Modelo IBGE, correspondente ao modelo não morfológico e composto somente por informações do IBGE.
 
 Cada modelo ordena todas as células da área pela sua própria pontuação e usa as mesmas quantidades do ranking geral:
 
@@ -112,7 +112,7 @@ Ao clicar em uma célula, mostre:
 - situação territorial e identificação da FCU, quando houver;
 - Modelo Completo: alto, médio ou baixo;
 - Modelo Morfológico: alto, médio ou baixo;
-- Modelo IBGE/Espectral: alto, médio ou baixo;
+- Modelo IBGE: alto, médio ou baixo;
 - pontuação ou probabilidade de cada modelo;
 - links para Google Maps, Street View e visualização 3D.
 

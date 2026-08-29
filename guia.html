@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Guia de leitura do mapa, da legenda e das regras de priorização do Preditor FCU.">
+  <link rel="icon" href="data:,">
   <title>Guia de uso — Preditor FCU</title>
   <style>
     :root {
@@ -369,6 +370,14 @@
     .level.low { color: #51616c; background: #edf1f3; }
     .level-rule p { margin: .7rem 0 0; color: var(--muted); font-size: .82rem; }
 
+    .cell-dimensions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; margin-top: 1rem; }
+    .cell-dimension { padding: .9rem; border-top: 3px solid var(--teal); }
+    .cell-dimension:nth-child(2) { border-top-color: var(--red); }
+    .cell-dimension:nth-child(3) { border-top-color: #64748b; }
+    .dimension-source { display: inline-block; margin-bottom: .35rem; color: var(--muted); font-size: .66rem; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; }
+    .cell-dimension strong { display: block; font-size: .9rem; }
+    .cell-dimension p { margin: .22rem 0 0; color: var(--muted); font-size: .77rem; }
+
     .explain-rail { display: grid; grid-template-columns: repeat(4, 1fr); gap: .65rem; margin-bottom: 1rem; }
     .explain-step { position: relative; padding: .9rem; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
     .explain-step:not(:last-child)::after { content: "→"; position: absolute; right: -.63rem; top: 50%; z-index: 2; width: 1.2rem; color: var(--teal); background: var(--canvas); font-weight: 900; text-align: center; }
@@ -382,14 +391,16 @@
     .explain-icon { display: grid; place-items: center; width: 31px; height: 31px; border-radius: 9px; color: #fff; background: var(--teal-dark); font-size: .76rem; font-weight: 900; }
     .explain-caption h3 { margin: 0; font-size: .98rem; }
     .explain-caption p { margin: .18rem 0 0; color: var(--muted); font-size: .78rem; }
-    .read-keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; margin-top: 1rem; }
+    .read-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: .65rem; margin-top: 1rem; }
     .read-key { padding: .9rem; }
     .key-mark { display: inline-flex; align-items: center; gap: .45rem; margin-bottom: .4rem; color: var(--teal-dark); font-size: .7rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
     .key-mark::before { content: ""; width: 11px; height: 11px; border-radius: 50%; background: var(--teal); }
     .read-key:nth-child(2) .key-mark::before { background: #e74c3c; }
     .read-key:nth-child(3) .key-mark::before { border: 1px solid #94a3b8; background: #d7dee2; }
+    .read-key:nth-child(4) .key-mark::before { background: #f28e2b; }
     .read-key strong { display: block; font-size: .92rem; }
     .read-key p { margin: .22rem 0 0; color: var(--muted); font-size: .77rem; }
+    .read-keys + .technical-details { margin-top: .65rem; }
     .interpret-limit { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 1rem; overflow: hidden; border: 1px solid #f0c6c0; border-radius: 13px; background: #f0c6c0; }
     .interpret-limit div { padding: .85rem; color: #77261f; background: #fff6f4; font-size: .78rem; text-align: center; }
     .interpret-limit strong { display: block; margin-bottom: .12rem; }
@@ -463,6 +474,7 @@
       .flow-step:nth-child(3)::after { display: none; }
       .explain-rail { grid-template-columns: repeat(2, 1fr); }
       .explain-step:nth-child(2)::after { display: none; }
+      .read-keys { grid-template-columns: repeat(2, 1fr); }
       .calculator { position: static; }
     }
     @media (max-width: 720px) {
@@ -474,7 +486,7 @@
       .hero { margin-top: 1rem; padding: 1.15rem; border-radius: 18px; }
       .hero-visual img { aspect-ratio: 1.3; }
       .hero-caption { position: static; max-width: none; margin-top: .5rem; color: var(--ink-soft); background: transparent; box-shadow: none; border-color: var(--line); }
-      .flow, .models, .examples, .formula-strip, .decision-grid, .explain-gallery, .read-keys, .interpret-limit { grid-template-columns: 1fr; }
+      .flow, .models, .examples, .formula-strip, .decision-grid, .explain-gallery, .read-keys, .interpret-limit, .cell-dimensions { grid-template-columns: 1fr; }
       .explain-panel.wide { grid-column: auto; }
       .flow-step { min-height: 0; display: grid; grid-template-columns: 33px 1fr; column-gap: .7rem; }
       .flow-number { grid-row: span 2; margin: 0; }
@@ -665,7 +677,7 @@
       <div class="section-heading">
         <div class="kicker">04 · Leitura da célula</div>
         <h2>O painel reúne a evidência essencial</h2>
-        <p>Primeiro a síntese; depois os sinais que a sustentam.</p>
+        <p>Primeiro identifique a classe de ação. Depois compare os modelos e, por fim, leia a situação territorial e o contexto.</p>
       </div>
       <div class="cell-layout">
         <figure class="shot cell-shot">
@@ -681,14 +693,19 @@
         </div>
       </div>
       <div class="models">
-        <article class="card model"><h3>Modelo completo</h3><p>Síntese das evidências disponíveis.</p></article>
-        <article class="card model"><h3>Morfologia</h3><p>Forma urbana, ocupação e edificações.</p></article>
-        <article class="card model"><h3>IBGE/Espectral</h3><p>Censo, infraestrutura e sinais espectrais.</p></article>
+        <article class="card model"><h3>Modelo completo</h3><p>Combina as evidências disponíveis e produz a síntese usada na leitura geral.</p></article>
+        <article class="card model"><h3>Morfologia</h3><p>Observa forma urbana, densidade construída, ocupação e organização das edificações.</p></article>
+        <article class="card model"><h3>IBGE</h3><p>Observa domicílios, moradores, renda e condições de infraestrutura registradas pelo IBGE.</p></article>
       </div>
       <div class="card level-rule">
         <h3>O que significam alto, médio e baixo?</h3>
         <div class="levels"><span class="level high">Alto · primeira faixa</span><span class="level medium">Médio · faixa seguinte</span><span class="level low">Baixo · fora das duas faixas</span></div>
-        <p>Cada modelo ordena todas as células da área com sua própria pontuação, usando as mesmas quantidades da escada. Portanto, “alto” descreve posição relativa naquele modelo — não é uma confirmação isolada nem uma probabilidade universal.</p>
+        <p>Cada modelo cria sua própria ordem das células, mas usa as mesmas quantidades definidas pela escada. Assim, uma célula pode ser alta no Completo, média na Morfologia e baixa no IBGE. Os níveis mostram posição relativa dentro da área — não certeza nem probabilidade universal.</p>
+      </div>
+      <div class="cell-dimensions" aria-label="Três leituras independentes do painel da célula">
+        <article class="card cell-dimension"><span class="dimension-source">Ranking geral</span><strong>Define a classe de ação</strong><p>Atenção prioritária, atenção ou demais áreas.</p></article>
+        <article class="card cell-dimension"><span class="dimension-source">Ranking de cada modelo</span><strong>Define alto, médio e baixo</strong><p>As quantidades são iguais; as células escolhidas podem mudar.</p></article>
+        <article class="card cell-dimension"><span class="dimension-source">FCU original</span><strong>Define a situação territorial</strong><p>Fora da FCU, Tipo 1 ou Tipo 2, independentemente da classe.</p></article>
       </div>
     </section>
 
@@ -696,7 +713,7 @@
       <div class="section-heading">
         <div class="kicker">05 · Explicabilidade</div>
         <h2>Como o modelo chegou ao resultado</h2>
-        <p>Leia do conjunto para a célula. Cada gráfico responde a uma pergunta.</p>
+        <p>Leia do conjunto para a célula: importância geral, contribuição local, comparação com a média e comportamento de cada variável.</p>
       </div>
 
       <div class="explain-rail" aria-label="Sequência de leitura dos gráficos de explicabilidade">
@@ -709,25 +726,28 @@
       <div class="explain-gallery">
         <figure class="shot explain-panel">
           <img src="assets/guia/explicabilidade-global.png" alt="Gráfico de importância global das variáveis do modelo" data-zoom>
-          <figcaption class="explain-caption"><span class="explain-icon" aria-hidden="true">01</span><div><h3>Importância global</h3><p>Barras longas indicam maior influência média no conjunto. Não mostram direção nem explicam uma célula isolada.</p></div></figcaption>
+          <figcaption class="explain-caption"><span class="explain-icon" aria-hidden="true">01</span><div><h3>Importância global</h3><p>A barra mede a influência média absoluta de cada variável em toda a área. Quanto maior, mais o modelo a utilizou; a barra não informa se o efeito aumenta ou reduz o resultado.</p></div></figcaption>
         </figure>
 
         <figure class="shot explain-panel wide">
           <img src="assets/guia/explicabilidade-local.png" alt="Decomposição do resultado de uma célula e comparação de seu perfil local com a média da área" data-zoom>
-          <figcaption class="explain-caption"><span class="explain-icon" aria-hidden="true">02</span><div><h3>Decomposição e perfil local</h3><p>À esquerda, a base recebe contribuições até o resultado final. À direita, a célula é comparada às referências da área.</p></div></figcaption>
+          <figcaption class="explain-caption"><span class="explain-icon" aria-hidden="true">02</span><div><h3>Decomposição e perfil local</h3><p>À esquerda, o resultado parte da base: contribuições positivas elevam o sinal e negativas o reduzem. À direita, o perfil azul da célula é comparado à média da área.</p></div></figcaption>
         </figure>
 
         <figure class="shot explain-panel">
           <img src="assets/guia/explicabilidade-curvas.png" alt="Curvas de efeito das variáveis com o valor da célula selecionada marcado em vermelho" data-zoom>
-          <figcaption class="explain-caption"><span class="explain-icon" aria-hidden="true">03</span><div><h3>Curvas das variáveis</h3><p>O ponto vermelho localiza a célula. A forma da curva mostra como o modelo aprendeu a relacionar valor e impacto.</p></div></figcaption>
+          <figcaption class="explain-caption"><span class="explain-icon" aria-hidden="true">03</span><div><h3>Curvas das variáveis</h3><p>O eixo horizontal mostra o valor da variável e o vertical, sua contribuição no modelo. O ponto vermelho localiza a célula no padrão aprendido.</p></div></figcaption>
         </figure>
       </div>
 
       <div class="read-keys" aria-label="Chaves para interpretar os gráficos">
-        <article class="card read-key"><span class="key-mark">Barras</span><strong>Influência no conjunto</strong><p>Servem para entender o modelo como um todo.</p></article>
-        <article class="card read-key"><span class="key-mark">Sobe ou desce</span><strong>Contribuição local</strong><p>Mostra o que empurrou esta célula em cada direção.</p></article>
-        <article class="card read-key"><span class="key-mark">Ponto vermelho</span><strong>Valor observado</strong><p>Indica onde a célula está no padrão aprendido.</p></article>
+        <article class="card read-key"><span class="key-mark">Barras</span><strong>Influência média</strong><p>Comprimento maior significa mais peso no conjunto, não efeito positivo.</p></article>
+        <article class="card read-key"><span class="key-mark">Decomposição</span><strong>Contribuição local</strong><p>Base + aumentos − reduções formam o resultado da célula.</p></article>
+        <article class="card read-key"><span class="key-mark">Radar</span><strong>Perfil comparado</strong><p>Mais distante do centro significa valor relativo maior, não necessariamente melhor.</p></article>
+        <article class="card read-key"><span class="key-mark">Ponto vermelho</span><strong>Valor observado</strong><p>Mostra onde a célula se encontra na curva daquela variável.</p></article>
       </div>
+
+      <details class="technical-details"><summary>O que significa “impacto em log-odds”?</summary><div class="answer"><p>É a escala interna usada pelo modelo para somar contribuições. Valores positivos empurram o resultado para cima e valores negativos, para baixo. Leia principalmente a direção e o tamanho relativo: esse número não é um percentual nem uma probabilidade direta.</p></div></details>
 
       <div class="interpret-limit" aria-label="Limites de interpretação">
         <div><strong>Impacto não é causa</strong>É uma relação aprendida pelo modelo.</div>
@@ -786,7 +806,7 @@
       <div class="faq-list" id="faq-list">
         <details data-search="explicabilidade gráficos importância global decomposição waterfall radar curvas causa"><summary>Como leio os gráficos de explicabilidade?</summary><div class="answer"><p>A importância global resume o conjunto; a decomposição mostra as contribuições da célula; o radar compara seu perfil com referências; e as curvas situam seus valores no padrão aprendido. Os gráficos explicam o comportamento do modelo, não relações causais.</p></div></details>
         <details data-search="comparar ranking áreas local posição percentil"><summary>Posso comparar diretamente os rankings entre áreas?</summary><div class="answer"><p>Não pela posição bruta. Cada área possui seu próprio universo e seu próprio ranking, de 1 até o total local. A posição 1.000 em Salvador e a posição 1.000 em São Paulo não representam a mesma fração da área. Para comparações, prefira a classe, a faixa percentual e o contexto de cada área.</p></div></details>
-        <details data-search="três modelos completo morfologia ibge espectral concordância divergência"><summary>O que significa ter três modelos diferentes?</summary><div class="answer"><p>Cada modelo organiza as células por uma família de evidências. O completo sintetiza o conjunto disponível; o morfológico enfatiza forma urbana e ocupação; o IBGE/Espectral destaca informações censitárias, de infraestrutura e espectrais. A concordância fortalece a indicação; a divergência mostra onde a interpretação precisa ser aprofundada.</p></div></details>
+        <details data-search="três modelos completo morfologia ibge concordância divergência"><summary>O que significa ter três modelos diferentes?</summary><div class="answer"><p>Cada modelo organiza as células por uma família de evidências. O Completo sintetiza o conjunto disponível; a Morfologia enfatiza forma urbana e ocupação; o IBGE utiliza informações censitárias sobre domicílios, moradores, renda e infraestrutura. A concordância fortalece a indicação; a divergência mostra qual dimensão precisa ser aprofundada.</p></div></details>
         <details data-search="demais áreas transparente clicar consultável ativada"><summary>Por que “demais áreas” é transparente?</summary><div class="answer"><p>Para manter o mapa legível e destacar as duas primeiras faixas de ação. A transparência é apenas visual: as células continuam existindo, podem ser ativadas e permanecem consultáveis. Na camada Ranking QML, todas as células recebem uma das 50 cores.</p></div></details>
         <details data-search="clicar fcu popup polígono célula informações nome código"><summary>O que acontece ao clicar em uma FCU?</summary><div class="answer"><p>Com a camada FCU ativa, o clique prioriza o polígono e abre suas informações territoriais, como nome, código, tipo e número de células. Para consultar a célula que está abaixo do polígono, desative temporariamente o tipo de FCU correspondente.</p></div></details>
         <details data-search="3d confirma classificação imagem contexto"><summary>O 3D confirma a classificação?</summary><div class="answer"><p>Não. O 3D oferece contexto sobre forma e volume construído. Ele ajuda a interpretar a indicação e a formular perguntas, mas não funciona como confirmação automática.</p></div></details>
