@@ -134,7 +134,7 @@
   <div id="map" aria-label="Mapa tridimensional de edificacoes GBA coloridas pelas classes do modelo"></div>
   <header class="panel topbar">
     <a class="back" id="back-to-2d" href="index.html" title="Voltar ao mapa 2D" aria-label="Voltar ao mapa 2D">&#8249;</a>
-    <div class="subtitle">Altura GBA LoD1 com teto visual; cor da celula do modelo.</div>
+    <div class="subtitle">Edificios GBA em 3D; as cores seguem a prioridade da celula.</div>
   </header>
 
   <aside class="panel legend" id="legend" aria-label="Legenda interativa">
@@ -151,21 +151,43 @@
   <script>
   (async function() {
     const params = new URLSearchParams(window.location.search);
-    const urlLat = Number(params.get('lat'));
-    const urlLng = Number(params.get('lng'));
-    const urlZoom = Number(params.get('zoom'));
-    const center = [Number.isFinite(urlLng) ? urlLng : -46.61, Number.isFinite(urlLat) ? urlLat : -23.68];
-    const initialZoom = Number.isFinite(urlZoom) ? Math.max(15, Math.min(19, urlZoom)) : 16;
+    const areaDefaultCenters = {
+      area_rgint_belem: [-48.4721655, -1.2984326],
+      area_conc_urb_curitiba: [-49.3035456, -25.3103571],
+      area_conc_urb_fortaleza: [-38.5126549, -3.8737401],
+      area_conc_urb_goiania: [-49.3415578, -16.8234199],
+      area_rgint_macapa: [-51.0464313, 0.0545485],
+      area_rgint_redencao: [-50.0391247, -8.0346122],
+      area_arranjo_pop_rj: [-42.3387940, -22.8539845],
+      area_conc_urb_rio_de_janeiro: [-43.0823523, -22.8506980],
+      area_medias_conc_urb_rj: [-44.1316668, -22.4976289],
+      area_conc_urb_sao_paulo: [-46.7386206, -23.3831689],
+      area_conc_urb_salvador: [-38.4900266, -12.9413564]
+    };
+    function optionalNumberParam(name) {
+      const raw = params.get(name);
+      if (raw === null || String(raw).trim() === '') return NaN;
+      const value = Number(raw);
+      return Number.isFinite(value) ? value : NaN;
+    }
+    const urlLat = optionalNumberParam('lat');
+    const urlLng = optionalNumberParam('lng');
+    const urlZoom = optionalNumberParam('zoom');
+    const hasUrlCenter = Number.isFinite(urlLat) && Number.isFinite(urlLng);
+    const requestedAreaId = params.get('area') || '';
+    let activeAreaId = requestedAreaId || (hasUrlCenter ? '' : 'area_conc_urb_salvador');
+    const fallbackCenter = areaDefaultCenters[activeAreaId] || areaDefaultCenters.area_conc_urb_salvador;
+    const center = hasUrlCenter ? [urlLng, urlLat] : fallbackCenter;
+    const initialZoom = Number.isFinite(urlZoom) ? Math.max(15, Math.min(19, urlZoom)) : 16.8;
     const loading = document.getElementById('loading');
     const loadingText = document.getElementById('loading-text');
     let selectedCellId = params.get('cell') || '';
-    let selectedLat = Number.isFinite(urlLat) ? urlLat : null;
-    let selectedLng = Number.isFinite(urlLng) ? urlLng : null;
+    let selectedLat = hasUrlCenter ? urlLat : null;
+    let selectedLng = hasUrlCenter ? urlLng : null;
     let selectedMarker = null;
     let tileRevision = 'full-v1';
     let refreshControl = null;
     let manualRefresh = false;
-    let activeAreaId = params.get('area') || '';
     let activeAreaRecord = null;
     const backTo2d = document.getElementById('back-to-2d');
     const USE_LOCAL_3D_TILES = false;
@@ -301,9 +323,10 @@
       style: localStyle,
       center: center,
       zoom: initialZoom,
-      pitch: 52,
-      bearing: 0,
+      pitch: 55,
+      bearing: -12,
       antialias: true,
+      minPitch: 28,
       maxPitch: 65,
       attributionControl: true
     });
@@ -383,7 +406,7 @@
     }
 
     function visualHeightExpression(extra) {
-      const h = rawHeightExpression();
+      const h = ['max', 3, rawHeightExpression()];
       return ['+', extra || 0, [
         'interpolate', ['linear'], h,
         0, 0,
@@ -397,7 +420,7 @@
     }
 
     function visualHeightMeters(height) {
-      const h = Math.max(0, Number(height) || 0);
+      const h = Math.max(3, Number(height) || 0);
       if (h <= 3) return h;
       if (h <= 12) return 3 + ((h - 3) * (7 / 9));
       if (h <= 30) return 10 + ((h - 12) * (12 / 18));
