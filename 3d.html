@@ -185,7 +185,7 @@
     let selectedLat = hasUrlCenter ? urlLat : null;
     let selectedLng = hasUrlCenter ? urlLng : null;
     let selectedMarker = null;
-    let tileRevision = 'full-v1';
+    let tileRevision = 'action-buildings-v2';
     let refreshControl = null;
     let manualRefresh = false;
     let activeAreaRecord = null;
@@ -193,16 +193,16 @@
     const USE_LOCAL_3D_TILES = false;
     const isLocalRuntime = USE_LOCAL_3D_TILES && ['localhost', '127.0.0.1'].includes(window.location.hostname);
     const areaTileOrigins = {
-      area_conc_urb_sao_paulo: 'https://preditor-fcu-3d-sp.vercel.app',
-      area_arranjo_pop_rj: 'https://preditor-fcu-3d-rj.vercel.app',
-      area_conc_urb_rio_de_janeiro: 'https://preditor-fcu-3d-rj.vercel.app',
-      area_medias_conc_urb_rj: 'https://preditor-fcu-3d-rj.vercel.app',
-      area_conc_urb_curitiba: 'https://preditor-fcu-3d-centro.vercel.app',
-      area_conc_urb_fortaleza: 'https://preditor-fcu-3d-centro.vercel.app',
-      area_conc_urb_goiania: 'https://preditor-fcu-3d-centro.vercel.app',
-      area_rgint_belem: 'https://preditor-fcu-3d-norte.vercel.app',
-      area_rgint_macapa: 'https://preditor-fcu-3d-norte.vercel.app',
-      area_rgint_redencao: 'https://preditor-fcu-3d-norte.vercel.app'
+      area_conc_urb_sao_paulo: 'https://preditor-fcu-3d-v2-sp.vercel.app',
+      area_arranjo_pop_rj: 'https://preditor-fcu-3d-v2-rj.vercel.app',
+      area_conc_urb_rio_de_janeiro: 'https://preditor-fcu-3d-v2-rj.vercel.app',
+      area_medias_conc_urb_rj: 'https://preditor-fcu-3d-v2-rj.vercel.app',
+      area_conc_urb_curitiba: 'https://preditor-fcu-3d-v2-centro.vercel.app',
+      area_conc_urb_fortaleza: 'https://preditor-fcu-3d-v2-centro.vercel.app',
+      area_conc_urb_goiania: 'https://preditor-fcu-3d-v2-centro.vercel.app',
+      area_rgint_belem: 'https://preditor-fcu-3d-v2-norte.vercel.app',
+      area_rgint_macapa: 'https://preditor-fcu-3d-v2-norte.vercel.app',
+      area_rgint_redencao: 'https://preditor-fcu-3d-v2-norte.vercel.app'
     };
 
     const classMeta = {
