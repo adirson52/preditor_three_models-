@@ -185,7 +185,7 @@
     const classMeta = {
       priority: {label: 'atencao prioritaria', color: '#f03b20'},
       attention: {label: 'atencao', color: '#f28e2b'},
-      other: {label: 'demais areas', color: 'rgba(0,0,0,0)'},
+      other: {label: 'demais areas', color: '#f7edc3'},
       unmodeled: {label: 'sem resultado', color: 'rgba(0,0,0,0)'}
     };
     const activeClasses = new Set(Object.keys(classMeta));
@@ -401,12 +401,17 @@
       return ['match', ['get', 'class'], visibleExtrusionClasses, true, false];
     }
 
+    function otherClassFilter() {
+      return ['==', ['get', 'class'], activeClasses.has('other') ? 'other' : '__hidden__'];
+    }
+
     function selectedFilter() {
       return ['all', ['==', ['get', 'cell_id'], selectedCellId || '__none__'], classFilter()];
     }
 
     function updateFilters() {
       if (map.getLayer('gba-buildings-3d')) map.setFilter('gba-buildings-3d', classFilter());
+      if (map.getLayer('gba-buildings-other-3d')) map.setFilter('gba-buildings-other-3d', otherClassFilter());
       if (map.getLayer('selected-buildings-3d')) map.setFilter('selected-buildings-3d', selectedFilter());
       if (map.getLayer('selected-buildings-outline')) map.setFilter('selected-buildings-outline', selectedFilter());
       const fcuFilter = ['all', ['==', ['get', 'area_col'], activeAreaId], ['match', ['get', 'aderencia_modelo'], Array.from(activeFcuClasses), true, false]];
@@ -416,6 +421,7 @@
 
     function setBuildingOpacity(value) {
       if (map.getLayer('gba-buildings-3d')) map.setPaintProperty('gba-buildings-3d', 'fill-extrusion-opacity', value ? 0.88 : 0);
+      if (map.getLayer('gba-buildings-other-3d')) map.setPaintProperty('gba-buildings-other-3d', 'fill-extrusion-opacity', value ? 0.52 : 0);
       if (map.getLayer('selected-buildings-3d')) map.setPaintProperty('selected-buildings-3d', 'fill-extrusion-opacity', value ? 1 : 0);
       if (map.getLayer('selected-buildings-outline')) map.setPaintProperty('selected-buildings-outline', 'line-opacity', value ? 1 : 0);
     }
@@ -628,6 +634,17 @@
       map.addSource('gba-buildings', {
         type: 'vector', tiles: [localTileUrl()], minzoom: 15, maxzoom: 15,
         bounds: [-75.5, -34.0, -32.0, 5.5]
+      });
+      map.addLayer({
+        id: 'gba-buildings-other-3d', type: 'fill-extrusion', source: 'gba-buildings', 'source-layer': 'buildings', minzoom: 15,
+        filter: otherClassFilter(),
+        paint: {
+          'fill-extrusion-color': classMeta.other.color,
+          'fill-extrusion-height': visualHeightExpression(0),
+          'fill-extrusion-base': 0,
+          'fill-extrusion-opacity': 0.52,
+          'fill-extrusion-vertical-gradient': true
+        }
       });
       map.addLayer({
         id: 'gba-buildings-3d', type: 'fill-extrusion', source: 'gba-buildings', 'source-layer': 'buildings', minzoom: 15,
