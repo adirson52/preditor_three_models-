@@ -2853,10 +2853,10 @@ window.addEventListener('unhandledrejection', function(event) {
   const SCENARIO_KEY = "final";
   const TILE_Z = 12;
   const TILE_BASE = `data_tiles/${SCENARIO_KEY}/points/${TILE_Z}`;
-  const OVERVIEW_QML_BASE = `data_tiles/${SCENARIO_KEY}/overview_qml/{z}/{x}/{y}.png?v=ranking_qml_qgis_20260828_v4`;
+  const OVERVIEW_QML_BASE = `data_tiles/${SCENARIO_KEY}/overview_qml/{z}/{x}/{y}.png?v=ranking_qml_qgis_20260828_v5`;
   const OVERVIEW_PRIORITY_BASES = {
-    priority: `data_tiles/${SCENARIO_KEY}/overview_action_classes/priority/{z}/{x}/{y}.png?v=prioridade_subcamadas_20260828_v2`,
-    attention: `data_tiles/${SCENARIO_KEY}/overview_action_classes/attention/{z}/{x}/{y}.png?v=prioridade_subcamadas_20260828_v2`
+    priority: `data_tiles/${SCENARIO_KEY}/overview_action_classes/priority/{z}/{x}/{y}.png?v=prioridade_subcamadas_20260828_v3`,
+    attention: `data_tiles/${SCENARIO_KEY}/overview_action_classes/attention/{z}/{x}/{y}.png?v=prioridade_subcamadas_20260828_v3`
   };
   const EMPTY_TILE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
   const LOOKUP_PREFIX_LEN = 8;
@@ -3590,6 +3590,19 @@ window.addEventListener('unhandledrejection', function(event) {
   const FINAL_POINT_RADIUS_MAX = 12.5;
   const FINAL_POINT_ZOOM_BOOST = 0.62;
 
+  function finalPointGeometryAtZoom(zoom, baseRadius) {
+    const z = Number(zoom);
+    const base = Number.isFinite(Number(baseRadius)) ? Number(baseRadius) : FINAL_POINT_RADIUS;
+    if (!Number.isFinite(z) || z <= 12) return {radius: Math.min(base, 1.35), alpha: 0.72};
+    if (z === 13) return {radius: Math.min(base, 2.15), alpha: 0.82};
+    if (z === 14) return {radius: Math.min(base, 3.10), alpha: 0.91};
+    if (z === 15) return {radius: base, alpha: 1};
+    return {
+      radius: Math.min(FINAL_POINT_RADIUS_MAX, base + (z - 15) * FINAL_POINT_ZOOM_BOOST),
+      alpha: 1
+    };
+  }
+
   function actionRankingValue(p) {
     if (!p) return null;
     const totalRank = Number(p.rt ?? p.ranking_total);
@@ -4173,6 +4186,17 @@ window.addEventListener('unhandledrejection', function(event) {
     App.satelliteLayer = satelliteLayer;
     App.basemapControl = L.control.layers(baseLayers, {}, {position: 'topright', collapsed: true});
     App.basemapControl.addTo(App.map);
+    refreshBasemapControlLabel();
+  }
+
+  function refreshBasemapControlLabel() {
+    if (!App.basemapControl || !App.basemapControl.getContainer) return;
+    const toggle = App.basemapControl.getContainer().querySelector('.leaflet-control-layers-toggle');
+    if (!toggle) return;
+    const label = mapLang() === 'en' ? 'Choose base map' : 'Escolher mapa-base';
+    toggle.title = label;
+    toggle.setAttribute('aria-label', label);
+    toggle.innerHTML = '<span class="rf-layer-icon" aria-hidden="true"><i></i><i></i><i></i></span>';
   }
 
   const MINIMAP_COLLAPSE_KEY = 'revelando-minimap-collapsed-v1';
@@ -5539,13 +5563,15 @@ window.addEventListener('unhandledrejection', function(event) {
     const y = projected.y - coords.y * size.y;
     if (x < -8 || x > size.x + 8 || y < -8 || y > size.y + 8) return;
     const zoomBoost = Math.max(0, coords.z - TILE_Z);
-    const drawRadius = Math.min(FINAL_POINT_RADIUS_MAX, style.radius + zoomBoost * FINAL_POINT_ZOOM_BOOST);
+    const geometry = finalPointGeometryAtZoom(coords.z, style.radius);
+    const drawRadius = geometry.radius;
     ctx.beginPath();
     ctx.arc(x, y, drawRadius, 0, Math.PI * 2);
     ctx.fillStyle = style.color;
-    ctx.globalAlpha = style.mode !== 'qml' && (style.key === 'priority' || style.key === 'attention')
+    const layerAlpha = style.mode !== 'qml' && (style.key === 'priority' || style.key === 'attention')
       ? Math.max(0.62, style.alpha - Math.min(0.16, zoomBoost * 0.02))
       : style.alpha;
+    ctx.globalAlpha = Math.min(1, layerAlpha * geometry.alpha);
     ctx.fill();
   }
 
@@ -5822,6 +5848,7 @@ window.addEventListener('unhandledrejection', function(event) {
           refreshMapSizeButton();
           refreshLocalPanelButton();
           refreshLocationButton();
+          refreshBasemapControlLabel();
           refreshMinimapToggleLabel();
           initMapOverlaySearch();
         }, 300);
@@ -6077,6 +6104,39 @@ window.addEventListener('unhandledrejection', function(event) {
   fixFinalNavigation();
 })();
 </script>
+
+<style id="map-basemap-control-icon-style">
+  .leaflet-control-layers-toggle {
+    position: relative;
+    display: grid !important;
+    place-items: center;
+    background-image: none !important;
+  }
+  .rf-layer-icon {
+    position: relative;
+    display: block;
+    width: 24px;
+    height: 22px;
+  }
+  .rf-layer-icon i {
+    position: absolute;
+    left: 4px;
+    width: 16px;
+    height: 10px;
+    border: 2px solid #0b3d5c;
+    border-radius: 2px;
+    background: #ffffff;
+    transform: rotate(45deg) skew(-8deg, -8deg);
+    box-sizing: border-box;
+  }
+  .rf-layer-icon i:nth-child(1) { top: 0; background: #9bd8cf; }
+  .rf-layer-icon i:nth-child(2) { top: 5px; background: #d9eef4; }
+  .rf-layer-icon i:nth-child(3) { top: 10px; background: #ffffff; }
+  .leaflet-control-layers-toggle:hover .rf-layer-icon i,
+  .leaflet-control-layers-toggle:focus .rf-layer-icon i {
+    border-color: #16839f;
+  }
+</style>
 
 <style id="real-3d-map-link-style">
   .real-3d-map-control a {

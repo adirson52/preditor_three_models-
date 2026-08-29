@@ -73,9 +73,9 @@
       "8": 0,
       "9": 0,
       "10": 0,
-      "11": 1
+      "11": 0
     },
-    "marker_shape": "single_pixel_or_5_pixel_cross",
+    "marker_shape": "single_pixel",
     "opacity_factor_by_zoom": {
       "6": 0.42,
       "7": 0.48,

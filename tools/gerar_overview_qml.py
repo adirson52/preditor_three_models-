@@ -178,9 +178,7 @@ def iter_points():
 
 
 def marker_radius(zoom: int) -> int:
-    if zoom <= 10:
-        return 0
-    return 1
+    return 0
 
 
 def point_visible_at_zoom(point: dict, zoom: int) -> bool:
@@ -204,7 +202,7 @@ def paint_marker(
     alpha: int,
     radius: int,
 ) -> None:
-    """Pinta 1 px de longe e uma cruz de 5 px nos zooms 10-11."""
+    """Pinta um pixel por célula na visão geral; o tamanho cresce no mapa interativo."""
     r, g, b = color
     if radius == 0:
         arr[py, px, :] = (r, g, b, alpha)
@@ -396,7 +394,7 @@ def main() -> None:
             "palette_size": len(QGIS_PALETTE),
             "rendering": {
                 "marker_radius_by_zoom": {str(zoom): marker_radius(zoom) for zoom in ZOOMS},
-                "marker_shape": "single_pixel_or_5_pixel_cross",
+                "marker_shape": "single_pixel",
                 "opacity_factor_by_zoom": {str(zoom): ZOOM_OPACITY_FACTORS[zoom] for zoom in ZOOMS},
                 "sample_divisor_by_zoom": {str(zoom): ZOOM_SAMPLE_DIVISORS[zoom] for zoom in ZOOMS},
                 "qml_alpha": {"all_50_colors": QML_ALPHA},

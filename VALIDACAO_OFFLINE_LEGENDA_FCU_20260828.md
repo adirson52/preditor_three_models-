@@ -33,12 +33,12 @@ Data: 28/08/2026
 - camada QML unificada gerada em `overview_qml`, com amostragem visual estável nos zooms afastados e todas as células no zoom 11;
 - prioridade categórica separada em `overview_action_classes/priority` e `overview_action_classes/attention`;
 - demais áreas permanece como subcamada lógica transparente;
-- zooms 6–10: ponto de 1 pixel;
-- zoom 11: marcador compacto em cruz;
-- zoom 12 ou superior: raio próximo original preservado;
+- zooms 6–11: ponto de 1 pixel;
+- zooms 12, 13 e 14: raios progressivos de 1,35 px, 2,15 px e 3,10 px;
+- zoom 15 ou superior: raio próximo original preservado;
 - divisores de amostragem nos zooms 6 a 11: 32, 16, 8, 4, 2 e 1;
 - fatores de opacidade da visão geral: 0,42; 0,48; 0,56; 0,65; 0,78 e 0,92 nos zooms 6 a 11;
-- os 50 tons do `estilo_revelando2608.qml` usam a mesma opacidade dentro de cada zoom; no zoom 12 ou superior, a opacidade próxima original é preservada;
+- os 50 tons do `estilo_revelando2608.qml` usam a mesma opacidade dentro de cada zoom; no mapa interativo, a opacidade progride de 0,72 no zoom 12 para 1 no zoom 15;
 - em Salvador, no zoom 11, QML, prioridade e atenção carregaram 6 tiles cada, sem falhas.
 
 ## Validação das 11 áreas de estudo
@@ -67,13 +67,14 @@ O validador de dados percorreu as 3.774.138 células e confirmou, área por áre
 
 ## Independência das camadas
 
-- no zoom 13 de Salvador, a camada QML interativa desenhou 577.836 pixels não transparentes no enquadramento testado, incluindo todas as classes do ranking local;
+- nos zooms 12 a 15 de Salvador, a camada QML interativa preservou as classes do ranking local e aumentou raio e opacidade progressivamente, sem o salto visual anterior;
 - o botão `ranking QML` removeu e recolocou somente a camada QML;
 - prioridade e atenção permaneceram com controles próprios;
 - demais áreas permaneceu com 0 pixels na camada de ação, por definição transparente;
 - zoom 11: 6 tiles QML, 6 tiles de atenção prioritária e 6 tiles de atenção carregados simultaneamente;
 - ao desligar somente o QML no zoom 11, os 12 tiles categóricos permaneceram;
 - ao desligar somente atenção prioritária, permaneceram 6 tiles QML e 6 tiles de atenção.
+- o seletor de mapa-base exibe ícone local, rótulo acessível `Escolher mapa-base` e abre as opções `Ruas` e `Satelite` sem depender da imagem ausente do Leaflet.
 
 ## FCUs
 

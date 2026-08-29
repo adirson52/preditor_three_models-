@@ -89,10 +89,9 @@ Uma célula possui baixa evidência quando apresenta três modelos baixos ou doi
 - permitir ligar e desligar separadamente atenção prioritária, atenção e demais áreas no grupo `Prioridade do modelo`; demais áreas permanece transparente, mas conserva sua função lógica e de clique;
 - sem resultado: transparente;
 - preservar o tamanho atual dos pontos no zoom próximo e deixá-los clicáveis;
-- nos zooms 6–9, renderizar cada ponto em 1 pixel;
-- nos zooms 10–11, usar marcador compacto em cruz de 5 pixels;
-- aplicar fatores globais de opacidade 0,50; 0,58; 0,66; 0,75; 0,86; 1,00 nos zooms 6 a 11; no zoom 11 e nos níveis próximos, preservar a opacidade integral e as 50 cores do QGIS;
-- a partir do zoom 12, preservar o raio atual da visualização próxima;
+- nos zooms 6–11, renderizar cada ponto em 1 pixel;
+- aplicar fatores globais de opacidade 0,42; 0,48; 0,56; 0,65; 0,78; 0,92 nos zooms 6 a 11 e manter as 50 cores do QGIS; no mapa interativo, aumentar a opacidade de 0,72 no zoom 12 para 1 no zoom 15;
+- fazer o raio crescer gradualmente no mapa interativo: 1,35 px no zoom 12, 2,15 px no zoom 13, 3,10 px no zoom 14 e tamanho próximo original a partir do zoom 15;
 - FCU Tipo 1: cinza-escuro com preenchimento translúcido e contorno contínuo;
 - FCU Tipo 2: cinza-claro com preenchimento translúcido e contorno tracejado;
 - desenhar cada FCU uma única vez em camada vetorial, sem canvas ou camada-base duplicados;
@@ -146,7 +145,7 @@ Ao clicar em uma célula, mostre:
 - na primeira abertura, ativar somente o Ranking QML;
 - persistir localmente a última combinação de camadas escolhida pelo usuário;
 - nos zooms afastados, usar amostragem progressiva estável, ponto de 1 pixel e transparência reduzida para preservar a leitura do mapa-base;
-- revelar progressivamente mais células ao aproximar e mostrar todas a partir do zoom 11, preservando o tamanho próximo original no zoom 12 ou superior.
+- revelar progressivamente mais células ao aproximar, mostrar todas a partir do zoom 11 e aumentar o tamanho dos pontos de forma contínua entre os zooms 12 e 15.
 - incluir um minimapa recolhível no canto inferior direito, com retângulo do enquadramento principal, sincronização de movimento/zoom/mapa-base e persistência do estado aberto ou recolhido.
 
 ## Arquivos de entrega
