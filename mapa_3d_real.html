@@ -133,7 +133,7 @@
 <body>
   <div id="map" aria-label="Mapa tridimensional de edificacoes GBA coloridas pelas classes do modelo"></div>
   <header class="panel topbar">
-    <a class="back" href="index.html" title="Voltar ao mapa 2D" aria-label="Voltar ao mapa 2D">&#8249;</a>
+    <a class="back" id="back-to-2d" href="index.html" title="Voltar ao mapa 2D" aria-label="Voltar ao mapa 2D">&#8249;</a>
     <div class="subtitle">Altura GBA LoD1 com teto visual; cor da celula do modelo.</div>
   </header>
 
@@ -167,6 +167,7 @@
     let manualRefresh = false;
     let activeAreaId = params.get('area') || '';
     let activeAreaRecord = null;
+    const backTo2d = document.getElementById('back-to-2d');
     const USE_LOCAL_3D_TILES = false;
     const isLocalRuntime = USE_LOCAL_3D_TILES && ['localhost', '127.0.0.1'].includes(window.location.hostname);
     const areaTileOrigins = {
@@ -194,6 +195,16 @@
       fcu_revisao: {label: 'FCU tipo 2', color: 'rgba(203,213,225,.22)', border: '#64748b'}
     };
     const activeFcuClasses = new Set(Object.keys(fcuMeta));
+
+    function updateBackTo2dLink() {
+      if (!backTo2d) return;
+      const url = new URL('index.html', window.location.href);
+      if (activeAreaId) url.searchParams.set('area', activeAreaId);
+      if (selectedCellId) url.searchParams.set('cell', selectedCellId);
+      if (selectedLat !== null && Number.isFinite(selectedLat)) url.searchParams.set('lat', selectedLat.toFixed(7));
+      if (selectedLng !== null && Number.isFinite(selectedLng)) url.searchParams.set('lng', selectedLng.toFixed(7));
+      backTo2d.href = url.pathname + url.search;
+    }
 
     function pointInRing(point, ring) {
       let inside = false;
@@ -254,6 +265,7 @@
       params.set('area', activeAreaId);
       history.replaceState(null, '', window.location.pathname + '?' + params.toString());
     }
+    updateBackTo2dLink();
 
     const localStyle = {
       version: 8,
@@ -406,7 +418,10 @@
     }
 
     function selectedFilter() {
-      return ['all', ['==', ['get', 'cell_id'], selectedCellId || '__none__'], classFilter()];
+      return ['all',
+        ['==', ['get', 'cell_id'], selectedCellId || '__none__'],
+        ['match', ['get', 'class'], Array.from(activeClasses), true, false]
+      ];
     }
 
     function updateFilters() {
@@ -468,6 +483,7 @@
         params.set('lng', selectedLng.toFixed(7));
         history.replaceState(null, '', window.location.pathname + '?' + params.toString());
       }
+      updateBackTo2dLink();
     }
 
     function refreshSource(message) {
@@ -595,13 +611,6 @@
     function initialize3dLayers() {
       if (layersInitialized) return;
       layersInitialized = true;
-      const boundaryUrl = activeAreaRecord ? 'data_3d/' + activeAreaRecord.boundary : 'data_3d/study_areas.geojson';
-      map.addSource('study-areas', {type: 'geojson', data: boundaryUrl});
-      map.addLayer({
-        id: 'study-areas-outline', type: 'line', source: 'study-areas',
-        paint: {'line-color': '#164e63', 'line-width': 1.5, 'line-opacity': 0.5}
-      });
-
       map.addSource('fcu-original', {type: 'geojson', data: 'data_tiles/fcu_aderencia.geojson'});
       map.addLayer({
         id: 'fcu-fill', type: 'fill', source: 'fcu-original',
@@ -677,9 +686,7 @@
       if (selectedCellId) selectCell(selectedCellId, selectedLat, selectedLng);
       setBusy('Carregando este enquadramento...');
 
-      map.on('mouseenter', 'gba-buildings-3d', function() { map.getCanvas().style.cursor = 'pointer'; });
-      map.on('mouseleave', 'gba-buildings-3d', function() { map.getCanvas().style.cursor = ''; });
-      map.on('click', 'gba-buildings-3d', function(event) {
+      function handleBuildingClick(event) {
         const feature = event.features && event.features[0];
         if (!feature) return;
         const properties = feature.properties || {};
@@ -689,6 +696,11 @@
           selectCell(properties.cell_id, cellLat, cellLng, properties.class);
         }
         new maplibregl.Popup({maxWidth: '320px'}).setLngLat(event.lngLat).setHTML(popupHtml(properties)).addTo(map);
+      }
+      ['gba-buildings-3d', 'gba-buildings-other-3d'].forEach(function(layerId) {
+        map.on('mouseenter', layerId, function() { map.getCanvas().style.cursor = 'pointer'; });
+        map.on('mouseleave', layerId, function() { map.getCanvas().style.cursor = ''; });
+        map.on('click', layerId, handleBuildingClick);
       });
 
       map.on('sourcedata', function(event) {

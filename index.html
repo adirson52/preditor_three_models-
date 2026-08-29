@@ -4849,6 +4849,23 @@ window.addEventListener('unhandledrejection', function(event) {
     }
   }
 
+  function openExternalSelectedCell(cellId, areaHint) {
+    const id = String(cellId || '').trim();
+    const area = String(areaHint || '').trim();
+    const prefix = mapLookupPrefixFromRaw(id);
+    if (!id || !prefix) return Promise.resolve(false);
+    return fetchLookup(prefix).then(data => {
+      const records = (data && data.p) || [];
+      const exactArea = records.find(record => lookupId(record) === id && (!area || lookupArea(record) === area));
+      const exact = exactArea || records.find(record => lookupId(record) === id);
+      if (!exact) return false;
+      openSampleFromLookup(exact);
+      return true;
+    });
+  }
+
+  window.__rfOpenExternalSelectedCell = openExternalSelectedCell;
+
   function createLookupChip(record) {
     const el = document.createElement('div');
     el.className = 'chip';
@@ -6204,7 +6221,7 @@ window.addEventListener('unhandledrejection', function(event) {
 <script id="real-3d-map-link-script">
 (function() {
   function installReal3dControl() {
-    if (!window.L || !window.App || !App.map || App.real3dControl) return false;
+    if (!window.L || typeof App === 'undefined' || !App.map || App.real3dControl) return false;
     App.real3dControl = L.control({position: 'topright'});
     App.real3dControl.onAdd = function() {
       const wrap = L.DomUtil.create('div', 'real-3d-map-control leaflet-control');
@@ -6217,11 +6234,19 @@ window.addEventListener('unhandledrejection', function(event) {
       L.DomEvent.on(link, 'click', function(event) {
         L.DomEvent.preventDefault(event);
         const center = App.map.getCenter();
+        const selected = App.selectedSample || null;
+        const selectedLat = Number(selected && selected.lat);
+        const selectedLng = Number(selected && selected.lng);
+        const lat = Number.isFinite(selectedLat) ? selectedLat : center.lat;
+        const lng = Number.isFinite(selectedLng) ? selectedLng : center.lng;
         const zoom = Math.max(15.5, Number(App.map.getZoom()) || 15.5);
         const url = new URL('mapa_3d_real.html', window.location.href);
-        url.searchParams.set('lat', center.lat.toFixed(7));
-        url.searchParams.set('lng', center.lng.toFixed(7));
+        url.searchParams.set('lat', lat.toFixed(7));
+        url.searchParams.set('lng', lng.toFixed(7));
         url.searchParams.set('zoom', zoom.toFixed(1));
+        const area = String((selected && (selected.scope || selected.a)) || (App.currentPolo && App.currentPolo.area_col) || '');
+        if (area) url.searchParams.set('area', area);
+        if (selected && selected.id) url.searchParams.set('cell', String(selected.id));
         window.location.href = url.toString();
       });
       return wrap;
@@ -6235,6 +6260,24 @@ window.addEventListener('unhandledrejection', function(event) {
     if (installReal3dControl() || attempts > 80) window.clearInterval(timer);
   }, 250);
   installReal3dControl();
+
+  function openIncoming3dSelection() {
+    const query = new URLSearchParams(window.location.search);
+    const cellId = query.get('cell');
+    if (!cellId) return;
+    let selectionAttempts = 0;
+    const selectionTimer = window.setInterval(function() {
+      selectionAttempts += 1;
+      if (typeof window.__rfOpenExternalSelectedCell !== 'function' || typeof App === 'undefined' || !App.data || !App.map) {
+        if (selectionAttempts > 100) window.clearInterval(selectionTimer);
+        return;
+      }
+      window.clearInterval(selectionTimer);
+      window.__rfOpenExternalSelectedCell(cellId, query.get('area') || '');
+    }, 120);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', openIncoming3dSelection, {once: true});
+  else openIncoming3dSelection();
 })();
 </script>
 
