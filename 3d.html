@@ -727,7 +727,7 @@
       });
 
       map.on('sourcedata', function(event) {
-        if (event.sourceId !== 'gba-buildings' || !event.isSourceLoaded || map.isMoving()) return;
+        if (event.sourceId !== 'gba-buildings' || !event.isSourceLoaded) return;
         setBuildingOpacity(true);
         clearBusy();
         if (selectedCellId) {
@@ -735,6 +735,18 @@
           const selected = features.find(function(feature) { return feature.properties && feature.properties.cell_id === selectedCellId; });
           if (selected) updateSelectedVisual(selected.properties.class);
         }
+      });
+
+      // Algumas areas possuem muitos blocos de edificios. Nelas, o mapa pode
+      // continuar solicitando blocos fora da tela mesmo depois de os edificios
+      // visiveis ja terem sido desenhados. Libera o painel assim que houver
+      // geometria renderizada, sem aguardar o carregamento global da fonte.
+      map.on('render', function() {
+        if (!loading.classList.contains('visible') || loading.classList.contains('error') || map.getZoom() < 15) return;
+        const visibleBuildings = map.queryRenderedFeatures({layers: ['gba-buildings-3d', 'gba-buildings-other-3d']});
+        if (!visibleBuildings.length) return;
+        setBuildingOpacity(true);
+        clearBusy();
       });
 
       map.on('movestart', function() {
