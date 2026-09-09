@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Medição de uso · Preditor FCU</title>
+  <style>
+    :root{color-scheme:light;--ink:#07324d;--muted:#617989;--line:#d8e5eb;--teal:#007f9f}*{box-sizing:border-box}body{margin:0;background:#f3f7f9;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}.wrap{width:min(780px,calc(100% - 32px));margin:48px auto}.card{padding:clamp(24px,5vw,52px);background:white;border:1px solid var(--line);border-radius:20px;box-shadow:0 18px 50px rgba(13,58,80,.09)}a{color:var(--teal)}h1{font-size:clamp(30px,5vw,44px);letter-spacing:-.035em;margin:0 0 12px}h2{font-size:19px;margin:30px 0 10px}p,li{color:var(--muted);line-height:1.7}.back{display:inline-block;margin-bottom:24px;text-decoration:none;font-weight:700}button{margin-top:12px;padding:12px 18px;border:0;border-radius:10px;background:var(--ink);color:white;font:inherit;font-weight:750;cursor:pointer}.status{margin-top:12px;font-weight:700;color:var(--teal)}
+  </style>
+</head>
+<body>
+  <main class="wrap"><article class="card">
+    <a class="back" href="./">← Voltar ao dashboard</a>
+    <h1>Medição de uso</h1>
+    <p>O Preditor FCU registra dados técnicos e interações básicas para produzir relatórios de acesso, compreender quais recursos são utilizados e melhorar a plataforma.</p>
+    <h2>O que é registrado</h2>
+    <ul>
+      <li>sessão e identificador aleatório do navegador;</li>
+      <li>país, região e cidade aproximados derivados da rede;</li>
+      <li>tipo de aparelho, navegador, sistema, idioma, fuso e resolução;</li>
+      <li>páginas, áreas de estudo e recursos consultados;</li>
+      <li>tempo estimado de atividade com a página visível.</li>
+    </ul>
+    <h2>O que não é registrado</h2>
+    <p>Não são armazenados nome, e-mail, texto digitado nas buscas, localização GPS ou endereço IP original. O IP é transformado no servidor em um código pseudonimizado, usado apenas para estimar redes recorrentes.</p>
+    <h2>Limites da medição</h2>
+    <p>Os números representam navegadores, redes e sessões estimadas — não pessoas identificadas. A localização por IP pode ser imprecisa e ser alterada por VPN ou redes corporativas.</p>
+    <h2>Não participar</h2>
+    <p>É possível interromper a medição neste navegador. A opção não remove relatórios agregados produzidos anteriormente.</p>
+    <button id="optout" type="button">Desativar medição neste navegador</button>
+    <p id="status" class="status" aria-live="polite"></p>
+  </article></main>
+  <script>
+    (function(){
+      var key='preditor_analytics_optout',button=document.getElementById('optout'),status=document.getElementById('status');
+      function update(){var off=localStorage.getItem(key)==='1';button.textContent=off?'Ativar medição neste navegador':'Desativar medição neste navegador';status.textContent=off?'Medição desativada neste navegador.':'';}
+      button.addEventListener('click',function(){if(localStorage.getItem(key)==='1'){localStorage.removeItem(key);}else{localStorage.setItem(key,'1');localStorage.removeItem('preditor_visitor_id_v1');}update();});update();
+    })();
+  </script>
+  <script src="telemetry.js" defer></script>
+</body>
+</html>
