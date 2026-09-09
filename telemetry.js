@@ -126,6 +126,17 @@
     const href = target.tagName === 'A' ? String(target.href || '') : '';
     const label = String(target.getAttribute('aria-label') || target.title || target.textContent || '').trim().slice(0, 100);
 
+    if (target.matches('.legend-layer-toggle')) {
+      send('layer_toggle', {
+        layer: String(target.dataset.layer || label || 'camada').slice(0, 100),
+        enabled: target.getAttribute('aria-checked') !== 'true'
+      });
+      return;
+    }
+    if (target.matches('.legend-toggle')) {
+      send('legend_toggle', { control: label || 'legenda' });
+      return;
+    }
     if (target.closest('#nav-container')) window.setTimeout(recordArea, 80);
     if (href && /(^|\/)3d(?:\.html)?(?:[?#]|$)/i.test(href)) send('open_3d', { source: 'link' });
     else if (href && /guia(?:\.html)?/i.test(href)) send('open_guide', { source: 'link' });
