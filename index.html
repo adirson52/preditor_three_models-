@@ -1390,6 +1390,7 @@ window.addEventListener('unhandledrejection', function(event) {
             map: null,
             mapLayers: L.layerGroup()
         };
+        window.__PREDITOR_APP__ = App;
 
         function initMap() {
             if (App.map) return;

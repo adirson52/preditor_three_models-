@@ -18,13 +18,16 @@
       <li>sessão e identificador aleatório do navegador;</li>
       <li>país, região e cidade aproximados derivados da rede;</li>
       <li>tipo de aparelho, navegador, sistema, idioma, fuso e resolução;</li>
-      <li>páginas, áreas de estudo e recursos consultados;</li>
+      <li>páginas, áreas de estudo, camadas, células e recursos consultados;</li>
+      <li>sequência e horário das interações para compor a jornada de cada sessão;</li>
       <li>tempo estimado de atividade com a página visível.</li>
     </ul>
     <h2>O que não é registrado</h2>
     <p>Não são armazenados nome, e-mail, texto digitado nas buscas, localização GPS ou endereço IP original. O IP é transformado no servidor em um código pseudonimizado, usado apenas para estimar redes recorrentes.</p>
     <h2>Limites da medição</h2>
-    <p>Os números representam navegadores, redes e sessões estimadas — não pessoas identificadas. A localização por IP pode ser imprecisa e ser alterada por VPN ou redes corporativas.</p>
+    <p>Os números representam navegadores, redes e sessões estimadas — não pessoas identificadas. Um identificador persistente permite reconhecer o mesmo navegador em dias diferentes, mas pode mudar quando os dados locais são apagados ou quando outro navegador é utilizado. A localização por IP pode ser imprecisa e ser alterada por VPN ou redes corporativas.</p>
+    <h2>Testes da equipe</h2>
+    <p>Um link administrativo assinado pode marcar um navegador como teste. Esses acessos ficam separados das estatísticas de uso real e exibem um aviso visível enquanto o modo estiver ativo.</p>
     <h2>Não participar</h2>
     <p>É possível interromper a medição neste navegador. A opção não remove relatórios agregados produzidos anteriormente.</p>
     <button id="optout" type="button">Desativar medição neste navegador</button>
@@ -34,7 +37,7 @@
     (function(){
       var key='preditor_analytics_optout',button=document.getElementById('optout'),status=document.getElementById('status');
       function update(){var off=localStorage.getItem(key)==='1';button.textContent=off?'Ativar medição neste navegador':'Desativar medição neste navegador';status.textContent=off?'Medição desativada neste navegador.':'';}
-      button.addEventListener('click',function(){if(localStorage.getItem(key)==='1'){localStorage.removeItem(key);}else{localStorage.setItem(key,'1');localStorage.removeItem('preditor_visitor_id_v1');}update();});update();
+      button.addEventListener('click',function(){if(localStorage.getItem(key)==='1'){localStorage.removeItem(key);}else{localStorage.setItem(key,'1');localStorage.removeItem('preditor_visitor_id_v1');localStorage.removeItem('preditor_test_mode_token_v1');sessionStorage.removeItem('preditor_session_id_v1');sessionStorage.removeItem('preditor_session_started_v1');sessionStorage.removeItem('preditor_session_last_seen_v1');}update();});update();
     })();
   </script>
   <script src="telemetry.js" defer></script>
