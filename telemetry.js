@@ -7,6 +7,7 @@
   const SESSION_KEY = 'preditor_session_id_v1';
   const SESSION_SENT_KEY = 'preditor_session_started_v1';
   const SESSION_LAST_KEY = 'preditor_session_last_seen_v1';
+  const SESSION_AREAS_KEY = 'preditor_selected_areas_v1';
   const TEST_TOKEN_KEY = 'preditor_test_mode_token_v1';
   const OPTOUT_KEY = 'preditor_analytics_optout';
   const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
@@ -43,6 +44,7 @@
     storageRemove(window.sessionStorage, SESSION_KEY);
     storageRemove(window.sessionStorage, SESSION_SENT_KEY);
     storageRemove(window.sessionStorage, SESSION_LAST_KEY);
+    storageRemove(window.sessionStorage, SESSION_AREAS_KEY);
   }
 
   function configureTestMode() {
@@ -93,6 +95,12 @@
   let lastHeartbeat = Date.now();
   let lastSessionWrite = 0;
   let lastArea = '';
+  const selectedAreas = new Set((function () {
+    try {
+      const value = JSON.parse(storageGet(window.sessionStorage, SESSION_AREAS_KEY) || '[]');
+      return Array.isArray(value) ? value.filter(item => typeof item === 'string').slice(0, 100) : [];
+    } catch (_) { return []; }
+  })());
   let lastCell = new URLSearchParams(window.location.search).get('cell') || '';
   let lastCellEventAt = 0;
   let lastPanelCell = '';
@@ -125,13 +133,13 @@
   }
 
   function currentArea() {
-    const queryArea = areaFromQuery();
-    if (queryArea) return queryArea;
     const active = document.querySelector('#nav-container .btn-nav.active[data-polo]');
     if (active) {
       const label = String(active.textContent || active.dataset.polo || '').trim();
       if (label && !/^preditor fcu/i.test(label)) return label.slice(0, 160);
     }
+    const queryArea = areaFromQuery();
+    if (queryArea) return queryArea;
     if (pageType() === '3d') return AREA_NAMES.area_conc_urb_salvador;
     return lastArea;
   }
@@ -201,6 +209,7 @@
     sessionId = storedId(window.sessionStorage, SESSION_KEY, 'session');
     lastSessionWrite = 0;
     lastArea = '';
+    selectedAreas.clear();
     lastCell = '';
     lastCellEventAt = 0;
     lastPanelCell = '';
@@ -235,18 +244,29 @@
     window.addEventListener(name, markActivity, { passive: true, capture: true });
   });
 
-  function recordArea(source) {
-    const area = currentArea();
-    if (area && area !== lastArea) {
-      if (lastArea) {
-        lastCell = '';
-        lastCellEventAt = 0;
-        lastPanelCell = '';
-        pendingCellSource = '';
-      }
-      lastArea = area;
-      send('area_select', { area: area, source: source || 'interface' }, { area: area });
+  function syncAreaState(areaValue) {
+    const area = String(areaValue || currentArea() || '').trim().slice(0, 160);
+    if (!area || area === lastArea) return area;
+    if (lastArea) {
+      lastCell = '';
+      lastCellEventAt = 0;
+      lastPanelCell = '';
+      pendingCellSource = '';
     }
+    lastArea = area;
+    return area;
+  }
+
+  function recordAreaChoice(areaValue) {
+    const area = syncAreaState(areaValue);
+    if (!area || selectedAreas.has(area)) return;
+    selectedAreas.add(area);
+    storageSet(window.sessionStorage, SESSION_AREAS_KEY, JSON.stringify(Array.from(selectedAreas).slice(-100)));
+    send('area_select', {
+      area: area,
+      source: 'menu de áreas',
+      explicit: true
+    }, { area: area });
   }
 
   function cellFromText(value) {
@@ -402,8 +422,12 @@
       send('legend_toggle', { control: label || 'legenda' });
       return;
     }
-    if (target.closest('#nav-container')) {
-      window.setTimeout(function () { recordArea('menu de áreas'); }, 100);
+    const areaButton = target.closest('#nav-container .btn-nav[data-polo]');
+    if (areaButton) {
+      if (event.isTrusted) {
+        const area = String(areaButton.textContent || areaButton.dataset.polo || '').trim();
+        recordAreaChoice(area);
+      }
       return;
     }
     if (target.matches('.map-size-button')) {
@@ -479,10 +503,10 @@
   }, true);
 
   window.addEventListener('popstate', function () {
-    window.setTimeout(function () { recordArea('navegação'); }, 50);
+    window.setTimeout(syncAreaState, 50);
   });
   window.addEventListener('hashchange', function () {
-    window.setTimeout(function () { recordArea('navegação'); }, 50);
+    window.setTimeout(syncAreaState, 50);
   });
 
   window.addEventListener('storage', function (event) {
@@ -510,7 +534,7 @@
       send('heartbeat', {}, { activeSeconds: seconds });
     }
     lastHeartbeat = now;
-    recordArea('estado do mapa');
+    syncAreaState();
     bindLeafletMap();
     bindMapLibre3d();
     bindPlots();
@@ -547,11 +571,11 @@
     }
     const nav = document.querySelector('#nav-container');
     if (nav && window.MutationObserver) {
-      new MutationObserver(function () { window.setTimeout(function () { recordArea('menu de áreas'); }, 30); })
+      new MutationObserver(function () { window.setTimeout(syncAreaState, 30); })
         .observe(nav, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
     }
     installTestBadge();
-    recordArea('carregamento');
+    syncAreaState();
     let attempts = 0;
     const bindingTimer = window.setInterval(function () {
       attempts += 1;
