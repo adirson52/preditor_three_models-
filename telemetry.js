@@ -3,8 +3,8 @@
 
   const PRODUCTION_HOST = 'preditor-fcu-v2.vercel.app';
   const ENDPOINT = 'https://preditor-fcu-master.vercel.app/api/collect';
-  const TELEMETRY_VERSION = '2026-09-10.5';
-  const PREVIOUS_COMPATIBLE_VERSION = '2026-09-10.4';
+  const TELEMETRY_VERSION = '2026-09-10.6';
+  const PREVIOUS_COMPATIBLE_VERSION = '2026-09-10.5';
   const VISITOR_KEY = 'preditor_visitor_id_v1';
   const SESSION_KEY = 'preditor_session_id_v1';
   const SESSION_SENT_KEY = 'preditor_session_started_v1';
@@ -408,18 +408,18 @@
     const copy = document.createElement('div');
     copy.className = 'preditor-location-copy';
     const title = document.createElement('strong');
-    title.textContent = locationText('Localização aproximada', 'Approximate location');
+    title.textContent = locationText('Cookies', 'Cookies');
     const description = document.createElement('span');
     description.textContent = locationText(
-      'Se você permitir, registramos uma posição aproximada do aparelho por sessão. Sem permissão, usamos apenas a origem aproximada da rede.',
-      'If allowed, we record one approximate device position per session. Otherwise, only approximate network origin is used.'
+      'Usamos cookies para melhorar sua experiência no uso da plataforma.',
+      'We use cookies to improve your experience using the platform.'
     );
     copy.append(title, description);
     const actions = document.createElement('div');
     actions.className = 'preditor-location-actions';
     const decline = document.createElement('button');
     decline.type = 'button';
-    decline.textContent = locationText('Agora não', 'Not now');
+    decline.textContent = locationText('Continuar sem localização', 'Continue without location');
     decline.addEventListener('click', function () {
       preferenceSet(LOCATION_PREFERENCE_KEY, 'declined');
       removeLocationBanner();
@@ -428,7 +428,7 @@
     const allow = document.createElement('button');
     allow.type = 'button';
     allow.className = 'preditor-location-allow';
-    allow.textContent = locationText('Permitir', 'Allow');
+    allow.textContent = locationText('Permitir localização', 'Allow location');
     allow.addEventListener('click', function () {
       allow.disabled = true;
       decline.disabled = true;
