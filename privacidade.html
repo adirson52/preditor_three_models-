@@ -39,9 +39,9 @@
     (function(){
       var key='preditor_analytics_optout',button=document.getElementById('optout'),status=document.getElementById('status');
       function update(){var off=localStorage.getItem(key)==='1';button.textContent=off?'Ativar medição neste navegador':'Desativar medição neste navegador';status.textContent=off?'Medição desativada neste navegador.':'';}
-      button.addEventListener('click',function(){if(localStorage.getItem(key)==='1'){localStorage.removeItem(key);}else{localStorage.setItem(key,'1');localStorage.removeItem('preditor_visitor_id_v1');localStorage.removeItem('preditor_test_mode_token_v1');sessionStorage.removeItem('preditor_session_id_v1');sessionStorage.removeItem('preditor_session_started_v1');sessionStorage.removeItem('preditor_session_last_seen_v1');}update();});update();
+      button.addEventListener('click',function(){if(localStorage.getItem(key)==='1'){localStorage.removeItem(key);}else{localStorage.setItem(key,'1');localStorage.removeItem('preditor_visitor_id_v1');localStorage.removeItem('preditor_test_mode_token_v1');sessionStorage.removeItem('preditor_session_id_v1');sessionStorage.removeItem('preditor_session_started_v1');sessionStorage.removeItem('preditor_session_last_seen_v1');sessionStorage.removeItem('preditor_session_collector_version_v1');}update();});update();
     })();
   </script>
-  <script src="telemetry.js?v=2026-09-10.2" defer></script>
+  <script src="telemetry.js?v=2026-09-10.4" defer></script>
 </body>
 </html>

@@ -3,12 +3,13 @@
 
   const PRODUCTION_HOST = 'preditor-fcu-v2.vercel.app';
   const ENDPOINT = 'https://preditor-fcu-master.vercel.app/api/collect';
-  const TELEMETRY_VERSION = '2026-09-10.2';
+  const TELEMETRY_VERSION = '2026-09-10.4';
   const VISITOR_KEY = 'preditor_visitor_id_v1';
   const SESSION_KEY = 'preditor_session_id_v1';
   const SESSION_SENT_KEY = 'preditor_session_started_v1';
   const SESSION_LAST_KEY = 'preditor_session_last_seen_v1';
   const SESSION_AREAS_KEY = 'preditor_selected_areas_v1';
+  const SESSION_VERSION_KEY = 'preditor_session_collector_version_v1';
   const TEST_TOKEN_KEY = 'preditor_test_mode_token_v1';
   const OPTOUT_KEY = 'preditor_analytics_optout';
   const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
@@ -46,6 +47,7 @@
     storageRemove(window.sessionStorage, SESSION_SENT_KEY);
     storageRemove(window.sessionStorage, SESSION_LAST_KEY);
     storageRemove(window.sessionStorage, SESSION_AREAS_KEY);
+    storageRemove(window.sessionStorage, SESSION_VERSION_KEY);
   }
 
   function configureTestMode() {
@@ -67,6 +69,12 @@
 
   let testToken = configureTestMode();
   if (storageGet(window.localStorage, OPTOUT_KEY) === '1') return;
+
+  const storedSessionId = storageGet(window.sessionStorage, SESSION_KEY);
+  const storedSessionVersion = storageGet(window.sessionStorage, SESSION_VERSION_KEY);
+  if (storedSessionId && storedSessionVersion !== TELEMETRY_VERSION) {
+    resetSession();
+  }
 
   const previousSessionActivity = Number(storageGet(window.sessionStorage, SESSION_LAST_KEY));
   if (!Number.isFinite(previousSessionActivity)
@@ -92,6 +100,7 @@
 
   const visitorId = storedId(window.localStorage, VISITOR_KEY, 'visitor');
   let sessionId = storedId(window.sessionStorage, SESSION_KEY, 'session');
+  storageSet(window.sessionStorage, SESSION_VERSION_KEY, TELEMETRY_VERSION);
   let lastActivity = Date.now();
   let lastHeartbeat = Date.now();
   let lastSessionWrite = 0;
@@ -208,6 +217,7 @@
   function rotateSession(reason) {
     resetSession();
     sessionId = storedId(window.sessionStorage, SESSION_KEY, 'session');
+    storageSet(window.sessionStorage, SESSION_VERSION_KEY, TELEMETRY_VERSION);
     lastSessionWrite = 0;
     lastArea = '';
     selectedAreas.clear();
@@ -391,12 +401,9 @@
 
   document.addEventListener('click', function (event) {
     const rawTarget = event.target;
-    const target = rawTarget && rawTarget.closest ? rawTarget.closest('a,button,[role="button"],img[data-zoom]') : null;
-    if (!target) return;
-    const href = target.tagName === 'A' ? String(target.getAttribute('href') || target.href || '') : '';
-    const label = String(target.getAttribute('aria-label') || target.title || target.textContent || target.alt || '').trim().slice(0, 100);
-
-    const searchResult = target.closest('#map-search-results .map-search-result, #search-results .chip');
+    const searchResult = rawTarget && rawTarget.closest
+      ? rawTarget.closest('#map-search-results .map-search-result, #search-results .chip')
+      : null;
     if (searchResult) {
       const cellId = cellFromText(searchResult.dataset.id || searchResult.textContent);
       pendingCellSource = cellId ? 'busca' : '';
@@ -405,6 +412,10 @@
       }, { cellId: cellId });
       return;
     }
+    const target = rawTarget && rawTarget.closest ? rawTarget.closest('a,button,[role="button"],img[data-zoom]') : null;
+    if (!target) return;
+    const href = target.tagName === 'A' ? String(target.getAttribute('href') || target.href || '') : '';
+    const label = String(target.getAttribute('aria-label') || target.title || target.textContent || target.alt || '').trim().slice(0, 100);
     if (target.matches('.legend-layer-toggle')) {
       send('layer_toggle', {
         layer: String(target.dataset.layer || label || 'camada').slice(0, 100),
