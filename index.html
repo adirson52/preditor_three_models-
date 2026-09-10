@@ -4619,6 +4619,9 @@ window.addEventListener('unhandledrejection', function(event) {
       position => {
         setLocationButtonLoading(false);
         showUserLocation(position);
+        if (window.PreditorTelemetry && typeof window.PreditorTelemetry.captureLocation === 'function') {
+          window.PreditorTelemetry.captureLocation(position, 'map_control');
+        }
       },
       error => {
         setLocationButtonLoading(false);
@@ -7188,7 +7191,7 @@ window.addEventListener('unhandledrejection', function(event) {
 </script>
 
 <script src="feedback.js?v=2026-09-10.2" defer></script>
-<script src="telemetry.js?v=2026-09-10.4" defer></script>
+<script src="telemetry.js?v=2026-09-10.5" defer></script>
 </body>
 
 </html>

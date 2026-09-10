@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Medição de uso · Preditor FCU</title>
   <style>
-    :root{color-scheme:light;--ink:#07324d;--muted:#617989;--line:#d8e5eb;--teal:#007f9f}*{box-sizing:border-box}body{margin:0;background:#f3f7f9;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}.wrap{width:min(780px,calc(100% - 32px));margin:48px auto}.card{padding:clamp(24px,5vw,52px);background:white;border:1px solid var(--line);border-radius:20px;box-shadow:0 18px 50px rgba(13,58,80,.09)}a{color:var(--teal)}h1{font-size:clamp(30px,5vw,44px);letter-spacing:-.035em;margin:0 0 12px}h2{font-size:19px;margin:30px 0 10px}p,li{color:var(--muted);line-height:1.7}.back{display:inline-block;margin-bottom:24px;text-decoration:none;font-weight:700}button{margin-top:12px;padding:12px 18px;border:0;border-radius:10px;background:var(--ink);color:white;font:inherit;font-weight:750;cursor:pointer}.status{margin-top:12px;font-weight:700;color:var(--teal)}
+    :root{color-scheme:light;--ink:#07324d;--muted:#617989;--line:#d8e5eb;--teal:#007f9f}*{box-sizing:border-box}body{margin:0;background:#f3f7f9;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}.wrap{width:min(780px,calc(100% - 32px));margin:48px auto}.card{padding:clamp(24px,5vw,52px);background:white;border:1px solid var(--line);border-radius:20px;box-shadow:0 18px 50px rgba(13,58,80,.09)}a{color:var(--teal)}h1{font-size:clamp(30px,5vw,44px);letter-spacing:-.035em;margin:0 0 12px}h2{font-size:19px;margin:30px 0 10px}p,li{color:var(--muted);line-height:1.7}.back{display:inline-block;margin-bottom:24px;text-decoration:none;font-weight:700}button{margin-top:12px;padding:12px 18px;border:0;border-radius:10px;background:var(--ink);color:white;font:inherit;font-weight:750;cursor:pointer}.button-row{display:flex;flex-wrap:wrap;gap:9px}.button-row .secondary{border:1px solid var(--line);background:#fff;color:var(--ink)}.status{margin-top:12px;font-weight:700;color:var(--teal)}
   </style>
 </head>
 <body>
@@ -18,12 +18,20 @@
       <li>sessão e identificador aleatório do navegador;</li>
       <li>país, região e cidade aproximados derivados da rede;</li>
       <li>tipo de aparelho, navegador, sistema, idioma, fuso e resolução;</li>
+      <li>uma posição aproximada do aparelho por sessão, somente quando autorizada;</li>
       <li>páginas, áreas de estudo, camadas, células e recursos consultados;</li>
       <li>sequência e horário das interações para compor a jornada de cada sessão;</li>
       <li>tempo estimado de atividade com a página visível.</li>
     </ul>
     <h2>O que não é registrado</h2>
-    <p>Não são armazenados nome, e-mail, texto digitado nas buscas, localização GPS ou endereço IP original. O IP é transformado no servidor em um código pseudonimizado, usado apenas para estimar redes recorrentes.</p>
+    <p>Não são armazenados nome, e-mail, texto digitado nas buscas nem endereço IP original. O IP é transformado no servidor em um código pseudonimizado, usado apenas para estimar redes recorrentes.</p>
+    <h2>Localização do aparelho</h2>
+    <p>A autorização é opcional. Quando aceita, o navegador fornece uma posição que é arredondada antes do registro, com precisão mínima indicada de 150 metros. A consulta ocorre uma vez em cada nova sessão para acompanhar mudanças de local. Se a autorização não for concedida, permanecem apenas país, região ou município aproximados derivados da rede, quando disponíveis.</p>
+    <div class="button-row">
+      <button id="location-on" type="button">Permitir localização</button>
+      <button id="location-off" class="secondary" type="button">Não usar localização</button>
+    </div>
+    <p id="location-status" class="status" aria-live="polite"></p>
     <h2>Mensagens voluntárias</h2>
     <p>O envio de mensagens é voluntário e separado da medição automática descrita acima. Se você escolher enviar uma mensagem, serão registrados o nome, o e-mail, o texto da mensagem e o contexto da área ou célula exibida. Essas informações serão usadas somente para tratar e responder à mensagem.</p>
     <h2>Limites da medição</h2>
@@ -37,11 +45,20 @@
   </article></main>
   <script>
     (function(){
-      var key='preditor_analytics_optout',button=document.getElementById('optout'),status=document.getElementById('status');
-      function update(){var off=localStorage.getItem(key)==='1';button.textContent=off?'Ativar medição neste navegador':'Desativar medição neste navegador';status.textContent=off?'Medição desativada neste navegador.':'';}
-      button.addEventListener('click',function(){if(localStorage.getItem(key)==='1'){localStorage.removeItem(key);}else{localStorage.setItem(key,'1');localStorage.removeItem('preditor_visitor_id_v1');localStorage.removeItem('preditor_test_mode_token_v1');sessionStorage.removeItem('preditor_session_id_v1');sessionStorage.removeItem('preditor_session_started_v1');sessionStorage.removeItem('preditor_session_last_seen_v1');sessionStorage.removeItem('preditor_session_collector_version_v1');}update();});update();
+      var key='preditor_analytics_optout',locationKey='preditor_location_preference_v1',button=document.getElementById('optout'),status=document.getElementById('status'),locationStatus=document.getElementById('location-status');
+      function safeGet(name){try{return localStorage.getItem(name)||'';}catch(_){try{var prefix=encodeURIComponent(name)+'=',item=String(document.cookie||'').split(';').map(function(value){return value.trim();}).find(function(value){return value.indexOf(prefix)===0;});return item?decodeURIComponent(item.slice(prefix.length)):'';}catch(__){return '';}}}
+      function safeSet(name,value){try{localStorage.setItem(name,value);}catch(_){}try{document.cookie=encodeURIComponent(name)+'='+encodeURIComponent(value)+'; Path=/; Max-Age=31536000; SameSite=Lax; Secure';}catch(_){}}
+      function safeRemove(name){try{localStorage.removeItem(name);}catch(_){}try{document.cookie=encodeURIComponent(name)+'=; Path=/; Max-Age=0; SameSite=Lax; Secure';}catch(_){}}
+      function telemetry(){return window.PreditorTelemetry||null;}
+      function isOff(){var api=telemetry();return api?api.measurementEnabled()===false:safeGet(key)==='1';}
+      function locationPreference(){var api=telemetry();return api?api.locationPreference():safeGet(locationKey)||'unset';}
+      function update(){var off=isOff(),preference=locationPreference();button.textContent=off?'Ativar medição neste navegador':'Desativar medição neste navegador';status.textContent=off?'Medição desativada neste navegador.':'';locationStatus.textContent=off?'A localização do aparelho não será consultada enquanto a medição estiver desativada.':preference==='accepted'?'Localização autorizada para as próximas sessões.':preference==='declined'?'Localização do aparelho não utilizada.':'Localização do aparelho ainda não definida.';}
+      button.addEventListener('click',function(){var enable=isOff(),api=telemetry();if(api){api.setMeasurementEnabled(enable);}else if(enable){safeRemove(key);}else{safeSet(key,'1');safeRemove(locationKey);}window.location.reload();});
+      document.getElementById('location-on').addEventListener('click',function(){if(isOff()){locationStatus.textContent='Ative a medição antes de permitir a localização.';return;}var api=telemetry();if(api){api.requestLocation();}else{safeSet(locationKey,'accepted');}update();});
+      document.getElementById('location-off').addEventListener('click',function(){var api=telemetry();if(api){api.declineLocation();}else{safeSet(locationKey,'declined');}update();});
+      window.addEventListener('preditor:location-status',update);update();
     })();
   </script>
-  <script src="telemetry.js?v=2026-09-10.4" defer></script>
+  <script src="telemetry.js?v=2026-09-10.5" defer></script>
 </body>
 </html>
