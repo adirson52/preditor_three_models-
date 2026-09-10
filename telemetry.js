@@ -3,8 +3,8 @@
 
   const PRODUCTION_HOST = 'preditor-fcu-v2.vercel.app';
   const ENDPOINT = 'https://preditor-fcu-master.vercel.app/api/collect';
-  const TELEMETRY_VERSION = '2026-09-10.6';
-  const PREVIOUS_COMPATIBLE_VERSION = '2026-09-10.5';
+  const TELEMETRY_VERSION = '2026-09-10.7';
+  const PREVIOUS_COMPATIBLE_VERSION = '2026-09-10.6';
   const VISITOR_KEY = 'preditor_visitor_id_v1';
   const SESSION_KEY = 'preditor_session_id_v1';
   const SESSION_SENT_KEY = 'preditor_session_started_v1';
@@ -404,7 +404,7 @@
     const banner = document.createElement('aside');
     banner.id = LOCATION_BANNER_ID;
     banner.className = 'preditor-location-consent';
-    banner.setAttribute('aria-label', locationText('Localização do acesso', 'Access location'));
+    banner.setAttribute('aria-label', locationText('Preferências de cookies', 'Cookie preferences'));
     const copy = document.createElement('div');
     copy.className = 'preditor-location-copy';
     const title = document.createElement('strong');
@@ -419,7 +419,7 @@
     actions.className = 'preditor-location-actions';
     const decline = document.createElement('button');
     decline.type = 'button';
-    decline.textContent = locationText('Continuar sem localização', 'Continue without location');
+    decline.textContent = locationText('Permitir o básico', 'Use essential only');
     decline.addEventListener('click', function () {
       preferenceSet(LOCATION_PREFERENCE_KEY, 'declined');
       removeLocationBanner();
@@ -428,7 +428,7 @@
     const allow = document.createElement('button');
     allow.type = 'button';
     allow.className = 'preditor-location-allow';
-    allow.textContent = locationText('Permitir localização', 'Allow location');
+    allow.textContent = locationText('Permitir cookies', 'Allow cookies');
     allow.addEventListener('click', function () {
       allow.disabled = true;
       decline.disabled = true;
