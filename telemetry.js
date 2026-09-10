@@ -3,6 +3,7 @@
 
   const PRODUCTION_HOST = 'preditor-fcu-v2.vercel.app';
   const ENDPOINT = 'https://preditor-fcu-master.vercel.app/api/collect';
+  const TELEMETRY_VERSION = '2026-09-10.2';
   const VISITOR_KEY = 'preditor_visitor_id_v1';
   const SESSION_KEY = 'preditor_session_id_v1';
   const SESSION_SENT_KEY = 'preditor_session_started_v1';
@@ -171,7 +172,7 @@
       screen_width: Number(window.screen && window.screen.width) || 0,
       screen_height: Number(window.screen && window.screen.height) || 0,
       active_seconds: Math.max(0, Math.min(60, Number(settings.activeSeconds) || 0)),
-      properties: properties || {},
+      properties: Object.assign({}, properties || {}, { telemetry_version: TELEMETRY_VERSION }),
       test_token: testToken
     };
   }
@@ -466,6 +467,11 @@
     } else if (/menu|sidebar|recolher|expandir/i.test(label)
       || target.id === 'desktop-sidebar-toggle' || target.id === 'hamburger-btn') {
       send('sidebar_toggle', { control: label || target.id });
+    } else if (event.isTrusted) {
+      send('ui_click', {
+        control: label || String(target.id || 'controle').slice(0, 100),
+        element: String(target.tagName || '').toLowerCase().slice(0, 30)
+      }, { cellId: currentCell() });
     }
   }, true);
 
