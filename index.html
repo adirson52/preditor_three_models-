@@ -1244,6 +1244,7 @@ window.addEventListener('unhandledrejection', function(event) {
   }
 </style>
 
+    <link rel="stylesheet" href="feedback.css?v=2026-09-10.1">
 </head>
 
 <body>
@@ -1278,8 +1279,9 @@ window.addEventListener('unhandledrejection', function(event) {
         <div id="nav-container">
             <!-- Buttons injected here -->
         </div>
-        <div style="margin-top:auto; font-size:0.75rem; color:#aaa; padding-top:1rem;">
-            v2.0 · <a href="privacidade.html" style="color:inherit">Medição de uso</a>
+        <div class="sidebar-feedback-footer">
+            <button class="sidebar-feedback-trigger" type="button" data-feedback-source="sidebar">Enviar mensagem</button>
+            <div class="sidebar-feedback-version">v2.0 · <a href="privacidade.html" style="color:inherit">Medição de uso</a></div>
         </div>
     </div>
 
@@ -3668,10 +3670,12 @@ window.addEventListener('unhandledrejection', function(event) {
     const areaId = encodeURIComponent(String(sampleArea));
     const view3d = `3d.html?lat=${latText}&lng=${lngText}&zoom=17&cell=${cellId}&area=${areaId}`;
     const view3dLabel = mapLang() === 'en' ? 'View in 3D' : 'Ver em 3D';
+    const feedbackLabel = mapLang() === 'en' ? 'Send a message' : 'Enviar mensagem';
     return `<div class="map-open-links" style="margin-top:6px;font-size:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">` +
       `<a href="${google}" target="_blank" rel="noopener">${mapText('google')}</a>` +
       `<a href="${street}" target="_blank" rel="noopener">${mapText('street')}</a>` +
       `<a href="${view3d}" target="_blank" rel="noopener">${view3dLabel}</a>` +
+      `<button type="button" class="feedback-trigger--cell" data-feedback-source="cell" data-feedback-cell-id="${escapeHtml(String(sample.id || ''))}" data-feedback-area-slug="${escapeHtml(String(sampleArea || ''))}">${feedbackLabel}</button>` +
       `</div>`;
   }
 
@@ -7183,6 +7187,7 @@ window.addEventListener('unhandledrejection', function(event) {
 })();
 </script>
 
+<script src="feedback.js?v=2026-09-10.2" defer></script>
 <script src="telemetry.js?v=2026-09-10.2" defer></script>
 </body>
 
